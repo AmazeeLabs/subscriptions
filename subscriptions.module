@@ -190,7 +190,7 @@ function subscriptions_page () {
         break;
 	  // removes a subscription from the subscriptions_nodes table	
 	  case "del":
-        db_query("DELETE FROM {subscriptions} WHERE sid = $sid AND uid = $uid");
+        db_query("DELETE FROM {subscriptions} WHERE sid = $sid AND uid = $uid AND stype = '$stype'");
   		$message = t("<p>Your subscription was deactivated.<p/>");
 		if(!(arg(3) == "taxa" && is_null(arg(5)))) {
                   $message .= l(t("Return to the thread"), "node/view/$nid") . " | ";
