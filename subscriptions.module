@@ -53,7 +53,7 @@ function subscriptions_settings() {
 /**
  * Implementation of hook_user().
  */
-function subscriptions_user($type, $edit, &$user, $category) {
+function subscriptions_user($type, $edit, &$user, $category = NULL) {
   switch ($type) {
     case 'form':
       if (user_access('maintain subscriptions') && $category == 'account') {
