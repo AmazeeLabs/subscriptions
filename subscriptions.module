@@ -107,7 +107,6 @@ function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
 // get email vars
 function subscriptions_mailvars ($sid, $ssid, $uid, $stype, $strsent) {
   global $base_url;
-  watchdog("special", t("subscription notification step 2: mailvars are $sid, $ssid, $uid, and $stype."));
   $from = variable_get("site_mail", ini_get("sendmail_from"));
   // if comment insertion, get vars
   if ($stype == "node") {
@@ -189,7 +188,6 @@ function subscriptions_nodeapi (&$node, $op, $arg = 0) {
   $nid = $node->nid;
   switch ($op) {
     case "insert":
-    case "update":
       if ($node->status) {
 	    foreach ($node->taxonomy as $tid){
           $strsent = $strsent . subscriptions_mailvars ($tid, $nid, $user->uid, "taxa", $strsent);
