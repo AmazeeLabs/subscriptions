@@ -132,7 +132,7 @@ function subscriptions_nodeapi (&$node, $op, $arg = 0){
 function subscriptions_link($type, $node = 0, $main) {
   if(user_access("subscribe to nodes")){
     if ($type == "system") {
-      menu("subscriptions/0" . $user->uid, t("my subscriptions"), "subscriptions_list", 0);
+      menu("subscriptions", t("my subscriptions"), "subscriptions_page", 0);
     }
     if ($type == "node"){ 
       $links[] =l(t("subscriptions"), "subscriptions/$node->nid", array("title" => t("Change your subscription status for this thread.")));
@@ -181,30 +181,28 @@ function subscriptions_page () {
 	  // inserts a new subscription into the subscriptions_nodes table
       case "add":
         db_query("INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES ($sid , $uid, \"$stype\")");
-  		$message = "<p>Your subscription was activated.<p/>";
-  		if(!(arg(3) == "taxa" && is_null(arg(5))))
-		{$message .= "<a href=\"?q=node/view/$nid\">".t("Return to the thread</a> | ");}
-		$message .= t("<a href=\"?q=subscriptions/0\">Return to the subscriptions</a><br />");
-  		theme("header");
-  		theme("box", t("Subscription Activated"), $message ,t("An error has occurred"));
-  		theme("footer");
+  		$message = t("<p>Your subscription was activated.<p/>");
+  		if(!(arg(3) == "taxa" && is_null(arg(5)))) {
+                  $message .= l(t("Return to the thread"), "node/view/$nid") . " | ";
+                }
+		$message .= l(t("Return to the subscriptions"), "subscriptions") . "<br />";
+  		print theme("page", $message, t("Subscription Activated"));
         break;
 	  // removes a subscription from the subscriptions_nodes table	
 	  case "del":
         db_query("DELETE FROM {subscriptions} WHERE sid = $sid AND uid = $uid");
   		$message = t("<p>Your subscription was deactivated.<p/>");
-		if(!(arg(3) == "taxa" && is_null(arg(5))))
-		{$message .= "<a href=\"?q=node/view/$nid\">".t("Return to the thread</a> | ");}
-  		$message .= t("<a href=\"?q=subscriptions/0\">Return to the subscriptions</a><br />");
-  		theme("header");
-  		theme("box", t("Subscription Deactivated"), $message ,t("An error has occurred"));
-  		theme("footer");
+		if(!(arg(3) == "taxa" && is_null(arg(5)))) {
+                  $message .= l(t("Return to the thread"), "node/view/$nid") . " | ";
+                }
+                $message .= l(t("Return to the subscriptions"), "subscriptions") . "<br />";
+                print theme("page", $message, t("Subscription Deactivated"));
         break;
 	  // determines the user's subscription status and displays the right option to change it	
 	  default:
 	    // get all subscriptions and write to table rows
 	    $subrows = "";
-		$queryn = "SELECT td.tid, td.name, tn.nid, n.title FROM";
+		$queryn = "SELECT td.tid, td.name, n.nid, n.title FROM";
 		$queryn .= "(({subscriptions} s LEFT JOIN {node} n  ON n.nid = s.sid) ";
 		$queryn .= "LEFT JOIN {term_node} tn ON tn.nid = s.sid) ";
 		$queryn .= "LEFT JOIN {term_data} td ON td.tid = tn.tid ";
@@ -222,7 +220,7 @@ function subscriptions_page () {
           	  $tsubscribed = true;
 			  $tsubtitle = $subscriptions->name;
 			}
-  		    $subrows .= "<tr><td>Category: ".$subscriptions->name."</td><td>[<a href=\"?q=subscriptions/del/taxa/".$subscriptions->tid."\">Unsubscribe</a>]</td></tr>\n";
+  		    $subrows .= t("<tr><td>Category: ").l($subscriptions->name, "taxonomy/page/or/$subscriptions->tid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/taxa/".$subscriptions->tid)."]</td></tr>\n";
           }		 
 
 		//build node rows
@@ -231,35 +229,35 @@ function subscriptions_page () {
           	  $nsubscribed = true;
 			  $nsubtitle = $subscriptions->title;
 			}
-			$subrows .= "<tr><td>Thread: ".$subscriptions->title."</td><td>[<a href=\"?q=subscriptions/del/node/".$subscriptions->nid."\">Unsubscribe</a>]</td></tr>\n";
+			$subrows .= t("<tr><td>Thread: ").l($subscriptions->title, "node/view/$subscriptions->nid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/node/".$subscriptions->nid)."]</td></tr>\n";
           }	 
 
 		// write out node specific message	
 		$message = "<p><b>$nsubtitle</b></p>";
-		$title = "Subscription status";
+		$title = t("Subscription status");
 		
 		// if subcribed to taxonomy
 		if ($tsubscribed) {
-		  $message .= "<div class=\"description\">$tname</div>";
-		  $message .= "<p>You are already subscribed to this category.  $tlinku</p>";
+		  $message .= "<div class=\"description\">".l($tname, "taxonomy/page/or/$tid")."</div>";
+		  $message .= t("<p>You are already subscribed to this category.  ").$tlinku."</p>";
 		} else 
 		{
   		  if ( $nid == 0) {
-  		  	$title = "Your Subscriptions";
+  		  	$title = t("Your Subscriptions");
 			$message = "";
   		  }  else 
 		  if ($tid != 0) {
 		    {		
-		      $message .= "<div class=\"description\">$tname</div>";  
-		      $message .= "<p>You are not currently subscribed to this category.  $tlinks</p>";					
+		      $message .= "<div class=\"description\">".l($tname, "taxonomy/page/or/$tid")."</div>";  
+		      $message .= t("<p>You are not currently subscribed to this category.  ").$tlinks."</p>";					
 		    }	
 		  }	
 		}		
 		
 		// if subscribed to node
 		if ($nsubscribed) {;
-		  $message .= "<div class=\"description\">$ntitle</div>";
-		  $message .= "<p>You are already subscribed to this thread.  $nlinku</p>";
+		  $message .= "<div class=\"description\">".l($ntitle, "node/view/$nid")."</div>";
+		  $message .= t("<p>You are already subscribed to this thread.  ").$nlinku."</p>";
 		} else 
 		{
   		  if ( $nid == 0) {
@@ -267,35 +265,33 @@ function subscriptions_page () {
   		  } else
 		  if(! is_null($tid)) 
 		  {		
-		    $message .= "<div class=\"description\">$ntitle</div>";  
-		    $message .= "<p>You are not currently subscribed to this thread.  $nlinks</p>";				
+		    $message .= "<div class=\"description\">".l($ntitle, "node/view/$nid")."</div>";  
+		    $message .= t("<p>You are not currently subscribed to this thread.  ").$nlinks."</p>";				
 		  }		
 		}
 		
 		// concatenate table to end of node specific message
 		// if no subscriptions, say so, else complete table
-		if ( arg(1) == 0) {
-  		  	$title = "Your Subscriptions";
+		if (!arg(1)) {
+  		  	$title = t("Your Subscriptions");
 			$message = "";
 		  } else
 		  {
-		    $message .= "<p><hr></p>";
-		    $message .= "<p class=\"nodetitle\">Your Subscriptions</p>";
+		    $message .= "<p><hr /></p>";
+		    $message .= t("<p class=\"nodetitle\">Your Subscriptions</p>");
 		  }    	
 		if (strlen($subrows) == 0) {
-		  $message .= "<p>You are not currently subscribed to any active threads or categories.</p>";
+		  $message .= t("<p>You are not currently subscribed to any active threads or categories.</p>");
 		} else
 		{ 
 		  $message .= "<p align=\"center\"><table>" . $subrows . "</table></p>";
 		}
 		//$message .= $subrows;
-  		theme("header");
-  		theme("box", t($title), $message ,"Not available");
-  		theme("footer");
+                print theme("page", $message, $title);
         break;
 	}
   } else {
-    print message_access();
+    print theme("page", message_access(), t("Access Denied"));
   }
 }
 

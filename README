@@ -38,7 +38,8 @@ Credits / Contact
 
 The original author of this module is Dan Ziemecki, who can be reached at
 c0c0c0@geeknetwork.org.  Other contributors are not aware that I stole their 
-code.
+code. Tom Dobes provided a couple of additional fixes and upgraded the
+module to function with Drupal post-4.3 CVS.
 
 ToDo
 ------------------------------------------------------------------------------
@@ -50,6 +51,15 @@ this, mailqueue, is currently in development.
 
 Change Log
 ------------------------------------------------------------------------------
+12/4/2003
+---------
+- updated menu callback for latest CVS
+- changed subscriptions list URL
+- replaced hard-coded links with l()'s
+- added many more t()'s
+- fixed a couple typos
+- made node/term names display as links
+
 11/16/2003
 ---------
 - improved support for translations.
