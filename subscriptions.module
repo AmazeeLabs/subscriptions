@@ -30,7 +30,7 @@ function subscriptions_settings() {
 function subscriptions_user($type, $edit, &$user) {
   switch ($type) {
     case "edit_form":
-      return form_item(t("Auto Subscribe"), form_checkbox(t("Automatically subscribe to threads to which you post."), "subscriptions_auto", 1, $user->subscriptions_auto, t("If you check this box, you'll be automatically subscribed to any thread you create or to which you post a comment.")));
+      return array(t('Subscription settings') => form_item(t("Auto Subscribe"), form_checkbox(t("Automatically subscribe threads to which you post."), "subscriptions_auto", 1, $user->subscriptions_auto, t("Checking this box allows you to be automatically subscribed to any thread you create or post a comment to."))));
       return $output;
       break;
   }
