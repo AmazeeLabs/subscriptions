@@ -437,7 +437,7 @@ function subscriptions_page() {
         $message .= t('<p>No threads or categories are currently subscribed.</p>');
       }
       else {
-        $message .= theme('table', $headers, $subrows);
+        $message .= theme('table', $headers, $subrows, array('id' => 'subscriptions'));
       }
       print theme('page', $message, t('Subscriptions Summary'));
       break;
@@ -476,7 +476,7 @@ function subscriptions_page() {
         $message .= t('<p>You are not currently subscribed to any active threads or categories.</p>');
       }
       else {
-        $message .= theme('table', $headers, $subrows);
+        $message .= theme('table', $headers, $subrows, array('id' => 'subscriptions'));
       }
       print theme('page', $message);
       break;
