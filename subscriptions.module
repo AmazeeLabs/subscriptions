@@ -211,8 +211,8 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
     $subj = t('new blog for ') . db_result($result);
     $result = db_query('SELECT u.uid, u.name, u.mail, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'blog\'', $sid);
     $strtype = 'blog';
-    $nid = $sid;
-    $cid = "comment-$ssid";
+    $nid = $ssid;
+    $cid = NULL;
   } 
   // loop through subscribers and call mail function
   while ($subscriptions = db_fetch_object($result)) {
