@@ -1,4 +1,4 @@
-subscriptions.module README.txt
+subscriptions.module ReadMe
 ==============================================================================
 
 The subscriptions module allows users to subscribe to nodes or taxonomies.  A
@@ -11,6 +11,7 @@ view all current subscriptions and make modifications.
 Because this module causes the post insert\update to pause while all subscribers
 are e-mailed, it may not be practical for some large sites.  
 
+
 Installation
 ------------------------------------------------------------------------------
 
@@ -19,6 +20,7 @@ Installation
     common method is:
         mysql -u username -ppassword drupal < subscriptions.mysql
   - Copy subscriptions.module to modules/.
+
 
 Configuration
 ------------------------------------------------------------------------------
@@ -32,6 +34,7 @@ Configuration
  NOTE:  This module requires e-mail addresses, so anonymous users don't make
  much sense.  Any user without an e-mail address will generate a log error.
 
+
 Credits / Contact
 ------------------------------------------------------------------------------
 
@@ -42,6 +45,11 @@ module to function with Drupal post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+
+11/23/2004 (tom dobes)
+---------
+- add pgsql support
+
 8/13/2004 (tom dobes)
 ---------
 - update for new-style taxonomy URL's
