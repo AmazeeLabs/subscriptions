@@ -293,7 +293,6 @@ function subscriptions_page () {
           foreach ($tree as $term) {
             $subrows .= t("<tr><td>Category: ") . l($term->name, "taxonomy/page/or/$term->tid") . "</td><td>[" . subscriptions_gen_taxa_links($term->tid, $taxa) . "]</td></tr>\n";
           } 
-          $i++;
         }
 
         if (strlen($subrows) == 0) {
