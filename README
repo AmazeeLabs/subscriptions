@@ -1,15 +1,16 @@
 subscriptions.module README
 ==============================================================================
 
-The subscriptions module allows users to subscribe to nodes.  A subscribed 
-user will be emailed whenever a comment is updated or added to a node.  When 
-this module is enabled, all nodes will display a new link, "subscriptions", 
-which takes users to a page that will allow them to subscribe or unsubscribe 
-to the node in question.  This page also allows the user to view all current
-subscriptions
+The subscriptions module allows users to subscribe to nodes or taxonomies.  A 
+subscribed user will be emailed whenever a comment is updated or added to a 
+node.  When this module is enabled, all nodes will display a new link, 
+"subscriptions", which takes users to a page that will allow them to subscribe 
+or unsubscribe to the node in question.  This page also allows the user to 
+view all current subscriptions.
 
 Because this module causes the comment insert to pause while all subscribers 
-are emailed, it may not be practical for large sites.  
+are emailed, it may not be practical for large sites.  It will be compatable 
+with mailqueue.module when that module is avaiulable.
 
 Installation
 ------------------------------------------------------------------------------
@@ -23,32 +24,38 @@ Installation
   - Grant permissions to the groups you wish to be able to subscribe.  
 subscribe to nodes
 
-
     NOTE:  This module requires email addresses, so anonymous users don't make
  much sense.
 
 Configuration
 ------------------------------------------------------------------------------
 
-This module needs no configuration, other than the permissions mentioned above.
+This module needs no configuration, other than the permissions mentioned above,
+at this time.
 
 Credits / Contact
 ------------------------------------------------------------------------------
 
 The original author of this module is Dan Ziemecki, who can be reached at
-c0c0c0@geeknetwork.org.
+c0c0c0@geeknetwork.org.  Other contributors are not aware that I stole their 
+code.
 
 ToDo
 ------------------------------------------------------------------------------
 
 One proposed improvement would have the module insert mail to be sent into a 
 table, which would then be cleared out by cronjob.  This table, however, and 
-its controlling module, does not currently exist.  Another proposed 
-improvement would extend this functionality to taxonomies.  Not sure how that 
-would work, so that will have to be someone else.
+its controlling module, does not currently exist.  The module that supports 
+this, mailqueue, is currently in development.
 
 Change Log
 ------------------------------------------------------------------------------
+11/16/2003
+---------
+- improved support for translations.
+- added the ability to subscribe to taxonomies
+- added "my subscriptions" link to account admin block
+
 11/10/2003
 ---------
 - added comment specific anchors to email links
