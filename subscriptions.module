@@ -171,10 +171,10 @@ function subscriptions_page () {
   
   // node links
   $nlinks =l(t("[Subscribe]"), "subscriptions/add/node/$nid", array("title" => t("Subscribe to this thread.")));
-  $nlinku =l(t("[Unsubscribe]"), "subscriptions/del/node/$nid", array("title" => t("Unsubscribe to this thread.")));
+  $nlinku =l(t("[Unsubscribe]"), "subscriptions/del/node/$nid", array("title" => t("Unsubscribe from this thread.")));
   // taxa links
   $tlinks =l(t("[Subscribe]"), "subscriptions/add/taxa/$tid/$nid", array("title" => t("Subscribe to this category.")));
-  $tlinku =l(t("[Unsubscribe]"), "subscriptions/del/taxa/$tid/$nid", array("title" => t("Unsubscribe to this category.")));
+  $tlinku =l(t("[Unsubscribe]"), "subscriptions/del/taxa/$tid/$nid", array("title" => t("Unsubscribe from this category.")));
   
   if (user_access("subscribe to nodes")){ 
     switch ($op) {
@@ -220,7 +220,7 @@ function subscriptions_page () {
           	  $tsubscribed = true;
 			  $tsubtitle = $subscriptions->name;
 			}
-  		    $subrows .= t("<tr><td>Category: ").l($subscriptions->name, "taxonomy/page/or/$subscriptions->tid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/taxa/".$subscriptions->tid)."]</td></tr>\n";
+  		    $subrows .= t("<tr><td>Category: ").l($subscriptions->name, "taxonomy/page/or/$subscriptions->tid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/taxa/".$subscriptions->tid, array("title" => t("Unsubscribe from this category.")))."]</td></tr>\n";
           }		 
 
 		//build node rows
@@ -229,7 +229,7 @@ function subscriptions_page () {
           	  $nsubscribed = true;
 			  $nsubtitle = $subscriptions->title;
 			}
-			$subrows .= t("<tr><td>Thread: ").l($subscriptions->title, "node/view/$subscriptions->nid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/node/".$subscriptions->nid)."]</td></tr>\n";
+			$subrows .= t("<tr><td>Thread: ").l($subscriptions->title, "node/view/$subscriptions->nid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/node/".$subscriptions->nid, array("title" => t("Unsubscribe from this thread.")))."]</td></tr>\n";
           }	 
 
 		// write out node specific message	
