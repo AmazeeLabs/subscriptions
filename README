@@ -42,6 +42,10 @@ module to function with Drupal post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+8/13/2004 (tom dobes)
+---------
+- update for new-style taxonomy URL's
+
 8/5/2004 (tom dobes)
 --------
 - update for new _menu hook (fixes bug 8693)

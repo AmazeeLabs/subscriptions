@@ -425,7 +425,7 @@ function subscriptions_page() {
       foreach ($vocabularies as $vocab) {
         $tree = taxonomy_get_tree($vocab->vid);
         foreach ($tree as $term) {
-          $subrowst[] = array(t('category'), $vocab->name .': '. l($term->name, 'taxonomy/page/or/'. $term->tid), is_null($taxa[$term->tid]) ? '0' : $taxa[$term->tid]);
+          $subrowst[] = array(t('category'), $vocab->name .': '. l($term->name, 'taxonomy/term/'. $term->tid), is_null($taxa[$term->tid]) ? '0' : $taxa[$term->tid]);
         }
       }
       // concatentate the arrays
@@ -464,7 +464,7 @@ function subscriptions_page() {
       foreach ($vocabularies as $vocab) {
         $tree = taxonomy_get_tree($vocab->vid);
         foreach ($tree as $term) {
-          $subrowst[] = array(t('category'), $vocab->name .': '. l($term->name, 'taxonomy/page/or/'. $term->tid), '['. subscriptions_gen_taxa_links($term->tid, $taxa) .']');
+          $subrowst[] = array(t('category'), $vocab->name .': '. l($term->name, 'taxonomy/term/'. $term->tid), '['. subscriptions_gen_taxa_links($term->tid, $taxa) .']');
 
         }
       }
