@@ -422,7 +422,12 @@ function subscriptions_page() {
       }
       // traverse the taxonomy tree
       $taxa = subscriptions_get_taxa_count();
+      // omit undesired vocabularies from listing
       $vocabularies = taxonomy_get_vocabularies();
+      $omits = variable_get('subscriptions_omitted_taxa', array());
+      foreach ($omits as $omit) {
+        unset($vocabularies[$omit]);
+      }
       foreach ($vocabularies as $vocab) {
         $tree = taxonomy_get_tree($vocab->vid);
         foreach ($tree as $term) {
