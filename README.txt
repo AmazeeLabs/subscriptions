@@ -39,8 +39,8 @@ Credits / Contact
 ------------------------------------------------------------------------------
 
 The original author of this module is Dan Ziemecki, who can be reached at
-dan@ziemecki.com.  Tom Dobes provided additional fixes and upgraded the
-module to function with Drupal post-4.3 CVS.
+dan[deletethis] - at - ziemecki - com.  Tom Dobes provided additional fixes and  
+upgraded the module to function with Drupal post-4.3 CVS.
 
 
 Change Log
