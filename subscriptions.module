@@ -1,13 +1,30 @@
 <?php
 // $Id$
-/*
- * This module enables users to subscribe to nodes and taxonomies
- * Subscribers are emailed when comments are added to subscribed nodes
-*/
+
+// text for the various help pages
+function subscriptions_help($section = "admin/help#subscriptions") {
+  switch ($section) {
+    case 'admin/help#subscriptions':
+      // appears on the admin module help page
+      return t('
+        <p>This module enables users to subscribe to be notified of changes to threads or categories.
+        Once enabled, all nodes will have an additional link that allows the user to change their subscriptions.
+        Additionally, all users will be given an account option to auto-subscribe to any thread to which they post.
+        No configuration is required for this module, although roles must be given permission to
+        use it.</p>
+
+        <p>Note that because this module causes the comment insert to pause while all
+        subscribers are notified, it may not be practical for large sites.</p>');
+    case 'admin/system/modules#description':
+      // appears on the admin module selection page
+      return t('Allows users to subscribe to nodes &amp taxonomy terms.');
+  }
+}
 
 function subscriptions_perm() {
   return array("maintain subscriptions");
 }
+
 // this section will be commented out until the mailqueue module is completed
 /*
 function subscriptions_settings() {
@@ -18,7 +35,8 @@ function subscriptions_settings() {
   $mailevent .= "to that module for handling.";
   if ( module_exist( 'mailqueue' ) ) {
     $output = form_radios( t( "Mailer Event" ), "subscriptions_event", variable_get( "subscriptions_event", "insert" ), array( "insert" => t( "On Comment Insert/Update" ), "queue" => t( "Send to mail queue" ) ) , t( $mailevent ) );
-  } else {
+  }
+  else {
     $output = "Subscription notifications will be sent upon insert/update.  This should be ";
     $output .= "sufficient for most installations, but you can install the mailqueue module to send on a batched schedule.";
     $output = t( $output );
@@ -35,27 +53,7 @@ function subscriptions_user($type, $edit, &$user) {
       break;
   }
 }
-// text for the various help pages
-function subscriptions_help($section = "admin/help#subscriptions") {
-  $output = "";
-  switch ($section) {
-    case 'admin/help#subscriptions':
-      // appears on the admin module help page
-      $output = "<p>This module enables users to subscribe to be notified of changes to threads or categories. ";
-      $output .= "Once enabled, all nodes will have an additional link that allows the user to change their subscriptions. ";
-      $output .= "Additionally, all users will be given an account option to auto-subscribe to any thread to which they post. ";
-      $output .= "No configuration is required for this module, although roles must be given permission to ";
-      $output .= "use it.</p><p>Note that because this module causes the comment insert to pause while all ";
-      $output .= "subscribers are notified, it may not be practical for large sites.</p>";
-      $output = t($output);
-      break;
-    case 'admin/system/modules#description':
-      // appears on the admin module selection page
-      $output = t("Allows users to subscribe to nodes &amp taxonomy terms.");
-      break;
-  }
-  return $output;
-}
+
 // returns all subscriptions for a given user. uses caching
 function subscriptions_get_user($account = NULL) {
   global $user;
@@ -93,7 +91,8 @@ function subscriptions_sendmail($to, $subject, $body, $headers) {
   $mail_success = user_mail($to, $subject, $body, $headers);
   if ($mail_success) {
     watchdog("regular", t("subscription notification for  '") . $name . "' &lt;" . $to . "&gt;");
-  } else {
+  }
+  else {
     watchdog("error", t("error mailing subscription notification: '") . $name . "' &lt;" . $to . "&gt;");
   }
 }
@@ -132,8 +131,8 @@ function subscriptions_mailvars ($sid, $ssid, $uid, $stype) {
       $body .= t("To manage your subscriptions, browse to ") . url('subscriptions', NULL, NULL, 1). ".\n";
       if (variable_get("subscriptions_event", "insert") == "queue" && module_exist('mailqueue')) {
         mailqueue_insert($uid, $subject, null, $body, 1);
-      } else
-      if (variable_get("subscriptions_event", "insert") == "insert" || ! module_exist('mailqueue')) {
+      }
+      elseif (variable_get("subscriptions_event", "insert") == "insert" || ! module_exist('mailqueue')) {
         subscriptions_sendmail($subscriptions->mail, $subject, $body, $headers);
       }
     }
@@ -206,7 +205,8 @@ function subscriptions_link($type, $node = 0, $main) {
       $name = node_invoke($node, 'node_name');
       if (isset($subscriptions['node'][$node->nid])) {
         $links[] = l(t("unsubscribe"), "subscriptions/del/node/$node->nid", array("title" => t("Stop receiving an email whenever a new comment is posted to this %n.", array ('%n' => $name))));
-      } else {
+      }
+      else {
         $links[] = l(t("subscribe"), "subscriptions/add/node/$node->nid", array("title" => t("Receive an email whenever a comment is posted to this %n.", array ('%n' => $name))));
       }
     }
@@ -225,7 +225,8 @@ function subscriptions_get_taxa($uid) {
 function subscriptions_gen_taxa_links($tid, $taxa) {
   if (in_array($tid, $taxa)) {
     $link = l(t("unsubscribe"), "subscriptions/del/taxa/$tid", array("title" => t("Unsubscribe from this category.")));
-  } else {
+  }
+  else {
     $link = l(t("subscribe"), "subscriptions/add/taxa/$tid", array("title" => t("Subscribe to this category.")));
   } 
   return $link;
@@ -243,7 +244,8 @@ function subscriptions_page () {
   if (! arg(2)) {
     $sid = arg(1);
     $nid = $sid;
-  } else {
+  }
+  else {
     $op = arg(1);
     $stype = arg(2);
     $sid = arg(3);
@@ -285,10 +287,8 @@ function subscriptions_page () {
         }
         // traverse the taxonomy tree
         $taxa = subscriptions_get_taxa($uid);
-        $i = 1;
-        while (taxonomy_get_vocabulary($i)) {
-          $tree = taxonomy_get_tree($i);
-          $vocab = taxonomy_get_vocabulary($i);
+        foreach (taxonomy_get_vocabularies() as $vocab) { 
+          $tree = taxonomy_get_tree($vocab->vid);        
           $subrows .= "<tr><td colspan=\"2\"><b>" . $vocab->name . "</b></td></tr>\n";
           foreach ($tree as $term) {
             $subrows .= t("<tr><td>Category: ") . l($term->name, "taxonomy/page/or/$term->tid") . "</td><td>[" . subscriptions_gen_taxa_links($term->tid, $taxa) . "]</td></tr>\n";
@@ -298,14 +298,16 @@ function subscriptions_page () {
 
         if (strlen($subrows) == 0) {
           $message .= t("<p>You are not currently subscribed to any active threads or categories.</p>");
-        } else {
+        }
+        else {
           $message .= "<p align=\"center\"><table>" . $subrows . "</table></p>";
         }
 
         print theme("page", $message, t("Your Subscriptions"));
         break;
     }
-  } else {
+  }
+  else {
     print theme("page", message_access(), t("Access Denied"));
   }
 }
