@@ -54,13 +54,11 @@ function subscriptions_settings() {
  * Implementation of hook_user().
  */
 function subscriptions_user($type, $edit, &$user, $category) {
-  if (user_access('maintain subscriptions')) {
-    switch ($type) {
-      case 'form':
-        if ($category == 'account') {
-          return array(array('title' => t('Subscription settings'), 'data' => form_checkbox(t('Automatically subscribe to threads in which you post.'), 'subscriptions_auto', 1, $user->subscriptions_auto, t('Checking this box allows you to be automatically subscribe to any thread you create or post a comment to.'))));
-        }
-    }
+  switch ($type) {
+    case 'form':
+      if (user_access('maintain subscriptions') && $category == 'account') {
+        return array(array('title' => t('Subscription settings'), 'data' => form_checkbox(t('Automatically subscribe to threads in which you post.'), 'subscriptions_auto', 1, isset($edit->subscriptions_auto) ? $edit->subscriptions_auto : $user->subscriptions_auto, t('Checking this box allows you to be automatically subscribe to any thread you create or post a comment to.'))));
+      }
   }
 }
 
@@ -77,7 +75,10 @@ function subscriptions_settings() {
   return $output;
 }
 
-// returns all subscriptions, and displayed metadata, for a given user. uses caching
+/**
+ * Returns all subscriptions, and displayed metadata, for a given user.
+ * (uses caching)
+ */
 function subscriptions_get_user($account = NULL) {
   global $user;
   static $subscriptions;
@@ -118,7 +119,9 @@ function subscriptions_get_user($account = NULL) {
   return $subscriptions[$account->uid];
 }
 
-// returns a summary of all subscriptions
+/*
+ * Returns a summary of all subscriptions
+ */
 function subscriptions_get_summary() {
   static $subssumm;
 
@@ -158,7 +161,9 @@ function subscriptions_get_summary() {
   return $subssumm;
 }
 
-// formats the mail and sends it.
+/*
+ * Formats the mail and sends it.
+ */
 function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
   $mail_success = user_mail($to, $subject, $body, $headers);
   if ($mail_success) {
@@ -169,7 +174,9 @@ function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
   }
 }
 
-// get e-mail vars
+/*
+ * Get e-mail vars
+ */
 function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   global $base_url;
   global $locale;
@@ -243,6 +250,9 @@ To manage your subscriptions, browse to %manage-url', array('%name' => $subscrip
   return $strsent;
 }
 
+/*
+ * Subscribes users to nodes in which they post, if not already subscribed
+ */
 function subscriptions_autosubscribe($uid, $nid) {
   global $user;
   // if user has auto subscribe enabled
@@ -327,7 +337,6 @@ function subscriptions_menu($may_cache) {
 /**
  * Implementation of hook_link().
  */
-// puts "change subscription" link on all nodes
 function subscriptions_link($type, $node = 0, $main) {
   if (user_access('maintain subscriptions') && $type == 'node' && $node->comment == 2) {
     $subscriptions = subscriptions_get_user();
@@ -380,7 +389,10 @@ function subscriptions_add($sid, $uid, $stype) {
   db_query('INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES (%d , %d, \'%s\')', $sid, $uid, $stype);
 }
 
-// pages where users add and delete their subscriptions to nodes
+/*
+ * Menu callback:
+ * Pages where users add and delete their subscriptions to nodes
+ */
 function subscriptions_page() {
   global $user;
   $subscribed = false;
