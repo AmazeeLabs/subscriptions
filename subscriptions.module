@@ -91,18 +91,18 @@ function subscriptions_get_user($account = NULL) {
     $queryn .= '(({subscriptions} s LEFT JOIN {node} n ON n.nid = s.sid) ';
     $queryn .= 'LEFT JOIN {term_node} tn ON tn.nid = s.sid) ';
     $queryn .= 'LEFT JOIN {term_data} td ON td.tid = tn.tid ';
-    $queryn .= "WHERE n.status = 1 AND s.uid = $account->uid AND s.stype = \"node\"";
+    $queryn .= 'WHERE n.status = 1 AND s.uid = %d AND s.stype = \'node\'';
     // query string for blog subscriptions (by blog owner)
     $queryb = 'SELECT u.uid, u.name, s.stype, s.sid FROM ';
     $queryb .= '({subscriptions} s LEFT JOIN {users} u ON u.uid = s.sid) ';
-    $queryb .= "WHERE u.status = 1 AND s.uid = $account->uid AND s.stype = \"blog\"";
+    $queryb .= 'WHERE u.status = 1 AND s.uid = %d AND s.stype = \'blog\'';
     // query string for category subscriptions
     $queryt .= 'SELECT td.tid, td.name FROM ';
     $queryt .= '{subscriptions} s INNER JOIN {term_data} td ON td.tid = s.sid ';
-    $queryt .= "WHERE s.uid = $account->uid AND s.stype = \"taxa\"";
-    $resultn = db_query($queryn);
-    $resultb = db_query($queryb);
-    $resultt = db_query($queryt);
+    $queryt .= 'WHERE s.uid = %d AND s.stype = \'taxa\'';
+    $resultn = db_query($queryn, $account->uid);
+    $resultb = db_query($queryb, $account->uid);
+    $resultt = db_query($queryt, $account->uid);
 
     $subscriptions[$account->uid]['node'] = $subscriptions[$account->uid]['taxa'] = $subscriptions[$account->uid]['blog'] = array();
     while ($nsub = db_fetch_object($resultn)) {
@@ -125,19 +125,19 @@ function subscriptions_get_summary() {
   // query string for node subscriptions
   $queryn = 'SELECT n.nid, n.title, s.sid, COUNT(*) as ncount FROM ';
   $queryn .= '{subscriptions} s INNER JOIN {node} n ON n.nid = s.sid ';
-  $queryn .= 'WHERE s.stype = "node" ';
+  $queryn .= 'WHERE s.stype = \'node\' ';
   $queryn .= 'GROUP BY s.sid ';
   $queryn .= 'ORDER BY s.sid ';
   // query string for blog subscriptions (by blog owner)
   $queryb = 'SELECT u.uid, u.name, s.sid, COUNT(*) as ncount FROM ';
   $queryb .= '{subscriptions} s INNER JOIN {users} u ON u.uid = s.sid ';
-  $queryb .= 'WHERE s.stype = "blog" ';
+  $queryb .= 'WHERE s.stype = \'blog\' ';
   $queryb .= 'GROUP BY s.sid ';
   $queryb .= 'ORDER BY s.sid ';
   // query string for category subscriptions
   $queryt .= 'SELECT s.sid, td.name, COUNT(*) as ncount FROM ';
   $queryt .= '{subscriptions} s RIGHT JOIN {term_data} td ON td.tid = s.sid ';
-  $queryt .= 'WHERE s.stype = "taxa" ';
+  $queryt .= 'WHERE s.stype = \'taxa\' ';
   $queryt .= 'GROUP BY s.sid ';
   $queryt .= 'ORDER BY s.sid ';
 
@@ -175,27 +175,27 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   $from = variable_get('site_mail', ini_get('sendmail_from'));
   // if comment insertion, get vars
   if ($stype == 'node') {
-    $result = db_query("SELECT title FROM {node} WHERE nid = $sid");
+    $result = db_query('SELECT title FROM {node} WHERE nid = %d', $sid);
     $subj = db_result($result);
-    $result = db_query("SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = $sid AND s.stype = \"node\"");
+    $result = db_query('SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'node\'', $sid);
     $strtype = 'thread';
     $nid = $sid;
     $cid = "comment-$ssid";
   }
   // if node insert, test if node has a taxonomy else skip
   if ($stype == 'taxa' && ! is_null($sid)) {
-    $result = db_query("SELECT name FROM {term_data} WHERE tid = $sid");
+    $result = db_query('SELECT name FROM {term_data} WHERE tid = %d', $sid);
     $subj = db_result($result);
-    $result = db_query("SELECT u.mail, u.name, u.uid FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = $sid AND stype = \"taxa\"");
+    $result = db_query('SELECT u.mail, u.name, u.uid FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND stype = \'taxa\'', $sid);
     $strtype = 'category';
     $nid = $ssid;
     $cid = NULL;
   }
   // if blog insert, get vars
   if ($stype == 'blog') {
-    $result = db_query("SELECT name FROM {users} WHERE uid = $uid");
+    $result = db_query('SELECT name FROM {users} WHERE uid = %d', $uid);
     $subj = t('new blog for ') . db_result($result);
-    $result = db_query("SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = $sid AND s.stype = \"blog\"");
+    $result = db_query('SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'blog\'', $sid);
     $strtype = 'blog';
     $nid = $sid;
     $cid = "comment-$ssid";
@@ -228,7 +228,7 @@ function subscriptions_autosubscribe($uid, $nid) {
   // if user has auto subscribe enabled
   if ($user->subscriptions_auto) {
     // check to see if already subscribed
-    $result = db_query("SELECT sid FROM {subscriptions} WHERE sid = $nid AND stype = \"node\" AND uid = $uid");
+    $result = db_query('SELECT sid FROM {subscriptions} WHERE sid = %d AND stype = \'node\' AND uid = %d', $nid, $uid);
     if (!db_num_rows($result)) {
       // if not, subscribe
       subscriptions_add($nid, $user->uid, 'node');
@@ -331,7 +331,7 @@ function subscriptions_link($type, $node = 0, $main) {
 }
 
 function subscriptions_get_taxa($uid) {
-  $result = db_query("SELECT sid FROM {subscriptions} WHERE uid = $uid and stype=\"taxa\"");
+  $result = db_query('SELECT sid FROM {subscriptions} WHERE uid = %d and stype=\'taxa\'', $uid);
   while ($taxasub = db_fetch_object($result)) {
     $tsubscriptions[] = $taxasub->sid;
   }
@@ -339,7 +339,7 @@ function subscriptions_get_taxa($uid) {
 }
 
 function subscriptions_get_taxa_count() {
-  $result = db_query('SELECT sid, count(*) as tcount FROM {subscriptions} WHERE stype="taxa" GROUP BY sid');
+  $result = db_query('SELECT sid, count(*) as tcount FROM {subscriptions} WHERE stype=\'taxa\' GROUP BY sid');
   while ($taxasub = db_fetch_object($result)) {
     $tsubscriptions[$taxasub->sid] = $taxasub->tcount;
   }
@@ -357,7 +357,7 @@ function subscriptions_gen_taxa_links($tid, $taxa) {
 }
 
 function subscriptions_add($sid, $uid, $stype) {
-  db_query("INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES ($sid , $uid, \"$stype\")");
+  db_query('INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES (%d , %d, \'%s\')', $sid, $uid, $stype);
 }
 
 // pages where users add and delete their subscriptions to nodes
@@ -399,7 +399,7 @@ function subscriptions_page() {
 
     // removes a subscription from the subscriptions_nodes table
     case 'del':
-      db_query("DELETE FROM {subscriptions} WHERE sid = $sid AND uid = $uid AND stype = '$stype'");
+      db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', $sid, $uid, $stype);
       $message = t('<p>Your subscription was deactivated.</p>');
       if (!(arg(2) == 'taxa')) {
         $message .= l(t('Return to the thread'), 'node/'. $nid) .' | ';
