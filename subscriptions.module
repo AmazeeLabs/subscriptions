@@ -126,10 +126,10 @@ function subscriptions_mailvars ($sid, $ssid, $uid, $stype) {
       $subject = "[" . variable_get("site_name", "drupal") . "] " . t("subscription update for ") . "$subscriptions->name : $subj";
       $body = t("Greetings ") . $subscriptions->name . ",\n\n";
       $body .= t("A $strtype to which you have subscribed has been updated.  To view the thread, ");
-      $body .= t("navigate to ") . url("node/view/$nid$cid"). ".";
+      $body .= t("navigate to ") . url("node/view/$nid$cid", NULL, NULL, 1). ".";
       $body .= "\n-- \n";
       $body .= t("This is an automatic mail from ") . variable_get("site_name", "drupal") . ".\n";
-      $body .= t("To manage your subscriptions, browse to ") . url('subscriptions'). ".\n";
+      $body .= t("To manage your subscriptions, browse to ") . url('subscriptions', NULL, NULL, 1). ".\n";
       if (variable_get("subscriptions_event", "insert") == "queue" && module_exist('mailqueue')) {
         mailqueue_insert($uid, $subject, null, $body, 1);
       } else
@@ -189,7 +189,7 @@ function subscriptions_nodeapi (&$node, $op, $arg = 0) {
       if (!$user->subscriptions_auto) {
         $allsubs = subscriptions_get_user();
         $val = isset($node->subscriptions_subscribe) ? $node->subscriptions_subscribe : $allsubs['node'][$node->nid] ? 1 : $user->subscriptions_subscribe;
-        return form_item(t("Subscribe"), form_checkbox(t("Receive notification of replies to this %name.", array ('%name' => module_invoke($node->type, 'node', 'name'))), "subscriptions_subscribe", 1, $val));
+        return form_item(t("Subscribe"), form_checkbox(t("Receive notification of replies to this %name.", array ('%name' => node_invoke($node, 'node_name'))), "subscriptions_subscribe", 1, $val));
       }
       break;
   }
@@ -203,7 +203,7 @@ function subscriptions_link($type, $node = 0, $main) {
     }
     if ($type == "node" && $node->comment == 2) {
       $subscriptions = subscriptions_get_user();
-      $name = module_invoke($node->type, "node", "name");
+      $name = node_invoke($node, 'node_name');
       if (isset($subscriptions['node'][$node->nid])) {
         $links[] = l(t("unsubscribe"), "subscriptions/del/node/$node->nid", array("title" => t("Stop receiving an email whenever a new comment is posted to this %n.", array ('%n' => $name))));
       } else {
