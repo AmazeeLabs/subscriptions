@@ -1,4 +1,4 @@
-subscriptions.module README
+subscriptions.module README.txt
 ==============================================================================
 
 The subscriptions module allows users to subscribe to nodes or taxonomies.  A
