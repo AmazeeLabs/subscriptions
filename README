@@ -51,12 +51,25 @@ login hook to clear the "since last visited" queue.
 
 Change Log
 ------------------------------------------------------------------------------
+12/20/2003
+----------
+- changed name of permission from 'subscribe to nodes' to 'maintain subscriptions'
+  (anyone currently using this module should visit their permissions
+  page after updating)
+- refactored insertion of new subscriptions into its own function
+- added subscribe checkbox to bottom of node forms
+
+12/17/2003
+----------
+- Added taxonomy subscriptions back
+- removed some cruft left over from previous change
+
 12/13/2003
----------
+----------
 - Changed node links to be 1 click 'subscribe' or 'unsubscribe' (moshe)
 
 12/10/2003
----------
+----------
 - Added autosubscription support for the 4.3.0 branch.
 - Updated CVS HEAD to reflect latest 4.3 feature additions.
 
@@ -70,22 +83,16 @@ Change Log
 - made node/term names display as links
 
 11/16/2003
----------
+----------
 - improved support for translations.
 - added the ability to subscribe to taxonomies
 - added "my subscriptions" link to account admin block
 
 11/10/2003
----------
+----------
 - added comment specific anchors to email links
 - added full subscription list to maintenance page
 
 11/9/2003
 ---------
 - initial release
-
-
-
-
-
-
