@@ -172,12 +172,19 @@ function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
 // get e-mail vars
 function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   global $base_url;
+  global $locale;
+  $initial_locale = $locale;
+  if (function_exists('locale')) {
+    $languages = locale_supported_languages();
+    $languages = $languages['name'];
+  }
+
   $from = variable_get('site_mail', ini_get('sendmail_from'));
   // if comment insertion, get vars
   if ($stype == 'node') {
     $result = db_query('SELECT title FROM {node} WHERE nid = %d', $sid);
     $subj = db_result($result);
-    $result = db_query('SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'node\'', $sid);
+    $result = db_query('SELECT u.uid, u.name, u.mail, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'node\'', $sid);
     $strtype = 'thread';
     $nid = $sid;
     $cid = "comment-$ssid";
@@ -186,7 +193,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   if ($stype == 'taxa' && ! is_null($sid)) {
     $result = db_query('SELECT name FROM {term_data} WHERE tid = %d', $sid);
     $subj = db_result($result);
-    $result = db_query('SELECT u.mail, u.name, u.uid FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND stype = \'taxa\'', $sid);
+    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND stype = \'taxa\'', $sid);
     $strtype = 'category';
     $nid = $ssid;
     $cid = NULL;
@@ -195,27 +202,40 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   if ($stype == 'blog') {
     $result = db_query('SELECT name FROM {users} WHERE uid = %d', $uid);
     $subj = t('new blog for ') . db_result($result);
-    $result = db_query('SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'blog\'', $sid);
+    $result = db_query('SELECT u.uid, u.name, u.mail, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'blog\'', $sid);
     $strtype = 'blog';
     $nid = $sid;
     $cid = "comment-$ssid";
   } 
   // loop through subscribers and call mail function
   while ($subscriptions = db_fetch_object($result)) {
-    if ($subscriptions->uid != $uid && ! is_null($sid) && ! strpos($strsent , '!'. $subscriptions->uid .'!')) {
-      $strsent = $strsent . $subscriptions->uid .'!';  // add this user to "previously notified" string
+    if ($subscriptions->uid != $uid && !is_null($sid) && !strpos($strsent , '!'. $subscriptions->uid .'!')) {
+      // add this user to "previously notified" string
+      $strsent = $strsent . $subscriptions->uid .'!';
+
+      // translate the message using the reciever's language
+      if (function_exists('locale') && $languages[$subscriptions->language]) {
+        $locale = $subscriptions->language;
+      }
+
       $headers = "From: $from\nReply-to: $from\nX-Mailer: Drupal\nReturn-path: $from\nErrors-to: $from";
-      $subject = '[' . variable_get('site_name', 'drupal') . '] ' . $strtype . t(' subscription update for ') . "$subscriptions->name : $subj";
-      $body = t('Greetings ') . $subscriptions->name . ",\n\n";
-      $body .= t("A $strtype to which you have subscribed has been updated.  To view the thread, ");
-      $body .= t('navigate to ') . url('node/'. $nid, NULL, $cid, 1);
-      $body .= "\n-- \n";
-      $body .= t('This is an automatic mail from ') . variable_get('site_name', 'drupal') . ".\n";
-      $body .= t('To manage your subscriptions, browse to ') . url('subscriptions', NULL, NULL, 1) ."\n";
+      $subject = t('[%site] %type subscription update for %name : %subject', array('%site' => variable_get('site_name', 'drupal'), '%type' => $strtype, '%name' => $subscriptions->name, '%subject' => $subj));
+      $body = t('Grettings, %name.
+
+A %type to which you have subscribed has been updated.  To view the thread,
+navigate to %url
+
+--
+This is an automatic mail from %site.
+To manage your subscriptions, browse to %manage-url', array('%name' => $subscriptions->name, '%type' => $strtype, '%url' => url('node/'. $nid, NULL, $cid, 1), '%site' => variable_get('site_name', 'drupal'), '%manage-url' => url('subscriptions', NULL, NULL, 1)));
+
+      // revert to original locale
+      $locale = $initial_locale;
+
       if (variable_get('subscriptions_event', 'insert') == 'queue' && module_exist('mailqueue')) {
         mailqueue_insert($uid, $subject, null, $body, 1);
       }
-      elseif (variable_get('subscriptions_event', 'insert') == 'insert' || !module_exist('mailqueue')) {
+      else {
         subscriptions_sendmail($subscriptions->name, $subscriptions->mail, $subject, $body, $headers);
       }
     }
