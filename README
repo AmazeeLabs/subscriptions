@@ -1,0 +1,49 @@
+subscriptions.module README
+==============================================================================
+
+The subscriptions module allows users to subscribe to nodes.  A subscribed user will be emailed whenever a comment is updated or added to a node.  When this module is enabled, all nodes will display a new link, "change subscription", which takes users to a page that will allow them to subscribe or unsubscribe to the node in question.  
+
+Because this module causes the comment insert to pause while all subscribers are notified, it may not be practical for large sites.  
+
+Installation
+------------------------------------------------------------------------------
+ 
+ Required:
+  - Create the SQL tables. This depends a little on your system, but the most
+    common method is:
+        mysql -u username -ppassword drupal < subscriptions.mysql
+  - Copy subscriptions.module to modules/
+  - Enable the module as usual from Drupal's admin pages.
+  - Grant permissions to the groups you wish to be able to subscribe.  
+subscribe to nodes
+
+
+    NOTE:  This module requires email addresses, so anonymous users don't make much sense.
+
+Configuration
+------------------------------------------------------------------------------
+
+This module needs no configuration, other than the permissions mentioned above.
+
+Credits / Contact
+------------------------------------------------------------------------------
+
+The original author of this module is Dan Ziemecki, who can be reached at
+c0c0c0@geeknetwork.org.
+
+ToDo
+------------------------------------------------------------------------------
+
+One proposed improvement would have the module insert mail to be sent into a table, which would then be cleared out by cronjob.  This table, however, and its controlling module, does not currently exist.  Another proposed improvement would extend this functionality to taxonomies.  Not sure how that would work, so that will have to be someone else.
+
+Change Log
+------------------------------------------------------------------------------
+11/9/2003
+---------
+- Initial release
+
+
+
+
+
+

@@ -1,0 +1,141 @@
+<?php
+// $Id: 
+
+/*
+ * This module enables users to subscribe to nodes
+ * Subscribers are emailed when comments are added to subscribed nodes
+*/
+
+function subscriptions_perm() {
+  return array("subscribe to nodes");
+}
+ 
+
+// text for the various help pages
+function subscriptions_help($section = "admin/help#subscriptions") {
+  $output = "";
+  switch ($section) {
+    case 'admin/help#subscriptions':
+	  // appears on the admin module help page
+	  $output = "<p>This module enables users to subscribe to be notified of changes to nodes. ";
+	  $output .= "Once enabled, all nodes will have an additional link that allows the user to \"change subscription\". ";
+	  $output .= "No configuration is required for this module, although roles must be given permission to ";
+	  $output .= "use it.</p><p>Note that because this module causes the comment insert to pause while all ";
+	  $output .= "subscribers are notified, it may not be practical for large sites.</p>";
+	  $output = t($output);
+      break;
+    case 'admin/system/modules#description':
+	  // appears on the admin module selection page
+      $output = t("Allows users to subscribe to nodes.");
+      break;
+  }
+  return $output;
+}
+
+// formats the mail and sends it.
+function subscriptions_sendmail($to,$nid, $name, $nodesubj){
+    global $base_url;
+    $from = variable_get("site_mail", ini_get("sendmail_from"));
+	$headers = "From: $from\nReply-to: $from\nX-Mailer: Drupal\nReturn-path: $from\nErrors-to: $from";
+	$subject = "[".variable_get("site_name", "drupal") ."] ". t("subscription update for $name : $nodesubj");
+	$body = t("Greetings") ." ". $name .",\n\n";
+	$body .= "A thread to which you have subscribed has been updated.  To view the thread, ";
+	$body .= "navigate to $base_url/node/view/$nid.";
+    $body .= "\n-- \n";
+    $body .= t("This is an automatic mail from") ." ". variable_get("site_name", "drupal") .".\n";
+    $body .= t("To stop receiving these mails go to") ." $base_url/.\n";
+	$mail_success = user_mail($to, $subject, $body, $headers);
+	if ($mail_success) {
+        watchdog("subscriptions", "subscription notification for  '". $name ."' &lt;". $to ."&gt;");
+    } else 
+	{
+        watchdog("error", "error mailing subscription notification: '". $name ."' &lt;". $to ."&gt;");
+    }
+}
+
+// hook to comments update event 
+function subscriptions_comment ($op, $comment) {
+  global $user;
+
+  if ($op == "insert" || $op == "update") {
+    $nid = $comment["nid"];
+	
+	//get node subject
+	$result = db_query("SELECT title FROM {node} WHERE nid = $nid");
+	$nodesubj = db_result($result);
+	
+	// loop through subscribers and call mail function
+    $result = db_query("SELECT u.mail, u.name, u.uid FROM {users} u INNER JOIN {subscriptions_nodes} s ON u.uid = s.uid WHERE s.nid = $nid");
+          while($subscriptions = db_fetch_object($result)) {
+		    if( $subscriptions->uid != $user->uid ){
+          	  subscriptions_sendmail($subscriptions->mail,$nid, $subscriptions->name, $nodesubj );
+			}
+          }
+   }
+}
+
+// puts "change subscription" link on all nodes
+function subscriptions_link($type, $node = 0, $main = 0) {
+  switch ($type) {
+  case 'node':
+    if (user_access("subscribe to nodes")){ 
+      $links[] =l(t("change subscription"), "subscriptions/$node->nid", array("title" => t("Change your subscription status for this node.")));
+    }
+    break;
+  }
+  return $links ? $links : array();
+}
+
+// pages where users add and delete their subscriptions to nodes
+function subscriptions_page () {
+  global $user;
+  $uid = $user->uid;
+  if (! arg(2)) {
+      $nid = arg(1); 
+  } else {
+	  $op = arg(1);
+	  $nid = arg(2);
+  }
+  
+  if (user_access("subscribe to nodes")){ 
+    switch ($op) {
+	  // inserts a new subscription into the subscriptions_nodes table
+      case "add":
+        db_query("INSERT INTO {subscriptions_nodes} ( nid , uid )  VALUES ($nid , $uid)");
+  		$message = "Your subscription was inserted.<br />";
+  		$message .= "<a href=\"?q=node/view/$nid\">Return to the thread</a>.<br />";
+  		theme("header");
+  		theme("box", t("Subscription Accepted"), $message ,"An error has occurred");
+  		theme("footer");
+        break;
+	  // remeoves a subscription from the subscriptions_nodes table	
+	  case "del":
+        db_query("DELETE FROM {subscriptions_nodes} WHERE nid = $nid AND uid = $uid");
+  		$message = "Your subscription was deleted.<br />";
+  		$message .= "<a href=\"?q=node/view/$nid\">Return to the thread</a>.<br />";
+  		theme("header");
+  		theme("box", t("Subscription Removed"), $message ,"An error has occurred");
+  		theme("footer");
+        break;
+	  // determines the user's subscription status and displays the right option to change it	
+	  default:
+	    $result = db_query("SELECT uid FROM {subscriptions_nodes} WHERE nid = $nid AND uid = $uid");
+		if (is_null(db_result($result))) {;	
+        $links =l(t("[Subscribe]"), "subscriptions/add/$nid", array("title" => t("Subscribe to this thread.")));
+  		$message = "Would you like to subscribe to this thread?  $links";
+		} else 
+		{
+        $links =l(t("[Unsubscribe]"), "subscriptions/del/$nid", array("title" => t("Unsubscribe to this thread.")));
+  		$message = "Would you like to unsubscribe to this thread?  $links";		
+		}
+  		theme("header");
+  		theme("box", t("Change Subscription"), $message ,"Not available");
+  		theme("footer");
+        break;
+	}
+  } else {
+    print message_access();
+  }
+}
+
+?>
