@@ -4,13 +4,12 @@ subscriptions.module README
 The subscriptions module allows users to subscribe to nodes or taxonomies.  A
 subscribed user will be emailed whenever a comment is updated or added to a
 node.  When this module is enabled, all nodes will display a new link,
-"subscriptions", which takes users to a page that will allow them to subscribe
-or unsubscribe to the node in question.  This page also allows the user to
-view all current subscriptions.
+"(un)subscribe", which enable users to subscribe or unsubscribe to the node in 
+question.  A new menu option, "my subscriptions",  allows the user to
+view all current subscriptions and make modifications.
 
-Because this module causes the comment insert to pause while all subscribers
-are emailed, it may not be practical for large sites.  It will be compatable
-with mailqueue.module when that module is avaiulable.
+Because this module causes the post insert\update to pause while all subscribers
+are emailed, it may not be practical for some large sites.  
 
 Installation
 ------------------------------------------------------------------------------
@@ -22,10 +21,10 @@ Installation
   - Copy subscriptions.module to modules/
   - Enable the module as usual from Drupal's admin pages.
   - Grant permissions to the groups you wish to be able to subscribe.
-subscribe to nodes
+  - subscribe to nodes
 
     NOTE:  This module requires email addresses, so anonymous users don't make
- much sense.
+ much sense.  Any user without an email address will generate a log error.
 
 Configuration
 ------------------------------------------------------------------------------
@@ -41,16 +40,18 @@ The original author of this module is Dan Ziemecki, who can be reached at
 c0c0c0@geeknetwork.org.  Tom Dobes provided additional fixes and upgraded the
 module to function with Drupal post-4.3 CVS.
 
-ToDo
-------------------------------------------------------------------------------
-
-One proposed improvement would have the module insert mail to be sent into a
-table, which would then be cleared out by cronjob. The module that supports
-this, mailqueue, is currently in development and is only waiting on an appropriate
-login hook to clear the "since last visited" queue.
 
 Change Log
 ------------------------------------------------------------------------------
+6/2/2004
+---------
+- corrected missing $name variable in emails
+- corrected bug where some blog subscriptions were not notified
+- added user level blog subscriptions
+- eliminated multiple notifications to same subscriber for single post
+- made notification subjects more descriptive
+- extended taxonomy notifications to check for multiple associated taxonomies
+
 2/11/2004
 ---------
 - updated to function with latest Drupal CVS changes
