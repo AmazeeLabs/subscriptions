@@ -197,7 +197,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
     $cid = "comment-$ssid";
   }
   // if node insert, test if node has a taxonomy else skip
-  if ($stype == 'taxa' && ! is_null($sid)) {
+  if ($stype == 'taxa' && !is_null($sid)) {
     $result = db_query('SELECT name FROM {term_data} WHERE tid = %d', $sid);
     $subj = db_result($result);
     $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND stype = \'taxa\'', $sid);
@@ -216,9 +216,9 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   } 
   // loop through subscribers and call mail function
   while ($subscriptions = db_fetch_object($result)) {
-    if ($subscriptions->uid != $uid && !is_null($sid) && !strpos($strsent , '!'. $subscriptions->uid .'!')) {
+    if ($subscriptions->uid != $uid && !is_null($sid) && strpos($strsent , '!'. $subscriptions->uid .'!') === false) {
       // add this user to "previously notified" string
-      $strsent = $strsent . $subscriptions->uid .'!';
+      $strsent .= $subscriptions->uid .'!';
 
       // translate the message using the reciever's language
       if (function_exists('locale') && $languages[$subscriptions->language]) {
@@ -227,7 +227,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
 
       $headers = "From: $from\nReply-to: $from\nX-Mailer: Drupal\nReturn-path: $from\nErrors-to: $from";
       $subject = t('[%site] %type subscription update for %name : %subject', array('%site' => variable_get('site_name', 'drupal'), '%type' => $strtype, '%name' => $subscriptions->name, '%subject' => $subj));
-      $body = t('Grettings, %name.
+      $body = t('Greetings, %name.
 
 A %type to which you have subscribed has been updated.  To view the thread,
 navigate to %url
@@ -271,8 +271,9 @@ function subscriptions_autosubscribe($uid, $nid) {
  */
 function subscriptions_comment($op, $comment) {
   global $user;
-  $strsent = '';  // tracks whether or not a particular user has already been notified by another subsciption
-  if ($comment->status == 0 && ($op == 'insert' || $op == 'update')) {
+  $strsent = '!';
+  // TODO: it appears the comment status is not provided by this hook... we'll have to look into that later
+  if (/* $comment['status'] == 0 && */ ($op == 'insert' || $op == 'update')) {
     $nid = $comment['nid'];
     $cid = $comment['cid'];
     subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
@@ -289,7 +290,7 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
   switch ($op) {
     case 'insert':
       if ($node->status) {
-        if (isset($node->taxonomy)) {
+        if (!empty($node->taxonomy)) {
           foreach ($node->taxonomy as $tid){
             $strsent = $strsent . subscriptions_mailvars($tid, $node->nid, $user->uid, 'taxa', $strsent);
           }
