@@ -31,26 +31,31 @@ Configuration
 ------------------------------------------------------------------------------
 
 This module needs no configuration, other than the permissions mentioned above,
-at this time.
+at this time.  There is a single user setting under "my accounts" to enable 
+autosubscriptions.
 
 Credits / Contact
 ------------------------------------------------------------------------------
 
 The original author of this module is Dan Ziemecki, who can be reached at
-c0c0c0@geeknetwork.org.  Other contributors are not aware that I stole their 
-code. Tom Dobes provided a couple of additional fixes and upgraded the
+c0c0c0@geeknetwork.org.  Tom Dobes provided additional fixes and upgraded the
 module to function with Drupal post-4.3 CVS.
 
 ToDo
 ------------------------------------------------------------------------------
 
 One proposed improvement would have the module insert mail to be sent into a 
-table, which would then be cleared out by cronjob.  This table, however, and 
-its controlling module, does not currently exist.  The module that supports 
-this, mailqueue, is currently in development.
+table, which would then be cleared out by cronjob. The module that supports 
+this, mailqueue, is currently in development and is only waiting on an appropriate 
+login hook to clear the "since last visited" queue.
 
 Change Log
 ------------------------------------------------------------------------------
+12/10/2003
+---------
+- Added autosubscription support for the 4.3.0 branch.
+- Updated CVS HEAD to reflect latest 4.3 feature additions.
+
 12/4/2003
 ---------
 - updated menu callback for latest CVS

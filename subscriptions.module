@@ -1,6 +1,5 @@
-<?php
+<?php 
 // $Id$ 
-
 /*
  * This module enables users to subscribe to nodes and taxonomies
  * Subscribers are emailed when comments are added to subscribed nodes
@@ -8,291 +7,295 @@
 
 function subscriptions_perm() {
   return array("subscribe to nodes");
-}
-
+} 
 // this section will be commented out until the mailqueue module is completed
-//function subscriptions_settings() {
-//  $mailevent = "This variable sets the event that will initiate the sending of update notification.  ";
-//  $mailevent .= "By default, subscription noticies are sent out as soon as a subscribed ";
-//  $mailevent .= "node recieved a comment.  This may be inefficient for some large sites.";
-//  $mailevent .= "Alternativly, if you have the mailqueue module installed, you can send the messages ";
-//  $mailevent .= "to that module for handling.";
-//  if (module_exist('mailqueue')) {
-//    $output = form_radios(t("Mailer Event"), "subscriptions_event", variable_get("subscriptions_event","insert"), array("insert" => t("On Comment Insert/Update"), "queue" => t("Send to mail queue")) , t($mailevent));
-//  } else
-//  {
-//    $output = "Subscription notifications will be sent upon insert/update.  This should be ";
-//	$output .= "sufficient for most installations, but you can install the mailqueue module to send on a batched schedule.";
-//	$output = t($output);
-//  }
-//  return $output;
-//} 
+/*
+function subscriptions_settings() {
+  $mailevent = "This variable sets the event that will initiate the sending of update notification.  ";
+  $mailevent .= "By default, subscription noticies are sent out as soon as a subscribed ";
+  $mailevent .= "node recieved a comment.  This may be inefficient for some large sites.";
+  $mailevent .= "Alternativly, if you have the mailqueue module installed, you can send the messages ";
+  $mailevent .= "to that module for handling.";
+  if ( module_exist( 'mailqueue' ) ) {
+    $output = form_radios( t( "Mailer Event" ), "subscriptions_event", variable_get( "subscriptions_event", "insert" ), array( "insert" => t( "On Comment Insert/Update" ), "queue" => t( "Send to mail queue" ) ) , t( $mailevent ) );
+  } else {
+    $output = "Subscription notifications will be sent upon insert/update.  This should be ";
+    $output .= "sufficient for most installations, but you can install the mailqueue module to send on a batched schedule.";
+    $output = t( $output );
+  } 
+  return $output;
+} 
+*/
 
+function subscriptions_user($type, $edit, &$user) {
+  switch ($type) {
+    case "edit_form":
+      return form_item(t("Auto Subscribe"), form_checkbox(t("Automatically subscribe to threads to which you post."), "subscriptions_auto", 1, $user->subscriptions_auto, t("If you check this box, you'll be automatically subscribed to any thread you create or to which you post a comment.")));
+      return $output;
+      break;
+  } 
+} 
 // text for the various help pages
 function subscriptions_help($section = "admin/help#subscriptions") {
   $output = "";
   switch ($section) {
-    case 'admin/help#subscriptions':
-	  // appears on the admin module help page
-	  $output = "<p>This module enables users to subscribe to be notified of changes to threads or categories. ";
-	  $output .= "Once enabled, all nodes will have an additional link that allows the user to change their subscriptions. ";
-	  $output .= "No configuration is required for this module, although roles must be given permission to ";
-	  $output .= "use it.</p><p>Note that because this module causes the comment insert to pause while all ";
-	  $output .= "subscribers are notified, it may not be practical for large sites.</p>";
-	  $output = t($output);
+    case 'admin/help#subscriptions': 
+      // appears on the admin module help page
+      $output = "<p>This module enables users to subscribe to be notified of changes to threads or categories. ";
+      $output .= "Once enabled, all nodes will have an additional link that allows the user to change their subscriptions. ";
+	  $output .= "Additionally, all users will be given an account option to auto-subscribe to any thread to which they post. ";
+      $output .= "No configuration is required for this module, although roles must be given permission to ";
+      $output .= "use it.</p><p>Note that because this module causes the comment insert to pause while all ";
+      $output .= "subscribers are notified, it may not be practical for large sites.</p>";
+      $output = t($output);
       break;
-    case 'admin/system/modules#description':
-	  // appears on the admin module selection page
+    case 'admin/system/modules#description': 
+      // appears on the admin module selection page
       $output = t("Allows users to subscribe to nodes.");
       break;
-  }
+  } 
   return $output;
-}
-
+} 
 // formats the mail and sends it.
-function subscriptions_sendmail($to, $subject, $body, $headers){
-	$mail_success = user_mail($to, $subject, $body, $headers);
-	if ($mail_success) {
-      watchdog(t("subscriptions"), t("subscription notification for  '"). $name ."' &lt;". $to ."&gt;");
-    } else 
-	{
-      watchdog(t("error"),t("error mailing subscription notification: '"). $name ."' &lt;". $to ."&gt;");
-    }
-}
-
+function subscriptions_sendmail($to, $subject, $body, $headers) {
+  $mail_success = user_mail($to, $subject, $body, $headers);
+  if ($mail_success) {
+    watchdog(t("subscriptions"), t("subscription notification for  '") . $name . "' &lt;" . $to . "&gt;");
+  } else {
+    watchdog(t("error"), t("error mailing subscription notification: '") . $name . "' &lt;" . $to . "&gt;");
+  } 
+} 
 // get email vars
-function subscriptions_mailvars ($sid, $ssid, $uid, $stype){
-global $base_url;
-$from = variable_get("site_mail", ini_get("sendmail_from"));
+function subscriptions_mailvars ($sid, $ssid, $uid, $stype) {
+  global $base_url;
+  $from = variable_get("site_mail", ini_get("sendmail_from"));
+  // if comment insertion, get vars
+  if ($stype == "node") {
+    $result = db_query("SELECT title FROM {node} WHERE nid = $sid");
+    $subj = db_result($result);
+    $result = db_query("SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = $sid AND s.stype = \"node\"");
+    $strtype = "thread";
+    $nid = $sid;
+    $cid = "#" . $ssid;
+  } 
+  // if node insert, test if node has a taxonomy else skip
+  if ($stype == "taxa" && ! is_null($sid)) {
+    $result = db_query("SELECT name FROM {term_data} WHERE tid = $sid");
+    $subj = db_result($result);
+    $result = db_query("SELECT u.mail, u.name, u.uid FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = $sid AND stype = \"taxa\"");
+    $strtype = "category";
+    $nid = $ssid;
+    $cid = "";
+  } 
+  // loop through subscribers and call mail function
+  while ($subscriptions = db_fetch_object($result)) {
+    if ($subscriptions->uid != $uid && ! is_null($sid)) {
+      $headers = "From: $from\nReply-to: $from\nX-Mailer: Drupal\nReturn-path: $from\nErrors-to: $from";
+      $subject = "[" . variable_get("site_name", "drupal") . "] " . t("subscription update for ") . "$subscriptions->name : $subj";
+      $body = t("Greetings ") . $subscriptions->name . ",\n\n";
+      $body .= t("A $strtype to which you have subscribed has been updated.  To view the thread, ");
+      $body .= t("navigate to ") . "$base_url/node/view/$nid$cid.";
+      $body .= "\n-- \n";
+      $body .= t("This is an automatic mail from ") . variable_get("site_name", "drupal") . ".\n";
+      $body .= t("To stop receiving these mails go to ") . "$base_url/.\n";
+      if (variable_get("subscriptions_event", "insert") == "queue" && module_exist('mailqueue')) {
+        mailqueue_insert($uid, $subject, null, $body, 1);
+      } else
+      if (variable_get("subscriptions_event", "insert") == "insert" || ! module_exist('mailqueue')) {
+        subscriptions_sendmail($subscriptions->mail, $subject, $body, $headers);
+      } 
+    } 
+  } 
+} 
 
-// if comment insertion, get vars
-if($stype == "node"){
-  $result = db_query("SELECT title FROM {node} WHERE nid = $sid");
-  $subj = db_result($result);
-  $result = db_query("SELECT u.uid, u.name, u.mail FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = $sid AND s.stype = \"node\"");
-  $strtype = "thread";
-  $nid = $sid;
-  $cid = "#".$ssid;
-}
-
-// if node insert, test if node has a taxonomy else skip
-if($stype == "taxa" && ! is_null($sid)){
-  $result = db_query("SELECT name FROM {term_data} WHERE tid = $sid");
-  $subj = db_result($result);
-  $result = db_query("SELECT u.mail, u.name, u.uid FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = $sid AND stype = \"taxa\"");
-  $strtype = "category";
-  $nid = $ssid;
-  $cid = "";
-}
-
-// loop through subscribers and call mail function
-     while($subscriptions = db_fetch_object($result)) {
-	   if( $subscriptions->uid != $uid  && ! is_null($sid) ){
-	   $headers = "From: $from\nReply-to: $from\nX-Mailer: Drupal\nReturn-path: $from\nErrors-to: $from";
-	   $subject = "[".variable_get("site_name", "drupal") ."] ". t("subscription update for ")."$subscriptions->name : $subj";
-	   $body = t("Greetings "). $subscriptions->name .",\n\n";
-	   $body .= t("A $strtype to which you have subscribed has been updated.  To view the thread, ");
-	   $body .= t("navigate to ")."$base_url/node/view/$nid$cid.";
-       $body .= "\n-- \n";
-       $body .= t("This is an automatic mail from "). variable_get("site_name", "drupal") .".\n";
-       $body .= t("To stop receiving these mails go to "). "$base_url/.\n";
-		 if(variable_get("subscriptions_event","insert") == "queue" && module_exist('mailqueue')) {
-	       mailqueue_insert( $uid, $subject, null, $body, 1 );
-	     } else
-		 if(variable_get("subscriptions_event","insert") == "insert" || ! module_exist('mailqueue')) {
-	       subscriptions_sendmail($subscriptions->mail,$subject, $body, $headers );
-	     }
-	  }
-    }	 
-}
-
-// hook to comments update event 
+function subscriptions_autosubscribe ($uid, $nid) {
+  global $user; 
+  // if user has auto subscribe enabled
+  if ($user->subscriptions_auto) {
+    // check to see if already subscribed
+    $result = db_query("SELECT sid FROM {subscriptions} WHERE sid = $nid AND stype = \"node\" AND uid = $uid");
+    $thisnode = db_fetch_object($result);
+    if (! $thisnode) {
+      // if not, subscribe
+      db_query("INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES ($nid , $uid, \"node\")");
+    } 
+  } 
+} 
+// hook to comments update event
 function subscriptions_comment ($op, $comment) {
   global $user;
   if ($op == "insert" || $op == "update") {
-  $nid = $comment["nid"];
-	$cid = $comment["cid"];	
-	subscriptions_mailvars ($nid, $cid, $user->uid, "node");
-   }
-}
-
+    $nid = $comment["nid"];
+    $cid = $comment["cid"];
+    subscriptions_mailvars ($nid, $cid, $user->uid, "node");
+    subscriptions_autosubscribe ($user->uid, $nid);
+  } 
+} 
 // hook to taxonomy update
-function subscriptions_nodeapi (&$node, $op, $arg = 0){
+function subscriptions_nodeapi (&$node, $op, $arg = 0) {
   global $user;
   $tid = $node->taxonomy[0];
-  $nid = $node->nid;	
+  $nid = $node->nid;
   if ($op == "insert" || $op == "update") {
     subscriptions_mailvars ($tid, $nid, $user->uid, "taxa");
-	subscriptions_mailvars ($nid, 0, $user->uid, "node");
+    subscriptions_mailvars ($nid, 0, $user->uid, "node");
+    if ($node->type == "blog") {
+      subscriptions_mailvars ($node->uid, $nid, $user->uid, "blog");
+    } 
+    subscriptions_autosubscribe ($user->uid, $nid);
   } 
-}
-
+} 
 // puts "change subscription" link on all nodes
 // and "my subscsriptions" link in the account settings block
 function subscriptions_link($type, $node = 0, $main) {
-  if(user_access("subscribe to nodes")){
+  if (user_access("subscribe to nodes")) {
     if ($type == "system") {
       menu("subscriptions", t("my subscriptions"), "subscriptions_page", 0);
-    }
-    if ($type == "node"){ 
-      $links[] =l(t("subscriptions"), "subscriptions/$node->nid", array("title" => t("Change your subscription status for this thread.")));
-    }
-  }
+    } 
+    if ($type == "node") {
+      $links[] = l(t("subscriptions"), "subscriptions/$node->nid", array("title" => t("Change your subscription status for this thread.")));
+    } 
+  } 
   return $links ? $links : array();
-}
-
+} 
 // pages where users add and delete their subscriptions to nodes
 function subscriptions_page () {
   global $user;
   $subscribed = false;
   $uid = $user->uid;
   if (! arg(2)) {
-      $sid = arg(1);
-	  $nid = $sid; 
+    $sid = arg(1);
+    $nid = $sid;
   } else {
-	  $op = arg(1);
-	  $stype = arg(2);
-	  $sid = arg(3);
-	  $nid = arg(4);
-	  if($stype == "node"){$nid = $sid;}
-  }
-  
+    $op = arg(1);
+    $stype = arg(2);
+    $sid = arg(3);
+    $nid = arg(4);
+    if ($stype == "node") {
+      $nid = $sid;
+    } 
+  } 
   // get taxonomy for node
   $result = db_query("SELECT tn.tid, td.name, n.title FROM ({node} n LEFT JOIN  {term_node} tn ON n.nid = tn.nid ) LEFT JOIN {term_data} td ON tn.tid = td.tid WHERE n.nid='$nid'");
   $thisnode = db_fetch_object($result);
-  if(is_null($thisnode->tid)){
+  if (is_null($thisnode->tid)) {
     $tid = 0;
-  } else
-  {
+  } else {
     $tid = $thisnode->tid;
-  }
+  } 
   $tname = $thisnode->name;
-  $ntitle = $thisnode->title;
-  
+  $ntitle = $thisnode->title; 
   // node links
-  $nlinks =l(t("[Subscribe]"), "subscriptions/add/node/$nid", array("title" => t("Subscribe to this thread.")));
-  $nlinku =l(t("[Unsubscribe]"), "subscriptions/del/node/$nid", array("title" => t("Unsubscribe from this thread.")));
+  $nlinks = l(t("[Subscribe]"), "subscriptions/add/node/$nid", array("title" => t("Subscribe to this thread.")));
+  $nlinku = l(t("[Unsubscribe]"), "subscriptions/del/node/$nid", array("title" => t("Unsubscribe from this thread."))); 
   // taxa links
-  $tlinks =l(t("[Subscribe]"), "subscriptions/add/taxa/$tid/$nid", array("title" => t("Subscribe to this category.")));
-  $tlinku =l(t("[Unsubscribe]"), "subscriptions/del/taxa/$tid/$nid", array("title" => t("Unsubscribe from this category.")));
-  
-  if (user_access("subscribe to nodes")){ 
+  $tlinks = l(t("[Subscribe]"), "subscriptions/add/taxa/$tid/$nid", array("title" => t("Subscribe to this category.")));
+  $tlinku = l(t("[Unsubscribe]"), "subscriptions/del/taxa/$tid/$nid", array("title" => t("Unsubscribe from this category.")));
+
+  if (user_access("subscribe to nodes")) {
     switch ($op) {
-	  // inserts a new subscription into the subscriptions_nodes table
+      // inserts a new subscription into the subscriptions_nodes table
       case "add":
         db_query("INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES ($sid , $uid, \"$stype\")");
-  		$message = t("<p>Your subscription was activated.<p/>");
-  		if(!(arg(3) == "taxa" && is_null(arg(5)))) {
-                  $message .= l(t("Return to the thread"), "node/view/$nid") . " | ";
-                }
-		$message .= l(t("Return to the subscriptions"), "subscriptions") . "<br />";
-  		print theme("page", $message, t("Subscription Activated"));
-        break;
-	  // removes a subscription from the subscriptions_nodes table	
-	  case "del":
+        $message = t("<p>Your subscription was activated.<p/>");
+        if (!(arg(3) == "taxa" && is_null(arg(5)))) {
+          $message .= l(t("Return to the thread"), "node/view/$nid") . " | ";
+        } 
+        $message .= l(t("Return to the subscriptions"), "subscriptions") . "<br />";
+	print theme("page", $message, t("Subscription Activated"));
+        break; 
+      // removes a subscription from the subscriptions_nodes table
+      case "del":
         db_query("DELETE FROM {subscriptions} WHERE sid = $sid AND uid = $uid AND stype = '$stype'");
-  		$message = t("<p>Your subscription was deactivated.<p/>");
-		if(!(arg(3) == "taxa" && is_null(arg(5)))) {
-                  $message .= l(t("Return to the thread"), "node/view/$nid") . " | ";
-                }
-                $message .= l(t("Return to the subscriptions"), "subscriptions") . "<br />";
-                print theme("page", $message, t("Subscription Deactivated"));
+        $message = t("<p>Your subscription was deactivated.<p/>");
+        if (!(arg(3) == "taxa" && is_null(arg(5)))) {
+          $message .= l(t("Return to the thread"), "node/view/$nid") . " | ";
+        } 
+        $message .= l(t("Return to the subscriptions"), "subscriptions") . "<br />";
+	print theme("page", $message, t("Subscription Deactivated"));
+        break; 
+      // determines the user's subscription status and displays the right option to change it
+      default: 
+        // get all subscriptions and write to table rows
+        $subrows = "";
+        $queryn = "SELECT td.tid, td.name, n.nid, n.title FROM";
+        $queryn .= "(({subscriptions} s LEFT JOIN {node} n  ON n.nid = s.sid) ";
+        $queryn .= "LEFT JOIN {term_node} tn ON tn.nid = s.sid) ";
+        $queryn .= "LEFT JOIN {term_data} td ON td.tid = tn.tid ";
+        $queryn .= "WHERE n.status = 1 AND s.uid = $uid AND s.stype = \"node\" ";
+        $queryt .= "SELECT td.tid, td.name FROM ";
+        $queryt .= "{subscriptions} s INNER JOIN {term_data} td ON td.tid = s.sid ";
+        $queryt .= "WHERE s.uid = $uid AND s.stype = \"taxa\"";
+
+        $resultn = db_query($queryn);
+        $resultt = db_query($queryt); 
+        // build taxonomy rows
+        while ($subscriptions = db_fetch_object($resultt)) {
+          if ($subscriptions->tid == $tid) {
+            $tsubscribed = true;
+            $tsubtitle = $subscriptions->name;
+          } 
+          $subrows .= t("<tr><td>Category: ") . l($subscriptions->name, "taxonomy/page/or/$subscriptions->tid") . "</td><td>[" . l(t("Unsubscribe"), "subscriptions/del/taxa/" . $subscriptions->tid, array("title" => t("Unsubscribe from this category."))) . "]</td></tr>\n";
+        } 
+        // build node rows
+        while ($subscriptions = db_fetch_object($resultn)) {
+          if ($subscriptions->nid == $nid) {
+            $nsubscribed = true;
+            $nsubtitle = $subscriptions->title;
+          } 
+          $subrows .= t("<tr><td>Thread: ") . l($subscriptions->title, "node/view/$subscriptions->nid") . "</td><td>[" . l(t("Unsubscribe"), "subscriptions/del/node/" . $subscriptions->nid, array("title" => t("Unsubscribe from this thread."))) . "]</td></tr>\n";
+        } 
+        // write out node specific message
+        $message = "<p><b>$nsubtitle</b></p>";
+        $title = t("Subscription status"); 
+        // if subcribed to taxonomy
+        if ($tsubscribed) {
+          $message .= "<div class=\"description\">" . l($tname, "taxonomy/page/or/$tid") . "</div>";
+          $message .= t("<p>You are already subscribed to this category.  ") . $tlinku . "</p>";
+        } else {
+          if ($nid == 0) {
+            $title = t("Your Subscriptions");
+            $message = "";
+          } else
+          if ($tid != 0) {
+            $message .= "<div class=\"description\">" . l($tname, "taxonomy/page/or/$tid") . "</div>";
+            $message .= t("<p>You are not currently subscribed to this category.  ") . $tlinks . "</p>";
+          } 
+        } 
+        // if subscribed to node
+        if ($nsubscribed) {;
+          $message .= "<div class=\"description\">" . l($ntitle, "node/view/$nid") . "</div>";
+          $message .= t("<p>You are already subscribed to this thread.  ") . $nlinku . "</p>";
+        } else {
+          if ($nid == 0) {
+            $message = "";
+          } else
+          if (! is_null($tid)) {
+            $message .= "<div class=\"description\">" . l($ntitle, "node/view/$nid") . "</div>";
+            $message .= t("<p>You are not currently subscribed to this thread.  ") . $nlinks . "</p>";
+          } 
+        } 
+        // concatenate table to end of node specific message
+        // if no subscriptions, say so, else complete table
+        if (!arg(1)) {
+          $title = t("Your Subscriptions");
+          $message = "";
+        } else {
+          $message .= "<p><hr /></p>";
+          $message .= t("<p class=\"nodetitle\">Your Subscriptions</p>");
+        } 
+        if (strlen($subrows) == 0) {
+          $message .= t("<p>You are not currently subscribed to any active threads or categories.</p>");
+        } else {
+          $message .= "<p align=\"center\"><table>" . $subrows . "</table></p>";
+        } 
+        // $message .= $subrows;
+	print theme("page", $message, $title);
         break;
-	  // determines the user's subscription status and displays the right option to change it	
-	  default:
-	    // get all subscriptions and write to table rows
-	    $subrows = "";
-		$queryn = "SELECT td.tid, td.name, n.nid, n.title FROM";
-		$queryn .= "(({subscriptions} s LEFT JOIN {node} n  ON n.nid = s.sid) ";
-		$queryn .= "LEFT JOIN {term_node} tn ON tn.nid = s.sid) ";
-		$queryn .= "LEFT JOIN {term_data} td ON td.tid = tn.tid ";
-		$queryn .= "WHERE n.status = 1 AND s.uid = $uid AND s.stype = \"node\" ";
-		$queryt .= "SELECT td.tid, td.name FROM ";
-		$queryt .= "{subscriptions} s INNER JOIN {term_data} td ON td.tid = s.sid ";
-		$queryt .= "WHERE s.uid = $uid AND s.stype = \"taxa\"";
-
-		$resultn = db_query($queryn);
-		$resultt = db_query($queryt);
-		
-		//build taxonomy rows  
-		while($subscriptions = db_fetch_object($resultt)) {
-		    if( $subscriptions->tid == $tid){
-          	  $tsubscribed = true;
-			  $tsubtitle = $subscriptions->name;
-			}
-  		    $subrows .= t("<tr><td>Category: ").l($subscriptions->name, "taxonomy/page/or/$subscriptions->tid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/taxa/".$subscriptions->tid, array("title" => t("Unsubscribe from this category.")))."]</td></tr>\n";
-          }		 
-
-		//build node rows
-		while($subscriptions = db_fetch_object($resultn)) {
-			if( $subscriptions->nid == $nid){
-          	  $nsubscribed = true;
-			  $nsubtitle = $subscriptions->title;
-			}
-			$subrows .= t("<tr><td>Thread: ").l($subscriptions->title, "node/view/$subscriptions->nid")."</td><td>[".l(t("Unsubscribe"), "subscriptions/del/node/".$subscriptions->nid, array("title" => t("Unsubscribe from this thread.")))."]</td></tr>\n";
-          }	 
-
-		// write out node specific message	
-		$message = "<p><b>$nsubtitle</b></p>";
-		$title = t("Subscription status");
-		
-		// if subcribed to taxonomy
-		if ($tsubscribed) {
-		  $message .= "<div class=\"description\">".l($tname, "taxonomy/page/or/$tid")."</div>";
-		  $message .= t("<p>You are already subscribed to this category.  ").$tlinku."</p>";
-		} else 
-		{
-  		  if ( $nid == 0) {
-  		  	$title = t("Your Subscriptions");
-			$message = "";
-  		  }  else 
-		  if ($tid != 0) {
-		    {		
-		      $message .= "<div class=\"description\">".l($tname, "taxonomy/page/or/$tid")."</div>";  
-		      $message .= t("<p>You are not currently subscribed to this category.  ").$tlinks."</p>";					
-		    }	
-		  }	
-		}		
-		
-		// if subscribed to node
-		if ($nsubscribed) {;
-		  $message .= "<div class=\"description\">".l($ntitle, "node/view/$nid")."</div>";
-		  $message .= t("<p>You are already subscribed to this thread.  ").$nlinku."</p>";
-		} else 
-		{
-  		  if ( $nid == 0) {
-			$message = "";
-  		  } else
-		  if(! is_null($tid)) 
-		  {		
-		    $message .= "<div class=\"description\">".l($ntitle, "node/view/$nid")."</div>";  
-		    $message .= t("<p>You are not currently subscribed to this thread.  ").$nlinks."</p>";				
-		  }		
-		}
-		
-		// concatenate table to end of node specific message
-		// if no subscriptions, say so, else complete table
-		if (!arg(1)) {
-  		  	$title = t("Your Subscriptions");
-			$message = "";
-		  } else
-		  {
-		    $message .= "<p><hr /></p>";
-		    $message .= t("<p class=\"nodetitle\">Your Subscriptions</p>");
-		  }    	
-		if (strlen($subrows) == 0) {
-		  $message .= t("<p>You are not currently subscribed to any active threads or categories.</p>");
-		} else
-		{ 
-		  $message .= "<p align=\"center\"><table>" . $subrows . "</table></p>";
-		}
-		//$message .= $subrows;
-                print theme("page", $message, $title);
-        break;
-	}
+    } 
   } else {
     print theme("page", message_access(), t("Access Denied"));
-  }
-}
+  } 
+} 
 
 ?>
