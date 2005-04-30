@@ -428,7 +428,7 @@ function subscriptions_page() {
       }
       $message .= l(t('Return to the subscriptions'), 'subscriptions') .'<br />';
       drupal_set_title(t('Subscription Activated'));
-      print theme('page', $message);
+      return $message;
       break;
 
     // removes a subscription from the subscriptions_nodes table
@@ -440,7 +440,7 @@ function subscriptions_page() {
       }
       $message .= l(t('Return to the subscriptions'), 'subscriptions') .'<br />';
       drupal_set_title(t('Subscription Deactivated'));
-      print theme('page', $message);
+      return $message;
       break;
 
     // Base report for admin functions
@@ -480,7 +480,7 @@ function subscriptions_page() {
         $message .= theme('table', $headers, $subrows, array('id' => 'subscriptions'));
       }
       drupal_set_title(t('Subscriptions Summary'));
-      print theme('page', $message);
+      return $message;
       break;
 
     // determines the user's subscription status and displays the right option to change it
@@ -519,7 +519,7 @@ function subscriptions_page() {
       else {
         $message .= theme('table', $headers, $subrows, array('id' => 'subscriptions'));
       }
-      print theme('page', $message);
+      return $message;
       break;
   }
 }
