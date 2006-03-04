@@ -38,13 +38,18 @@ Configuration
 Credits / Contact
 ------------------------------------------------------------------------------
 
-The original author of this module is Dan Ziemecki, who can be reached at
-dan[deletethis] - at - ziemecki - com.  Tom Dobes provided additional fixes and  
-upgraded the module to function with Drupal post-4.3 CVS.
+The original author of this module is Dan Ziemecki, who can be contacted through
+the Drupal site at http://drupal.org/user/4532/contact.  Tom Dobes provided
+additional fixes and upgraded the module to function with Drupal post-4.3 CVS.
 
 
 Change Log
 ------------------------------------------------------------------------------
+03/04/2006 (dan ziemecki)
+- added Norwegian translation
+- added check to see if comments are allowed on a node and if the viewer is
+logged on before prompting viewer to subscribe. (Fixes bug #2610)
+- added array initialization to prevetn error on an array merge. (Fixes bug #22849)
 
 11/23/2004 (tom dobes)
 ---------

@@ -309,7 +309,7 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
       }
       break;
     case 'form post':
-      if (!$user->subscriptions_auto) {
+      if (!$user->subscriptions_auto && $node->comment == 2 && $user->uid) {
         $allsubs = subscriptions_get_user();
         $val = isset($node->subscriptions_subscribe) ? $node->subscriptions_subscribe : $allsubs['node'][$node->nid] ? 1 : $user->subscriptions_subscribe;
         return form_item(t('Subscribe'), form_checkbox(t('Receive notification of replies to this %name.', array('%name' => node_invoke($node, 'node_name'))), 'subscriptions_subscribe', 1, $val));
@@ -475,6 +475,9 @@ function subscriptions_page() {
       }
       // concatenate the arrays
       $headers = array(t('type'), t('title'), t('subscribers'));
+      if (!is_array($subrowsn)) $subrowsn=array();
+      if (!is_array($subrowsb)) $subrowsb=array();
+      if (!is_array($subrowst)) $subrowst=array();
       $subrows = array_merge($subrowsn, $subrowsb, $subrowst);
       // assemble output
       if (!$subrows) {
