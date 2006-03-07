@@ -425,35 +425,39 @@ function subscriptions_page() {
       $nid = $sid;
     }
   }
-
+  
+  //  determine return location
+  if(is_null($_SERVER['HTTP_REFERER'])){
+  	$rtnloc = "node/$node->nid";
+  } else {
+	if(variable_get('clean_url', 0) == 1){  // clean URLs on
+      global $base_url;
+	  // extract $base_url from $_SERVER['HTTP_REFERER']
+	  $istart = strlen($base_url) + 1;
+	  %rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
+	}else {
+	  // split $_SERVER['HTTP_REFERER'] at "q="
+	  $istart = strpos($_SERVER['HTTP_REFERER'], 'q=') + 2;
+	  $rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
+	}
+  	$return = $_SERVER['HTTP_REFERER'];
+  } // end determine return location
+  
   switch ($op) {
     // inserts a new subscription into the subscriptions_nodes table
     case 'add':
       subscriptions_add($sid, $uid, $stype);
-      $message = t('<p>Your subscription was activated.</p>');
-      if (!(arg(2) == 'taxa')) {
-        if (arg(2) == 'blog') {
-          $message .= l(t('Return to the blog'), 'blog/'. $sid) .' | ';
-        }
-        else {
-          $message .= l(t('Return to the thread'), 'node/'. $nid) .' | ';
-        }
-      }
-      $message .= l(t('Return to the subscriptions'), 'subscriptions') .'<br />';
-      drupal_set_title(t('Subscription Activated'));
-      return $message;
+      $message = t('Your subscription was activated.');
+      drupal_set_message($message);
+      drupal_goto($rtnloc);
       break;
 
     // removes a subscription from the subscriptions_nodes table
     case 'del':
       db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', $sid, $uid, $stype);
-      $message = t('<p>Your subscription was deactivated.</p>');
-      if (!(arg(2) == 'taxa')) {
-        $message .= l(t('Return to the thread'), 'node/'. $nid) .' | ';
-      }
-      $message .= l(t('Return to the subscriptions'), 'subscriptions') .'<br />';
-      drupal_set_title(t('Subscription Deactivated'));
-      return $message;
+      $message = t('Your subscription was deactivated.');
+      drupal_set_message($message);
+      drupal_goto($rtnloc);
       break;
 
     // Base report for admin functions

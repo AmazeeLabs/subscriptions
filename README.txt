@@ -54,6 +54,9 @@ names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+03/07/2006 (dan ziemecki)
+- replaced confirmation page with message and redirect (addresses request #4625)
+
 03/06/2006 (dan ziemecki)
 - added notification upon node status change, like publishing (Fixes bug #31041)
 - added another array initialization to prevent error on an array merge.
