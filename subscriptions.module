@@ -288,7 +288,16 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
   global $user;
   $strsent = '!';
   switch ($op) {
+    case 'update':  // fall through
     case 'insert':
+	  if($op == 'update') {
+	    // If node was previously published, no need to go further
+        $oldnode = node_load(array('nid' => $node->nid));
+        if ($oldnode->status) {
+          break;
+        }
+        // Otherwise, fall through
+      }
       if ($node->status) {
         if (!empty($node->taxonomy)) {
           foreach ($node->taxonomy as $tid){
@@ -519,7 +528,10 @@ function subscriptions_page() {
       }
       // concatentate the arrays
       $headers = array(t('type'), t('title'), t('operations'));
-      $subrows = array_merge((array) $subrowsn, (array) $subrowsb, $subrowst);
+      if (!is_array($subrowsn)) $subrowsn=array();
+      if (!is_array($subrowsb)) $subrowsb=array();
+      if (!is_array($subrowst)) $subrowst=array();
+      $subrows = array_merge($subrowsn, $subrowsb, $subrowst);
       if (!$subrows) {
         $message .= t('<p>You are not currently subscribed to any active threads or categories.</p>');
       }
