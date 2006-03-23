@@ -434,7 +434,7 @@ function subscriptions_page() {
       global $base_url;
 	  // extract $base_url from $_SERVER['HTTP_REFERER']
 	  $istart = strlen($base_url) + 1;
-	  %rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
+	  $rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
 	}else {
 	  // split $_SERVER['HTTP_REFERER'] at "q="
 	  $istart = strpos($_SERVER['HTTP_REFERER'], 'q=') + 2;
