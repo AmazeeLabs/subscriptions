@@ -15,8 +15,23 @@ function subscriptions_help($section) {
         No configuration is required for this module, although roles must be given permission to
         use it.</p>
 
-        <p>Note that because this module causes the comment insert to pause while all
-        subscribers are notified, it may not be practical for large sites.</p>');
+        <p>While no configuration is required, administrators are offered a few configurable options:</p>
+        
+				<p>"<b>Omitted vocabularies</b>" allows the admin to exclude certain node categories from this list of those
+				available for subscription.</p>
+
+				<p>"<b>Use cron for notifications</b>" allows you to postpone subscription
+				notifications until the next cron job is run.  Default behavior is to notify all subscribers immediately
+				upon content change.  This behavior is probably best for low volume sites, but high volume sites could
+				observe appreciable pauses upon node or comment insert, and should probably use the cron option.
+
+				<p>"<b>Display watchdog entries for successful mailings</b>" should also probably be disabled for high volume sites,
+				as a large number of mailings could completely fill the log.</p>
+
+				<p>"<b>Test held posts prior to sending</b>" tells Subscriptions to test if a node or comment
+				is still active\published prior toi sending a notification.  This is mainly to avoid sending
+				notifications for for posts that have been deleted.  This will result in a small performance
+				hit, and only makes sense if you are delaying the notifications with "Use cron for notifications".</p>');
     case 'admin/modules#description':
       // appears on the admin module selection page
       return t('Allows users to subscribe to nodes and taxonomy terms.');
@@ -29,26 +44,6 @@ function subscriptions_help($section) {
 function subscriptions_perm() {
   return array('maintain subscriptions');
 }
-
-// this section will be commented out until the mailqueue module is completed
-/*
-function subscriptions_settings() {
-  $mailevent = "This variable sets the event that will initiate the sending of update notification.  ";
-  $mailevent .= "By default, subscription noticies are sent out as soon as a subscribed ";
-  $mailevent .= "node recieved a comment.  This may be inefficient for some large sites.";
-  $mailevent .= "Alternativly, if you have the mailqueue module installed, you can send the messages ";
-  $mailevent .= "to that module for handling.";
-  if ( module_exist( 'mailqueue' ) ) {
-    $output = form_radios( t( "Mailer Event" ), "subscriptions_event", variable_get( "subscriptions_event", "insert" ), array( "insert" => t( "On Comment Insert/Update" ), "queue" => t( "Send to mail queue" ) ) , t( $mailevent ) );
-  }
-  else {
-    $output = "Subscription notifications will be sent upon insert/update.  This should be ";
-    $output .= "sufficient for most installations, but you can install the mailqueue module to send on a batched schedule.";
-    $output = t( $output );
-  }
-  return $output;
-}
-*/
 
 /**
  * Implementation of hook_user().
@@ -72,6 +67,9 @@ function subscriptions_settings() {
     $select[$vocabulary->vid] = $vocabulary->name;
   }
   $output = form_select(t('Omitted vocabularies'), 'subscriptions_omitted_taxa', variable_get('subscriptions_omitted_taxa', array()), $select, t('Select vocabularies which should be <strong>omitted</strong> from subscription listings.'), '', 1);
+  $output .= form_checkbox(t('Use cron for notifications'), 'subscriptions_usecron', 1, variable_get('subscriptions_usecron', 0), t('Sends subscription notification when cron module runs.  Default is to send upon node update.  Note:  currently only works with mySQL.'));
+  $output .= form_checkbox(t('Display watchdog entries for successful mailings'), 'subscriptions_watchgood', 1, variable_get('subscriptions_watchgood', 1), t('Inserts notification of successful mailings in the watchdog log.  Default is "yes".'));
+  $output .= form_checkbox(t('Test held posts prior to sending'), 'subscriptions_testpost', 1, variable_get('subscriptions_testpost', 0), t('Tests to see if a post about to be sent by cron is still active.  Adds a small amount of overhead.  Default is "no".'));
   return $output;
 }
 
@@ -167,7 +165,9 @@ function subscriptions_get_summary() {
 function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
   $mail_success = user_mail($to, $subject, $body, $headers);
   if ($mail_success) {
-    watchdog('regular', t('subscription notification for ') .'"'. $name .'" &lt;'. $to .'&gt;');
+  	if(variable_get('subscriptions_watchgood', 1) == 1){
+      watchdog('regular', t('subscription notification for ') .'"'. $name .'" &lt;'. $to .'&gt;');
+    }
   }
   else {
     watchdog('error', t('error mailing subscription notification: ') .'"'. $name .'"  &lt;'. $to .'&gt;');
@@ -238,13 +238,7 @@ To manage your subscriptions, browse to %manage-url', array('%name' => $subscrip
 
       // revert to original locale
       $locale = $initial_locale;
-
-      if (variable_get('subscriptions_event', 'insert') == 'queue' && module_exist('mailqueue')) {
-        mailqueue_insert($uid, $subject, null, $body, 1);
-      }
-      else {
-        subscriptions_sendmail($subscriptions->name, $subscriptions->mail, $subject, $body, $headers);
-      }
+      subscriptions_sendmail($subscriptions->name, $subscriptions->mail, $subject, $body, $headers);
     }
   }
   return $strsent;
@@ -267,16 +261,108 @@ function subscriptions_autosubscribe($uid, $nid) {
 }
 
 /**
+ * handling for held nodes
+ */
+function subscriptions_heldnodes($heldnode, $poster){
+  $strsent = '!';
+  $onode = unserialize($heldnode);
+  if ($onode->status) {
+    if (!empty($onode->taxonomy)) {
+      foreach ($onode->taxonomy as $tid){
+        $strsent = $strsent . subscriptions_mailvars($tid, $onode->nid, $poster, 'taxa', $strsent);
+      }
+    }
+    $strsent = $strsent . subscriptions_mailvars($onode->nid, 0, $poster, 'node', $strsent);
+    if ($node->type == 'blog') {
+      $strsent = $strsent . subscriptions_mailvars($onode->uid, $onode->nid, $poster, 'blog', $strsent);
+    }
+  }
+}
+
+/**
+ * handling for held comments
+ */
+function subscriptions_heldcomments($heldcomment, $poster){
+  $strsent = '!';
+  $ocom = unserialize($heldcomment);
+  subscriptions_mailvars($ocom['nid'], $ocom['cid'], $poster, 'node', $strsent);
+}
+
+/**
+ * store node changes for later handling
+ */
+function subscriptions_hold( $content, $ptype , $op, $pid ) {
+  $strqry = 'INSERT INTO {subscriptions_holding} ( content, ptype , op, pid )  VALUES (\'%s\', \'%s\', \'%s\', %d)';
+  db_query($strqry, serialize($content), $ptype, $op, $pid);
+}
+
+/**
+ * Test to see if a post is still vactive before notifications are sent
+ */
+function subscriptions_testpost($content, $ptype){
+	$content = unserialize($content);
+	$valid = false;
+  switch ($ptype) {
+  case 'comment':  // comment handling
+		$result = db_query('SELECT pid, status FROM {comments} WHERE cid = %d', $content['cid']);
+		$row = db_fetch_object($result);
+		if(!is_null($row->pid) && ($row->pid != 0) &&  ($row->status != 1)){$valid = true;}
+		break;
+	case 'node':  // node handling
+		$result = db_query('SELECT status FROM {node} WHERE nid = %d', $content['cid']);
+		if(db_result($result)==1){$valid = true;}
+		break;
+	}
+	return $valid;
+}
+
+
+/**
+ * Implementation of cron job.
+ */
+function subscriptions_cron() {
+  if(variable_get('subscriptions_usecron', 0) == 1){
+    // get all currently held node updates
+	$result = db_query('SELECT * FROM {subscriptions_holding} ');
+	while ($row = db_fetch_object($result)) {
+		$proceed = true;
+		if(variable_get('subscriptions_testpost', 0) == 1){$proceed = subscriptions_testpost($row->content,$row->ptype);}
+		If($proceed){
+		  // do send
+		  if($row->ptype == 'comment'){
+	    subscriptions_heldcomments($row->content, $row->puid);
+	    // delete processed row
+	    db_query('DELETE FROM {subscriptions_holding} WHERE rid = %d', $row->rid);
+	  } // row type == 'comment'
+	  if($row->ptype == 'node'){
+	    subscriptions_heldnodes($row->content, $row->puid);
+	    // delete processed row
+	    db_query('DELETE FROM {subscriptions_holding} WHERE rid = %d', $row->rid);
+	  } // row type == 'node'
+		}else{
+		  // do delete
+		  db_query('DELETE FROM {subscriptions_holding} WHERE rid = %d', $row->rid);
+		}
+	} // for each row in results set
+  }  // if using cron to send notifications
+}
+
+/**
  * Implementation of hook_comment().
  */
 function subscriptions_comment($op, $comment) {
-  global $user;
+   global $user;
   $strsent = '!';
   // TODO: it appears the comment status is not provided by this hook... we'll have to look into that later
-  if (/* $comment['status'] == 0 && */ ($op == 'insert' || $op == 'update')) {
-    $nid = $comment['nid'];
-    $cid = $comment['cid'];
-    subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
+  if (/* $comment['status'] == 0 && */ ($op == 'insert' || ($op == 'update' && $comment->status == 1))) { // ignore deactivated comments
+    //  if use_cron is set, insert node actions into holding table
+    if(variable_get('subscriptions_usecron', 0) == 1){
+      subscriptions_hold( $comment, 'comment' , $op, $user->uid );
+    } else {  // if cron is not used
+      $nid = $comment['nid'];
+      $cid = $comment['cid'];
+      subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
+    } // end cron test
     subscriptions_autosubscribe($user->uid, $nid);
   }
 }
@@ -293,23 +379,28 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
 	  if($op == 'update') {
 	    // If node was previously published, no need to go further
         $oldnode = node_load(array('nid' => $node->nid));
-        if ($oldnode->status) {
+        if ($oldnode->status == 1) {  // only want 0->1
           break;
         }
         // Otherwise, fall through
-      }
-      if ($node->status) {
-        if (!empty($node->taxonomy)) {
-          foreach ($node->taxonomy as $tid){
-            $strsent = $strsent . subscriptions_mailvars($tid, $node->nid, $user->uid, 'taxa', $strsent);
-          }
-        }
-        $strsent = $strsent . subscriptions_mailvars($node->nid, 0, $user->uid, 'node', $strsent);
-        if ($node->type == 'blog') {
-          $strsent = $strsent . subscriptions_mailvars($node->uid, $node->nid, $user->uid, 'blog', $strsent);
-        }
-        subscriptions_autosubscribe($user->uid, $node->nid);
-      }
+    }
+	  if(variable_get('subscriptions_usecron', 0) == 1){
+	  	// using cron to send notifications
+	  	subscriptions_hold( $node, 'node' , $op, $user->uid );
+	  }else{  // sending notification on submission
+	      if ($node->status) {
+	        if (!empty($node->taxonomy)) {
+	          foreach ($node->taxonomy as $tid){
+	            $strsent = $strsent . subscriptions_mailvars($tid, $node->nid, $user->uid, 'taxa', $strsent);
+	          }
+	        }
+	        $strsent = $strsent . subscriptions_mailvars($node->nid, 0, $user->uid, 'node', $strsent);
+	        if ($node->type == 'blog') {
+	          $strsent = $strsent . subscriptions_mailvars($node->uid, $node->nid, $user->uid, 'blog', $strsent);
+	        }
+	        subscriptions_autosubscribe($user->uid, $node->nid);
+	      }
+     }  // cron test
       if (isset($node->subscriptions_subscribe)) {
         if ($node->subscriptions_subscribe) {
           subscriptions_add($node->nid, $user->uid, 'node');
@@ -432,13 +523,13 @@ function subscriptions_page() {
   } else {
 	if(variable_get('clean_url', 0) == 1){  // clean URLs on
       global $base_url;
-	  // extract $base_url from $_SERVER['HTTP_REFERER']
-	  $istart = strlen($base_url) + 1;
-	  $rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
+		// extract $base_url from $_SERVER['HTTP_REFERER']
+		$istart = strlen($base_url) + 1;
+		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
 	}else {
-	  // split $_SERVER['HTTP_REFERER'] at "q="
-	  $istart = strpos($_SERVER['HTTP_REFERER'], 'q=') + 2;
-	  $rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
+		// split $_SERVER['HTTP_REFERER'] at "q="
+		$istart = strpos($_SERVER['HTTP_REFERER'], 'q=') + 2;
+		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
 	}
   	$return = $_SERVER['HTTP_REFERER'];
   } // end determine return location
@@ -451,7 +542,6 @@ function subscriptions_page() {
       drupal_set_message($message);
       drupal_goto($rtnloc);
       break;
-
     // removes a subscription from the subscriptions_nodes table
     case 'del':
       db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', $sid, $uid, $stype);
@@ -459,7 +549,6 @@ function subscriptions_page() {
       drupal_set_message($message);
       drupal_goto($rtnloc);
       break;
-
     // Base report for admin functions
     case 'admin':
       // get all subscriptions for all users
@@ -486,7 +575,7 @@ function subscriptions_page() {
           $subrowst[] = array(t('category'), $vocab->name .': '. l($term->name, 'taxonomy/term/'. $term->tid), is_null($taxa[$term->tid]) ? '0' : $taxa[$term->tid]);
         }
       }
-      // concatenate the arrays
+      // concatentate the arrays
       $headers = array(t('type'), t('title'), t('subscribers'));
       if (!is_array($subrowsn)) $subrowsn=array();
       if (!is_array($subrowsb)) $subrowsb=array();

@@ -54,6 +54,13 @@ names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+03/27/2006 (dan ziemecki)
+- refined node publishing trap to only notify on publication, not un-publication
+- added cron managed notification mailings (addresses request #14516)
+- added ability to turn off watchdog logging for successful mailings
+- added option to confirm posts are still active prior to cron mailings
+ (addresses request #17745)
+
 03/07/2006 (dan ziemecki)
 - replaced confirmation page with message and redirect (addresses request #4625)
 

@@ -4,3 +4,17 @@ CREATE TABLE subscriptions(
   uid      integer not null,
   stype    text not null
 );
+
+DROP TABLE subscriptions_holding;
+CREATE TABLE subscriptions_holding (
+  rid serial,
+  content text not null,
+  ptype text not null,
+  op text not null,
+  puid integer not null default 0
+);
+COMMENT ON COLUMN subscriptions_holding.rid IS 'Unique row ID';
+COMMENT ON COLUMN subscriptions_holding.content IS 'The node array';
+COMMENT ON COLUMN subscriptions_holding.type IS 'post type - node or comment';
+COMMENT ON COLUMN subscriptions_holding.op IS 'The operation on the node';
+COMMENT ON COLUMN subscriptions_holding.uid IS 'The ID of the poster';
