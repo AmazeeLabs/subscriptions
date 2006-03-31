@@ -12,7 +12,7 @@ CREATE TABLE subscriptions_holding (
   ptype tinytext NOT NULL COMMENT 'post type - node or comment',
   op tinytext NOT NULL COMMENT 'The operation on the node',
   pid int(11) NOT NULL default '0' COMMENT 'The ID of the poster',
-  PRIMARY KEY  ('rid')
+  PRIMARY KEY  (rid)
 );
 
 
