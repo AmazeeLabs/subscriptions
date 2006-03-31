@@ -15,6 +15,6 @@ CREATE TABLE subscriptions_holding (
 );
 COMMENT ON COLUMN subscriptions_holding.rid IS 'Unique row ID';
 COMMENT ON COLUMN subscriptions_holding.content IS 'The node array';
-COMMENT ON COLUMN subscriptions_holding.type IS 'post type - node or comment';
+COMMENT ON COLUMN subscriptions_holding.ptype IS 'post type - node or comment';
 COMMENT ON COLUMN subscriptions_holding.op IS 'The operation on the node';
-COMMENT ON COLUMN subscriptions_holding.uid IS 'The ID of the poster';
+COMMENT ON COLUMN subscriptions_holding.puid IS 'The ID of the poster';
