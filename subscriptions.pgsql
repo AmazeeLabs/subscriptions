@@ -11,7 +11,7 @@ CREATE TABLE subscriptions_holding (
   content text not null,
   ptype text not null,
   op text not null,
-  puid integer not null default 0
+  pid integer not null default 0
 );
 COMMENT ON COLUMN subscriptions_holding.rid IS 'Unique row ID';
 COMMENT ON COLUMN subscriptions_holding.content IS 'The node array';

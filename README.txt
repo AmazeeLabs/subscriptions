@@ -8,8 +8,11 @@ node.  When this module is enabled, all nodes will display a new link,
 question.  A new menu option, "my subscriptions",  allows the user to
 view all current subscriptions and make modifications.
 
-Because this module causes the post insert\update to pause while all subscribers
-are e-mailed, it may not be practical for some large sites.  
+Postgres Compatibility:
+This module attempts to offer compatability with Postgres SQL, but has not
+yet been tested succesfully due to the unavailability of a suitable test
+environment.  If you are able to succesfully deploy the module, please contact
+the author so that your modifications can be made available for other users.
 
 
 Installation
@@ -47,6 +50,7 @@ trew
 tostinni
 shezz
 mikeryan
+q0rban
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
@@ -54,6 +58,10 @@ names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+03/31/2006
+- modified form element construction for new 4.7 api (fixes bug #31041)
+- added subscriptions.install file
+
 03/27/2006 (dan ziemecki)
 - refined node publishing trap to only notify on publication, not un-publication
 - added cron managed notification mailings (addresses request #14516)
@@ -65,13 +73,13 @@ Change Log
 - replaced confirmation page with message and redirect (addresses request #4625)
 
 03/06/2006 (dan ziemecki)
-- added notification upon node status change, like publishing (Fixes bug #31041)
+- added notification upon node status change, like publishing (fixes bug #31041)
 - added another array initialization to prevent error on an array merge.
 
 03/04/2006 (dan ziemecki)
 - added Norwegian translation
 - added check to see if comments are allowed on a node and if the viewer is
-logged on before prompting viewer to subscribe. (Fixes bug #26130)
+logged on before prompting viewer to subscribe. (fixes bug #26130)
 - added array initialization to prevent error on an array merge.
   (Fixes bug #22849)
 
