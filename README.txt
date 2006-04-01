@@ -19,11 +19,14 @@ Installation
 ------------------------------------------------------------------------------
 
  Required:
+  - Copy subscriptions folder to modules/.
   - Create the SQL tables. This depends a little on your system, but the most
-    common method is:
+    common method is simply activate the module and let the *.install file
+    do the work.  If this is not the initial install or if the *.install
+    process does not work for some reason, you can create the tables manually
+    with something like:
+    
         mysql -u username -ppassword drupal < subscriptions.mysql
-  - Copy subscriptions.module to modules/.
-
 
 Configuration
 ------------------------------------------------------------------------------
