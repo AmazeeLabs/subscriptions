@@ -149,19 +149,19 @@ function subscriptions_get_summary() {
   $queryn = 'SELECT n.nid, n.title, s.sid, COUNT(*) as ncount FROM ';
   $queryn .= '{subscriptions} s INNER JOIN {node} n ON n.nid = s.sid ';
   $queryn .= 'WHERE s.stype = \'node\' ';
-  $queryn .= 'GROUP BY s.sid ';
+  $queryn .= 'GROUP BY n.nid, n.title, s.sid ';
   $queryn .= 'ORDER BY s.sid ';
   // query string for blog subscriptions (by blog owner)
   $queryb = 'SELECT u.uid, u.name, s.sid, COUNT(*) as ncount FROM ';
   $queryb .= '{subscriptions} s INNER JOIN {users} u ON u.uid = s.sid ';
   $queryb .= 'WHERE s.stype = \'blog\' ';
-  $queryb .= 'GROUP BY s.sid ';
+  $queryb .= 'GROUP BY u.uid, u.name, s.sid ';
   $queryb .= 'ORDER BY s.sid ';
   // query string for category subscriptions
   $queryt .= 'SELECT s.sid, td.name, COUNT(*) as ncount FROM ';
   $queryt .= '{subscriptions} s RIGHT JOIN {term_data} td ON td.tid = s.sid ';
   $queryt .= 'WHERE s.stype = \'taxa\' ';
-  $queryt .= 'GROUP BY s.sid ';
+  $queryt .= 'GROUP BY s.sid, td.name ';
   $queryt .= 'ORDER BY s.sid ';
   $resultn = db_query($queryn);
   $resultb = db_query($queryb);

@@ -10,9 +10,7 @@ view all current subscriptions and make modifications.
 
 Postgres Compatibility:
 This module attempts to offer compatability with Postgres SQL, but has not
-yet been tested succesfully due to the unavailability of a suitable test
-environment.  If you are able to succesfully deploy the module, please contact
-the author so that your modifications can be made available for other users.
+yet been tested due to the unavailability of a suitable test environment.
 
 
 Installation
@@ -40,28 +38,47 @@ Configuration
  NOTE:  This module requires e-mail addresses, so anonymous users don't make
  much sense.  Any user without an e-mail address will generate a log error.
 
+Troubleshooting:
+------------------------------------------------------------------------------
+ If this module isn't working for you, some key things to test include ...
+
+ 1) Make sure you're not posting to your own subscriptions and expecting to 
+notified of it.  That is quite deliberately turned off.  Try posting to your 
+subscriptions from another test account.
+
+ 2) If you've enabled cron sending, you'll need to run cron to see any email.  
+Try entering "http://yoursite.com/cron.php" in the URL.  The blank screen is 
+normal.
 
 Credits / Contact
 ------------------------------------------------------------------------------
 
-The original author of this module is Dan Ziemecki, who can be contacted through
-the Drupal site at http://drupal.org/user/4532/contact.  Tom Dobes provided
-additional fixes and upgraded the module to function with Drupal post-4.3 CVS.
+The original author (and maintainer) of this module is Dan Ziemecki, who can be
+contacted through the Drupal site at http://drupal.org/user/4532/contact.  Tom
+Dobes provided additional fixes and upgraded the module to function with Drupal
+post-4.3 CVS.
 
 The following people have contributed patches and translations:
 trew
+michelef
+Gerard Farras
+Interactors
 tostinni
 shezz
 mikeryan
 q0rban
+patrickslee
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
 
-
 Change Log
 ------------------------------------------------------------------------------
-03/31/2006
+04/06/2006 (dan ziemecki)
+- corrected a grouping error in psql (fixes bug #23551)
+- aded troubleshooting section
+
+03/31/2006 (dan ziemecki)
 - modified form element construction for new 4.7 api (fixes bug #31041)
 - added subscriptions.install file
 
