@@ -68,12 +68,16 @@ shezz
 mikeryan
 q0rban
 patrickslee
+jmiccolis
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+04/16/2006 (dan ziemecki)
+- Corrected improper node call (fixes bug #57844)
+
 04/06/2006 (dan ziemecki)
 - corrected a grouping error in psql (fixes bug #23551)
 - aded troubleshooting section

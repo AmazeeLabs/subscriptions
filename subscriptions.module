@@ -459,7 +459,7 @@ function subscriptions_menu($may_cache) {
 function subscriptions_link($type, $node = 0, $main) {
   if (user_access('maintain subscriptions') && $type == 'node' && $node->comment == 2) {
     $subscriptions = subscriptions_get_user();
-    $name = node_invoke($node, 'node_name');
+    $name = node_invoke($node->type, 'node_name');
     if ($node->type == 'blog') {
       if (isset($subscriptions['blog'][$node->uid])) {
         $links[] = l(t('unsubscribe blog'), 'subscriptions/del/blog/'. $node->uid, array('title' => t('Stop receiving an e-mail whenever a new entry is made to this person\'s blog.')));
