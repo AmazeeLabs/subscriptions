@@ -1,0 +1,254 @@
+# Polish translation of Drupal's Subscriptions module (subscriptions.module)
+# Copyright 2006 archetwist <arche#letwist.net>
+msgid ""
+msgstr ""
+"Project-Id-Version: drupal pl arche\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-08-04 11:48+0200\n"
+"PO-Revision-Date: 2006-04-08 16:17+0100\n"
+"Last-Translator: Arche Twist <arche#letwist.net>\n"
+"Language-Team: Arche Twist <arche#letwist.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: subscriptions.module:11
+msgid ""
+"\n"
+"        <p>This module enables users to subscribe to be notified of changes to threads or categories.\n"
+"        Once enabled, all nodes will have an additional link that allows the user to change their subscriptions.\n"
+"        Additionally, all users will be given an account option to auto-subscribe to any thread to which they post.\n"
+"        No configuration is required for this module, although roles must be given permission to\n"
+"        use it.</p>\n"
+"\n"
+"        <p>Note that because this module causes the comment insert to pause while all\n"
+"        subscribers are notified, it may not be practical for large sites.</p>"
+msgstr ""
+"\n"
+"        <p>Ten moduł umożliwia użytkownikom subskrybowanie powiadomień o nowościach w wątkach lub kategoriach.\n"
+"        Gdy włączony, wszystkie segmenty zostaną wyposażone w dodatkowy odnośnik, poprzez który użytkownicy będą mogli je zasubskrybować lub cofnąć ich subskrypcję.\n"
+"        Wszyscy użytkownicy będą mogli także włączyć automatyczną subsrypcję powiadomień o nowościach we wszystkich wątkach, w których zabrali głos.\n"
+"        Moduł ten nie wymaga konfiguracji, jednak konieczne jest nadanie właściwych uprawnień odpowiednim rangom użytkowników.</p>\n"
+"\n"
+"        <p>Ponieważ moduł sprawia, że dodawanie odpowiedzi zostaje wstrzymane podczas wysyłania powiadomień, może nie być odpowiedni dla dużych stron.</p>"
+
+#: subscriptions.module:22
+msgid "Allows users to subscribe to nodes and taxonomy terms."
+msgstr "Pozwala użytkownikom na subskrybowanie powiadomień o nowościach w segmentach i terminach taksonomii."
+
+#: subscriptions.module:60
+msgid "Subscription settings"
+msgstr "Ustawienia subskrypcji"
+
+#: subscriptions.module:60
+msgid "Automatically subscribe to threads in which you post."
+msgstr "Automatycznie subskrybuj powiadomienia o nowościach w wątkach, w których piszesz."
+
+#: subscriptions.module:60
+msgid "Checking this box allows you to be automatically subscribe to any thread you create or post a comment to."
+msgstr "Wybranie tej opcji pozwala Ci na otrzymywania automatycznych powiadomień o zmianach w wątkach, które stworzyłeś, lub w których odpowiedziałeś."
+
+#: subscriptions.module:70
+msgid "none"
+msgstr "brak"
+
+#: subscriptions.module:74
+msgid "Omitted vocabularies"
+msgstr "Pomijane słowniki"
+
+#: subscriptions.module:74
+msgid "Select vocabularies which should be <strong>omitted</strong> from subscription listings."
+msgstr "Posty powiązane z którymi ze słowników mają być <strong>pomijane</strong>?"
+
+#: subscriptions.module:170
+msgid "subscription notification for "
+msgstr "powiadomienie dla"
+
+#: subscriptions.module:173
+msgid "error mailing subscription notification: "
+msgstr "błąd podczas wysyłania powiadomienia:"
+
+#: subscriptions.module:211
+msgid "new blog for "
+msgstr "nowy blog dla"
+
+#: subscriptions.module:229
+msgid "[%site] %type subscription update for %name : %subject"
+msgstr "Powiadomienie o nowościach na %site: %subject, %name (%type)"
+
+#: subscriptions.module:230
+msgid ""
+"Greetings, %name.\n"
+"\n"
+"A %type to which you have subscribed has been updated.  To view the thread,\n"
+"navigate to %url\n"
+"\n"
+"--\n"
+"This is an automatic mail from %site.\n"
+"To manage your subscriptions, browse to %manage-url"
+msgstr ""
+"Witaj, %name.\n"
+"\n"
+"Segment (%type), o zmianach w którym chcialeś być powiadamiany, został zaktualizowany.\n"
+" By go obejrzeć, skorzystaj z odnośnika %url\n"
+"\n"
+"--\n"
+"Wiadomość ta została wysłana automatycznie z %site.\n"
+"By zmienić ustawienia subskrypcji powiadomień, przejdź na stronę %manage-url"
+
+#: subscriptions.module:315
+msgid "Subscribe"
+msgstr "Subskrybuj"
+
+#: subscriptions.module:315
+msgid "Receive notification of replies to this %name."
+msgstr "Otrzymuj powiadomienia o nowych odpowiedziach."
+
+#: subscriptions.module:328
+msgid "my subscriptions"
+msgstr "moje subskrypcje"
+
+#: subscriptions.module:331;0
+msgid "subscriptions"
+msgstr "subskrypcje"
+
+#: subscriptions.module:347
+msgid "unsubscribe blog"
+msgstr "cofnij subskrypcję bloga"
+
+#: subscriptions.module:347
+msgid "Stop receiving an e-mail whenever a new entry is made to this person's blog."
+msgstr "Powoduje zaprzestanie przesyłania wiadomości e-mail z powiadomieniami o nowych wpisach w tym blogu."
+
+#: subscriptions.module:350
+msgid "subscribe blog"
+msgstr "subskrybuj bloga"
+
+#: subscriptions.module:350
+msgid "Receive an e-mail whenever a new entry is made to this person's blog."
+msgstr "Powoduje przesyłanie wiadomości e-mail z powiadomieniami o nowych wpisach w tym blogu."
+
+#: subscriptions.module:354
+msgid "unsubscribe post"
+msgstr "cofnij subskrypcję posta"
+
+#: subscriptions.module:354
+msgid "Stop receiving an e-mail whenever a new comment is posted to this %n."
+msgstr "Powoduje zaprzestanie przesyłania wiadomości e-mail z powiadomieniami o nowościach."
+
+#: subscriptions.module:357
+msgid "subscribe post"
+msgstr "subskrybuj"
+
+#: subscriptions.module:357
+msgid "Receive an e-mail whenever a comment is posted to this %n."
+msgstr "Powoduje przesyłanie wiadomości e-mail z powiadomieniami o nowościach."
+
+#: subscriptions.module:381;492;496
+msgid "unsubscribe"
+msgstr "cofnij subskrypcję"
+
+#: subscriptions.module:381
+msgid "Unsubscribe from this category."
+msgstr "Cofa subskrypcję powiadomień dla tej kategorii."
+
+#: subscriptions.module:384
+msgid "subscribe"
+msgstr "subskrybuj"
+
+#: subscriptions.module:384
+msgid "Subscribe to this category."
+msgstr "Włącza subskrypcję powiadomień dla tej kategorii."
+
+#: subscriptions.module:420
+msgid "<p>Your subscription was activated.</p>"
+msgstr "<p>Subskrybowanie zostało włączone</p>"
+
+#: subscriptions.module:423
+msgid "Return to the blog"
+msgstr "Powróć do bloga"
+
+#: subscriptions.module:426;439
+msgid "Return to the thread"
+msgstr "Powróć do wątku"
+
+#: subscriptions.module:429;441
+msgid "Return to the subscriptions"
+msgstr "Powróć do listy subskrypcji"
+
+#: subscriptions.module:430
+msgid "Subscription Activated"
+msgstr "Subskrybowanie włączone"
+
+#: subscriptions.module:437
+msgid "<p>Your subscription was deactivated.</p>"
+msgstr "<p>Subskrybowanie zostało wyłączone</p>"
+
+#: subscriptions.module:442
+msgid "Subscription Deactivated"
+msgstr "Subskrypcja wyłączona"
+
+#: subscriptions.module:452;492
+msgid "thread"
+msgstr "wątek"
+
+#: subscriptions.module:456;496
+msgid "blog"
+msgstr "blog"
+
+#: subscriptions.module:469;509
+msgid "category"
+msgstr "kategoria"
+
+#: subscriptions.module:473;514
+msgid "type"
+msgstr "typ"
+
+#: subscriptions.module:473;514
+msgid "title"
+msgstr "tytuł"
+
+#: subscriptions.module:473
+msgid "subscribers"
+msgstr "subskrybenci"
+
+#: subscriptions.module:477
+msgid "<p>No threads or categories are currently subscribed.</p>"
+msgstr "<p>Żadne wątki ani kategorie nie są w tej chwili subskrybowane</p>"
+
+#: subscriptions.module:482
+msgid "Subscriptions Summary"
+msgstr "Podsumowanie subskrypcji"
+
+#: subscriptions.module:492
+msgid "Unsubscribe from this thread."
+msgstr "Cofnij subskrypcję tego wątku"
+
+#: subscriptions.module:496
+msgid "Unsubscribe from this user's blog."
+msgstr "Cofnij subskrypcję bloga tego użytkownika"
+
+#: subscriptions.module:514
+msgid "operations"
+msgstr "czynności"
+
+#: subscriptions.module:517
+msgid "<p>You are not currently subscribed to any active threads or categories.</p>"
+msgstr "<p>Nie subskrybujesz w tej chwili powiadomień z żadnych wątków czy kategorii</p>"
+
+#: subscriptions.module:170
+msgid "regular"
+msgstr "zwykły"
+
+#: subscriptions.module:173
+msgid "error"
+msgstr "błąd"
+
+#: subscriptions.module:30
+msgid "maintain subscriptions"
+msgstr "zarządzanie powiadomieniami"
+
+#: subscriptions.module
+msgid "my subscriptions feed"
+msgstr "kanał moich powiadomień"
