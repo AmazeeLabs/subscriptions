@@ -69,20 +69,24 @@ mikeryan
 q0rban
 patrickslee
 jmiccolis
+samc
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+04/19/2006 (dan ziemecki)
+- Correct improper node call (another fix for bug #57844)
+
 04/16/2006 (dan ziemecki)
-- Corrected improper node call (fixes bug #57844)
+- Correct improper node call (fixes bug #57844)
 
 04/06/2006 (dan ziemecki)
-- corrected a grouping error in psql (fixes bug #23551)
+- corrected a grouping error in psql
 - aded troubleshooting section
 
-03/31/2006 (dan ziemecki)
+03/31/2006
 - modified form element construction for new 4.7 api (fixes bug #31041)
 - added subscriptions.install file
 
