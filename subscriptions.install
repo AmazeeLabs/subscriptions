@@ -4,11 +4,11 @@ function subscriptions_install(){
     case 'mysql':
     case 'mysqli':
       db_query("CREATE TABLE {subscriptions_holding} (
-          rid int(11) NOT NULL auto_increment COMMENT 'Unique row ID',
-          content blob NOT NULL COMMENT 'The node array',
-          ptype tinytext NOT NULL COMMENT 'post type - node or comment',
-          op tinytext NOT NULL COMMENT 'The operation on the node',
-          pid int(11) NOT NULL default '0' COMMENT 'The ID of the poster',
+          rid int(11) NOT NULL auto_increment,
+          content blob NOT NULL,
+          ptype tinytext NOT NULL,
+          op tinytext NOT NULL,
+          pid int(11) NOT NULL default '0',
           PRIMARY KEY  (`rid`)
 				) TYPE=MyISAM /*!40100 DEFAULT CHARACTER SET utf8 */;");
 			db_query("CREATE TABLE {subscriptions} (

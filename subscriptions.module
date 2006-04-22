@@ -3,6 +3,14 @@
 /**
  * Implementation of hook_help().
  */
+global $user;
+global $subscriptions_root;
+$subscriptions_root = "user/$user->uid/subscriptions"; // my account
+if(variable_get('subscriptions_usersmenu', 1)==0 &&
+	 variable_get('subscriptions_mainmenu', 0)==1){
+  $subscriptions_root = 'subscriptions'; // main menu
+}
+
 function subscriptions_help($section) {
   switch ($section) {
     case 'admin/help#subscriptions':
@@ -96,6 +104,18 @@ function subscriptions_settings() {
     '#title'         => t('Test held posts prior to sending'),
     '#default_value' => variable_get('subscriptions_testpost', 0),
     '#description'   => t('Tests to see if a post about to be sent by cron is still active.  Adds a small amount of overhead.  Default is OFF.'),
+  );
+  $form['sub_settings']['subscriptions_mainmenu'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Show Subscriptions users menu on main menu'),
+    '#default_value' => variable_get('subscriptions_mainmenu', 0),
+    '#description'   => t('Displays the Subscriptions users menu on the main menu. Default is OFF.'),
+  );
+  $form['sub_settings']['subscriptions_usersmenu'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Show Subscriptions users menu under "my account"'),
+    '#default_value' => variable_get('subscriptions_usersmenu', 1),
+    '#description'   => t('Displays the Subscriptions users menu as a tab under "my Account". Default is On.'),
   );
   return $form;
 }
@@ -439,17 +459,22 @@ function subscriptions_form_alter($form_id, &$form) {
  * Implementation of hook_menu().
  */
 function subscriptions_menu($may_cache) {
+	global $user;
   $items = array();
   if ($may_cache) {
-    $items[] = array('path' => 'subscriptions', 'title' => t('my subscriptions'),
-      'access' => user_access('maintain subscriptions'),
-      'callback' => 'subscriptions_page');
-    $items[] = array('path' => 'subscriptions/feed', 'title' => t('my subscriptions feed'),
-      'access' => user_access('maintain subscriptions'),
-      'callback' => 'subscriptions_feed');
-    $items[] = array('path' => 'admin/subscriptions', 'title' => t('subscriptions'),
-      'access' => user_access('administer users'),
-      'callback' => 'subscriptions_page');
+  	if (variable_get('subscriptions_usersmenu', 1)){
+	  	$items[] = array('path' => "user/$user->uid/subscriptions", 'title' => t('my subscriptions'),
+			'callback' => 'subscriptions_page', 'access' => user_access('access subscriptions'),
+			'type' => MENU_LOCAL_TASK);
+     }
+    if (variable_get('subscriptions_mainmenu', 0)){
+    	$items[] = array('path' => 'subscriptions', 'title' => t('my subscriptions'),
+	      'access' => user_access('maintain subscriptions'),
+	      'callback' => 'subscriptions_page');
+	    $items[] = array('path' => 'subscriptions/feed', 'title' => t('my subscriptions feed'),
+	      'access' => user_access('maintain subscriptions'),
+	      'callback' => 'subscriptions_feed');
+		}
   }
   return $items;
 }
@@ -457,22 +482,23 @@ function subscriptions_menu($may_cache) {
  * Implementation of hook_link().
  */
 function subscriptions_link($type, $node = 0, $main) {
+	global $subscriptions_root;
   if (user_access('maintain subscriptions') && $type == 'node' && $node->comment == 2) {
     $subscriptions = subscriptions_get_user();
     $name = node_get_name($node->type);
     if ($node->type == 'blog') {
       if (isset($subscriptions['blog'][$node->uid])) {
-        $links[] = l(t('unsubscribe blog'), 'subscriptions/del/blog/'. $node->uid, array('title' => t('Stop receiving an e-mail whenever a new entry is made to this person\'s blog.')));
+        $links[] = l(t('unsubscribe blog'), $subscriptions_root.'/del/blog/'. $node->uid, array('title' => t('Stop receiving an e-mail whenever a new entry is made to this person\'s blog.')));
       }
       else {
-        $links[] = l(t('subscribe blog'), 'subscriptions/add/blog/'. $node->uid, array('title' => t('Receive an e-mail whenever a new entry is made to this person\'s blog.')));
+        $links[] = l(t('subscribe blog'), $subscriptions_root.'/add/blog/'. $node->uid, array('title' => t('Receive an e-mail whenever a new entry is made to this person\'s blog.')));
       }
     }
     if (isset($subscriptions['node'][$node->nid])) {
-      $links[] = l(t('unsubscribe post'), 'subscriptions/del/node/'. $node->nid, array('title' => t('Stop receiving an e-mail whenever a new comment is posted to this %n.', array('%n' => $name))));
+      $links[] = l(t('unsubscribe post'), $subscriptions_root.'/del/node/'. $node->nid, array('title' => t('Stop receiving an e-mail whenever a new comment is posted to this %n.', array('%n' => $name))));
     }
     else {
-      $links[] = l(t('subscribe post'), 'subscriptions/add/node/'. $node->nid, array('title' => t('Receive an e-mail whenever a comment is posted to this %n.', array('%n' => $name))));
+      $links[] = l(t('subscribe post'), $subscriptions_root.'/add/node/'. $node->nid, array('title' => t('Receive an e-mail whenever a comment is posted to this %n.', array('%n' => $name))));
     }
   }
   return $links ? $links : array();
@@ -492,11 +518,13 @@ function subscriptions_get_taxa_count() {
   return $tsubscriptions ? $tsubscriptions : array();
 }
 function subscriptions_gen_taxa_links($tid, $taxa) {
+	global $user;
+	global $subscriptions_root;
   if (in_array($tid, $taxa)) {
-    $link = l(t('unsubscribe'), 'subscriptions/del/taxa/'. $tid, array('title' => t('Unsubscribe from this category.')));
+    $link = l(t('unsubscribe'), $subscriptions_root.'/del/taxa/'. $tid, array('title' => t('Unsubscribe from this category.')));
   }
   else {
-    $link = l(t('subscribe'), 'subscriptions/add/taxa/'. $tid, array('title' => t('Subscribe to this category.')));
+    $link = l(t('subscribe'), $subscriptions_root.'/add/taxa/'. $tid, array('title' => t('Subscribe to this category.')));
   }
   return $link;
 }
@@ -510,18 +538,26 @@ function subscriptions_add($sid, $uid, $stype) {
  */
 function subscriptions_page() {
   global $user;
+  global $subscriptions_root;
   $subscribed = false;
   $uid = $user->uid;
-  if (!arg(2)) {
-    $sid = arg(1);
+  // argument location vary based upon subscription root
+  if(arg(0)=='user'){
+		$arginc = 2;  // increment argument by x
+	}
+	else{
+    $arginc = 0;
+	}
+  if (!arg($arginc+2)) {
+    $sid = arg($arginc+1);
     $nid = $sid;
-    $op = arg(0);
+    $op = arg($arginc+0);
   }
   else {
-    $op = arg(1);
-    $stype = arg(2);
-    $sid = arg(3);
-    $nid = arg(4);
+    $op = arg($arginc+1);
+    $stype = arg($arginc+2);
+    $sid = arg($arginc+3);
+    $nid = arg($arginc+4);
     if ($stype == 'node') {
       $nid = $sid;
     }
@@ -604,11 +640,11 @@ function subscriptions_page() {
       $subscriptions = subscriptions_get_user();
       // build node rows
       foreach ($subscriptions['node'] as $nsub) {
-        $subrowsn[] = array(t('thread'), l($nsub->title, 'node/'. $nsub->nid), '['. l(t('unsubscribe'), 'subscriptions/del/node/'. $nsub->nid, array('title' => t('Unsubscribe from this thread.'))) .']');
+        $subrowsn[] = array(t('thread'), l($nsub->title, 'node/'. $nsub->nid), '['. l(t('unsubscribe'), $subscriptions_root.'/del/node/'. $nsub->nid, array('title' => t('Unsubscribe from this thread.'))) .']');
       }
       // build blog rows
       foreach ($subscriptions['blog'] as $bsub) {
-        $subrowsb[] = array(t('blog'), l($bsub->name, 'blog/'. $bsub->uid), '['. l(t('unsubscribe'), 'subscriptions/del/blog/'. $bsub->uid, array('title' => t('Unsubscribe from this user\'s blog.'))) .']');
+        $subrowsb[] = array(t('blog'), l($bsub->name, 'blog/'. $bsub->uid), '['. l(t('unsubscribe'), $subscriptions_root.'/del/blog/'. $bsub->uid, array('title' => t('Unsubscribe from this user\'s blog.'))) .']');
       }
       // traverse the taxonomy tree
       $taxa = subscriptions_get_taxa($uid);
@@ -638,12 +674,13 @@ function subscriptions_page() {
       drupal_add_link(array('rel' => 'alternate',
                           'type' => 'application/rss+xml',
                           'title' => t("%name Subscriptions", array('%name' => $user->name)),
-                          'href' => url('subscriptions/feed')));
+                          'href' => url($subscriptions_root.'/feed')));
       return $message;
       break;
   }
 }
 function subscriptions_feed($account = NULL) {
+	global $subscriptions_root;
   if (is_null($account)) {
     global $user;
     $account = $user;
@@ -670,7 +707,7 @@ function subscriptions_feed($account = NULL) {
   $sql .= " GROUP BY n.nid ORDER BY n.created DESC";
   $result = db_query_range(db_rewrite_sql($sql), 0, variable_get('feed_default_items', 10));
   $channel['title'] = t("%name Subscriptions", array('%name' => $account->name));
-  $channel['link'] = url("subscriptions/feed", NULL, NULL, TRUE);
+  $channel['link'] = url($subscriptions_root."/feed", NULL, NULL, TRUE);
   // $channel['description'] = ;
   node_feed($result, $channel);
 }

@@ -76,6 +76,11 @@ names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+04/22/2006 (dan ziemecki)
+- Removed comments on install file (addresses bug #59857)
+- Moved Subscriptions user menu under 'my account', but created an admin option
+	to leave it on the main menu
+
 04/19/2006 (dan ziemecki)
 - Correct improper node call (another fix for bug #57844)
 
