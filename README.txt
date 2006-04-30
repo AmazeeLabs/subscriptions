@@ -76,6 +76,9 @@ names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+04/30/2006 (dan ziemecki)
+- Adjusted menu call (addresses bug #60602)
+
 04/22/2006 (dan ziemecki)
 - Removed comments on install file (addresses bug #59857)
 - Moved Subscriptions user menu under 'my account', but created an admin option
