@@ -54,7 +54,7 @@ function subscriptions_user($type, $edit, &$user, $category = NULL) {
         $form['subscriptions']['subscriptions_auto'] = array(
           '#type'          => 'checkbox',
           '#title'         => t('Autosubscribe'),
-          '#default_value' => isset($edit['subscriptions_auto']) ? $edit['subscriptions_auto'] : $user->subscriptions_auto,
+          '#default_value' => isset($edit['subscriptions_auto']) ? $edit['subscriptions_auto'] : variable_get('subscriptions_autoset', 0),
           '#description'   => t('Checking this box allows you to be automatically subscribe to any thread you create or post a comment to.')
         );
       return $form;
@@ -83,7 +83,7 @@ function subscriptions_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Use cron for notifications'),
     '#default_value' => variable_get('subscriptions_usecron', 0),
-    '#description'   => t("Sends subscription notification when cron module runs.  Default is to send upon node update.  <em>Note:  Currently only works with MySQL.</em>"),
+    '#description'   => t("Sends subscription notification when cron module runs.  Default is to send upon node update.  <br /><em>Note:  Currently only works with MySQL.</em>"),
   );
   $form['sub_settings']['subscriptions_watchgood'] = array(
     '#type'          => 'checkbox',
@@ -107,7 +107,13 @@ function subscriptions_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Show Subscriptions users menu under "my account"'),
     '#default_value' => variable_get('subscriptions_usersmenu', 1),
-    '#description'   => t('Displays the Subscriptions users menu as a tab under "my Account". Default is On.'),
+    '#description'   => t('Displays the Subscriptions users menu as a tab under "my Account". Default is ON.'),
+  );
+  $form['sub_settings']['subscriptions_autoset'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Set all users to "autosubscribe" by default'),
+    '#default_value' => variable_get('subscriptions_autoset', 0),
+    '#description'   => t('Set\'s each users "autosubscribe" profile option. Default is OFF.'),
   );
   return $form;
 }
@@ -387,6 +393,15 @@ function subscriptions_cron() {
 	} // for each row in results set
   }  // if using cron to send notifications
 }
+
+/**
+ * given a comment, return an array of associated taxonomies
+ */
+function subscriptions_comment_taxa($comment){
+	$result = db_query('SELECT tid FROM {term_node} WHERE nid = "%s"', $comment['nid']);
+	return db_fetch_object($result);
+}
+
 /**
  * Implementation of hook_comment().
  */
@@ -402,6 +417,14 @@ function subscriptions_comment($comment, $op) {
       $nid = $comment['nid'];
       $cid = $comment['cid'];
       subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
+			// get subscription->node->taxonomy
+	    $taxa = subscriptions_comment_taxa($comment);
+			// send to taxonomy subscribers
+			if (!empty($taxa)) {
+	        foreach ($taxa as $tid){
+	          $strsent = $strsent . subscriptions_mailvars($tid, $nid, $user->uid, 'taxa', $strsent);
+	        }
+	      }
     } // end cron test
     subscriptions_autosubscribe($user->uid, $nid);
   }
@@ -667,6 +690,7 @@ function subscriptions_page() {
       break;
   }
 }
+
 function subscriptions_feed($account = NULL) {
   if (is_null($account)) {
     global $user;

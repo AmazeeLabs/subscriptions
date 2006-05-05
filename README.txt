@@ -76,6 +76,11 @@ names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+05/04/2006 (dan ziemecki)
+- enabled taxa subscription notifications for comments (fixes bug #61567)
+- added administration option to preset user profile autosubscribe option
+- cleaned up administration option text
+
 04/30/2006 (dan ziemecki)
 - Adjusted menu call (addresses bug #60602)
 
