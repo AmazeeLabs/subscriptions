@@ -70,12 +70,16 @@ q0rban
 patrickslee
 jmiccolis
 samc
+introfini
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+05/05/2006 (dan ziemecki)
+- Added portuguese translation (request #61988)
+
 05/04/2006 (dan ziemecki)
 - enabled taxa subscription notifications for comments (fixes bug #61567)
 - added administration option to preset user profile autosubscribe option
