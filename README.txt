@@ -71,43 +71,57 @@ patrickslee
 jmiccolis
 samc
 introfini
+jpetso 
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+05/08/2006 (dan ziemecki)
+---------
+- Added german translation (request #62412)
+
 05/05/2006 (dan ziemecki)
+---------
 - Added portuguese translation (request #61988)
 
 05/04/2006 (dan ziemecki)
+---------
 - enabled taxa subscription notifications for comments (fixes bug #61567)
 - added administration option to preset user profile autosubscribe option
 - cleaned up administration option text
 
 04/30/2006 (dan ziemecki)
+---------
 - Adjusted menu call (addresses bug #60602)
 
 04/22/2006 (dan ziemecki)
+---------
 - Removed comments on install file (addresses bug #59857)
 - Moved Subscriptions user menu under 'my account', but created an admin option
 	to leave it on the main menu
 
 04/19/2006 (dan ziemecki)
+---------
 - Correct improper node call (another fix for bug #57844)
 
 04/16/2006 (dan ziemecki)
+---------
 - Correct improper node call (fixes bug #57844)
 
 04/06/2006 (dan ziemecki)
+---------
 - corrected a grouping error in psql
 - aded troubleshooting section
 
 03/31/2006
+---------
 - modified form element construction for new 4.7 api (fixes bug #31041)
 - added subscriptions.install file
 
 03/27/2006 (dan ziemecki)
+---------
 - refined node publishing trap to only notify on publication, not un-publication
 - added cron managed notification mailings (addresses request #14516)
 - added ability to turn off watchdog logging for successful mailings
@@ -115,13 +129,16 @@ Change Log
  (addresses request #17745)
 
 03/07/2006 (dan ziemecki)
+---------
 - replaced confirmation page with message and redirect (addresses request #4625)
 
 03/06/2006 (dan ziemecki)
+---------
 - added notification upon node status change, like publishing (fixes bug #31041)
 - added another array initialization to prevent error on an array merge.
 
 03/04/2006 (dan ziemecki)
+---------
 - added Norwegian translation
 - added check to see if comments are allowed on a node and if the viewer is
 logged on before prompting viewer to subscribe. (fixes bug #26130)
@@ -173,8 +190,6 @@ logged on before prompting viewer to subscribe. (fixes bug #26130)
 12/20/2003 (weitzman)
 ----------
 - changed name of permission from 'subscribe to nodes' to 'maintain subscriptions'
-  (anyone currently using this module should visit their permissions.
-  page after updating)
 - refactored insertion of new subscriptions into its own function.
 - added subscribe checkbox to bottom of node forms.
 
