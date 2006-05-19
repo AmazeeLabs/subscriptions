@@ -71,23 +71,29 @@ patrickslee
 jmiccolis
 samc
 introfini
-jpetso 
+jpetso
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
 
 Change Log
 ------------------------------------------------------------------------------
+05/18/2006 (dan ziemecki)
+---------
+- added my account\my subscriptions menu
+- split subscription management into submenus by subscription type
+- added content types as a subscription option
+- added "autosubscribe by default" admin option
+
 05/08/2006 (dan ziemecki)
 ---------
-- Added german translation (request #62412)
+- added german translation (request #62412)
 
 05/05/2006 (dan ziemecki)
 ---------
-- Added portuguese translation (request #61988)
+- added portuguese translation (request #61988)
 
 05/04/2006 (dan ziemecki)
----------
 - enabled taxa subscription notifications for comments (fixes bug #61567)
 - added administration option to preset user profile autosubscribe option
 - cleaned up administration option text

@@ -14,7 +14,6 @@ function subscriptions_help($section) {
         No configuration is required for this module, although roles must be given permission to
         use it.</p>
         <p>While no configuration is required, administrators are offered a few configurable options:</p>
-        
 				<p>"<b>Omitted vocabularies</b>" allows the admin to exclude certain node categories from this list of those
 				available for subscription.</p>
 				<p>"<b>Use cron for notifications</b>" allows you to postpone subscription
@@ -26,7 +25,22 @@ function subscriptions_help($section) {
 				<p>"<b>Test held posts prior to sending</b>" tells Subscriptions to test if a node or comment
 				is still active\published prior toi sending a notification.  This is mainly to avoid sending
 				notifications for for posts that have been deleted.  This will result in a small performance
-				hit, and only makes sense if you are delaying the notifications with "Use cron for notifications".</p>');
+				hit, and only makes sense if you are delaying the notifications with "Use cron for notifications".</p>
+
+				<p>"<b>Show Subscriptions users menu on main menu</b>" tells Subscriptions to display the
+				Subscriptions user menu, used to manage one\'s own subscriptions, on the main menu.  The default
+				setting is OFF.</p>
+				
+				<p>"<b>Show Subscriptions users menu under \'my account\'</b>" tells Subscriptions to display the
+				Subscriptions user menu, used to manage one\'s own subscriptions, under the \'My Account\' menu.  The default
+				setting is ON.</p>
+				
+				<p>"<b>Set all users to \'autosubscribe\' by default</b>" set\'s the default value of the \'autosubscribe\'
+				option in each user\'s account to ON.  This value will not be set, however, until the user saves their
+				account preferences.  This, essentially, pre-checks the option associated with \'autosubscribe\'. The
+				default value is OFF.</p>
+
+				');
     case 'admin/modules#description':
       // appears on the admin module selection page
       return t('Allows users to subscribe to nodes and taxonomy terms.');
@@ -71,19 +85,21 @@ function subscriptions_settings() {
   foreach ($vocabularies as $vocabulary) {
     $select[$vocabulary->vid] = $vocabulary->name;
   }
-  $form['sub_settings']['subscriptions_omitted_taxa'] = array(
-    '#type'          => 'select',
-    '#title'         => t('Omitted vocabularies'),
-    '#default_value' => variable_get('subscriptions_omitted_taxa', array()),
-    '#options'       => $select,
-    '#description'   => t('Select vocabularies which should be <strong>omitted</strong> from subscription listings.'),
-    '#multiple'      => TRUE
-  );  
+  if (module_exist('taxonomy')){
+	  $form['sub_settings']['subscriptions_omitted_taxa'] = array(
+	    '#type'          => 'select',
+	    '#title'         => t('Omitted vocabularies'),
+	    '#default_value' => variable_get('subscriptions_omitted_taxa', array()),
+	    '#options'       => $select,
+	    '#description'   => t('Select vocabularies which should be <strong>omitted</strong> from subscription listings.'),
+	    '#multiple'      => TRUE
+	  );
+	}
   $form['sub_settings']['subscriptions_usecron'] = array(
     '#type'          => 'checkbox',
     '#title'         => t('Use cron for notifications'),
     '#default_value' => variable_get('subscriptions_usecron', 0),
-    '#description'   => t("Sends subscription notification when cron module runs.  Default is to send upon node update.  <br /><em>Note:  Currently only works with MySQL.</em>"),
+    '#description'   => t("Sends subscription notification when cron module runs.  Default is to send upon node update.  <br /><em>Note:  Currently only tested with MySQL.</em>"),
   );
   $form['sub_settings']['subscriptions_watchgood'] = array(
     '#type'          => 'checkbox',
@@ -127,21 +143,65 @@ function subscriptions_menu($may_cache) {
   	if (variable_get('subscriptions_usersmenu', 0)){
   		global $user;
 	  	$items[] = array('path' => "user/$user->uid/subscriptions", 'title' => t('my subscriptions'),
-			'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
-			'type' => MENU_LOCAL_TASK);
+			  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+			  'type' => MENU_LOCAL_TASK);
+			// My Subscriptios submenus
+			if(module_exist('blog')){
+				$items[] = array('path' => "user/$user->uid/subscriptions/blogs", 'title' => t('blogs'),
+				  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+				  'type' => MENU_LOCAL_TASK);
+			}
+		 	$items[] = array('path' => "user/$user->uid/subscriptions/node", 'title' => t('threads'),
+			  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+			  'type' => MENU_DEFAULT_LOCAL_TASK, 'weight' => -1);
+			if (module_exist('taxonomy')){
+				$items[] = array('path' => "user/$user->uid/subscriptions/taxa", 'title' => t('categories'),
+				  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+				  'type' => MENU_LOCAL_TASK);
+			}
+			$items[] = array('path' => "user/$user->uid/subscriptions/type", 'title' => t('content types'),
+			  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+			  'type' => MENU_LOCAL_TASK);
+			$items[] = array('path' => "user/$user->uid/subscriptions/feed", 'title' => t('rss feed'),
+	      'access' => user_access('maintain subscriptions'),
+	      'callback' => 'subscriptions_feed','type' => MENU_LOCAL_TASK, 'weight' => 1);
      }
+     
     if (variable_get('subscriptions_mainmenu', 1)){
     	$items[] = array('path' => 'subscriptions', 'title' => t('my subscriptions'),
 	      'access' => user_access('maintain subscriptions'),
 	      'callback' => 'subscriptions_page');
-	    $items[] = array('path' => 'subscriptions/feed', 'title' => t('my subscriptions feed'),
+			// My Subscriptios submenus
+			if(module_exist('blog')){
+				$items[] = array('path' => "subscriptions/blogs", 'title' => t('blogs'),
+				  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+				  'type' => MENU_LOCAL_TASK);
+			}
+		 	$items[] = array('path' => "subscriptions/node", 'title' => t('threads'),
+			  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+			  'type' => MENU_DEFAULT_LOCAL_TASK, 'weight' => -1);
+			$items[] = array('path' => "user/$user->uid/subscriptions/type", 'title' => t('my content types'),
+			  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+			  'type' => MENU_LOCAL_TASK);
+			if (module_exist('taxonomy')){
+				$items[] = array('path' => "subscriptions/taxa", 'title' => t('categories'),
+				  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+				  'type' => MENU_LOCAL_TASK);
+		  }
+		 	$items[] = array('path' => "subscriptions/type", 'title' => t('content types'),
+			  'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+			  'type' => MENU_LOCAL_TASK);
+	    $items[] = array('path' => 'subscriptions/feed', 'title' => t('rss feed'),
 	      'access' => user_access('maintain subscriptions'),
-	      'callback' => 'subscriptions_feed');
+	      'callback' => 'subscriptions_feed','type' => MENU_LOCAL_TASK, 'weight' => 1);
 		}else{
 			  $items[] = array('path' => 'subscriptions', 'title' => t('my subscriptions'),
-	      'access' => user_access('maintain subscriptions'),
-	      'callback' => 'subscriptions_page', 'type' => MENU_CALLBACK);
+	        'access' => user_access('maintain subscriptions'),
+	        'callback' => 'subscriptions_page', 'type' => MENU_CALLBACK);
 		}
+		$items[] = array('path' => 'admin/subscriptions', 'title' => t('subscriptions'),
+      'access' => user_access('administer users'),
+      'callback' => 'subscriptions_page');
   }
   return $items;
 }
@@ -166,7 +226,7 @@ function subscriptions_get_user($account = NULL) {
     // query string for blog subscriptions (by blog owner)
     $queryb = 'SELECT u.uid, u.name, s.stype, s.sid FROM ';
     $queryb .= '({subscriptions} s LEFT JOIN {users} u ON u.uid = s.sid) ';
-    $queryb .= 'WHERE u.status = 1 AND s.uid = %d AND s.stype = \'blog\'';
+    $queryb .= 'WHERE u.status = 1 AND s.uid = %d AND s.stype = \'blogs\'';
     // query string for category subscriptions
     $queryt .= 'SELECT td.tid, td.name FROM ';
     $queryt .= '{subscriptions} s INNER JOIN {term_data} td ON td.tid = s.sid ';
@@ -210,18 +270,28 @@ function subscriptions_get_summary() {
   $queryt .= 'WHERE s.stype = \'taxa\' ';
   $queryt .= 'GROUP BY s.sid, td.name ';
   $queryt .= 'ORDER BY s.sid ';
+  // query string for content type subscriptions
+  $querytp .= 'SELECT s.stype, COUNT(*) as ncount FROM ';
+  $querytp .= '{subscriptions} s ';
+  $querytp .= 'WHERE s.stype LIKE \'type%\' ';
+  $querytp .= 'GROUP BY s.sid ';
+  $querytp .= 'ORDER BY s.sid ';
   $resultn = db_query($queryn);
   $resultb = db_query($queryb);
   $resultt = db_query($queryt);
-  $subssumm['node'] = $subssumm['taxa'] = $subssumm['blog'] = array();
+  $resulttp = db_query($querytp);
+  $subssumm['node'] = $subssumm['taxa'] = $subssumm['blog'] = $subssumm['type']= array();
   while ($nsub = db_fetch_object($resultn)) {
     $subssumm['node'][$nsub->nid] = $nsub;
   }
   while ($bsub = db_fetch_object($resultb)) {
     $subssumm['blog'][$bsub->uid] = $bsub;
   }
-  while ($tsub = db_fetch_object($resultn)) {
+  while ($tsub = db_fetch_object($resultt)) {
     $subssumm['taxa'][$tsub->tid] = $tsub;
+  }
+  while ($tpsub = db_fetch_object($resulttp)) {
+    $subssumm['type'][$tsub->stype] = $tpsub;
   }
   return $subssumm;
 }
@@ -240,7 +310,7 @@ function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
   }
 }
 /*
- * Get e-mail vars
+ * Get e-mail varsc
  */
 function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   global $base_url;
@@ -259,6 +329,14 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
     $strtype = 'thread';
     $nid = $sid;
     $cid = "comment-$ssid";
+  }
+   // if content type, get vars
+  if ($stype == 'type') {
+  	$typestr = 'type'.$sid;
+    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.stype =%d', $typestr);
+    $strtype = 'content type';
+    $nid = $ssid;
+    $cid = NULL;
   }
   // if node insert, test if node has a taxonomy else skip
   if ($stype == 'taxa' && !is_null($sid)) {
@@ -416,7 +494,9 @@ function subscriptions_comment($comment, $op) {
     } else {  // if cron is not used
       $nid = $comment['nid'];
       $cid = $comment['cid'];
-      subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
+      $nobj = node_load($nid);
+      // send node subscriptions
+      $strsent = $strsent . subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
 			// get subscription->node->taxonomy
 	    $taxa = subscriptions_comment_taxa($comment);
 			// send to taxonomy subscribers
@@ -424,7 +504,9 @@ function subscriptions_comment($comment, $op) {
 	        foreach ($taxa as $tid){
 	          $strsent = $strsent . subscriptions_mailvars($tid, $nid, $user->uid, 'taxa', $strsent);
 	        }
-	      }
+	    }
+	    // send content type subscriptions
+	    $strsent = $strsent . subscriptions_mailvars($nobj->type, $nobj->nid, $user->uid, 'type', $strsent);
     } // end cron test
     subscriptions_autosubscribe($user->uid, $nid);
   }
@@ -454,11 +536,16 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
 	    if ($node->status) {
 	      if (!empty($node->taxonomy)) {
 	        foreach ($node->taxonomy as $tid){
+	        	// send taxonomy subscriptions
 	          $strsent = $strsent . subscriptions_mailvars($tid, $node->nid, $user->uid, 'taxa', $strsent);
 	        }
 	      }
+	      // send content type subscriptions
+	      $strsent = $strsent . subscriptions_mailvars($node->type, $node->nid, $user->uid, 'type', $strsent);
+	      // send node subscriptions
 	      $strsent = $strsent . subscriptions_mailvars($node->nid, 0, $user->uid, 'node', $strsent);
 	      if ($node->type == 'blog') {
+	      	// send blog subscriptions
 	        $strsent = $strsent . subscriptions_mailvars($node->uid, $node->nid, $user->uid, 'blog', $strsent);
 	      }
 	      subscriptions_autosubscribe($user->uid, $node->nid);
@@ -524,6 +611,7 @@ function subscriptions_link($type, $node = 0, $main) {
   }
   return $links ? $links : array();
 }
+
 function subscriptions_get_taxa($uid) {
   $result = db_query('SELECT sid FROM {subscriptions} WHERE uid = %d and stype=\'taxa\'', $uid);
   while ($taxasub = db_fetch_object($result)) {
@@ -531,6 +619,17 @@ function subscriptions_get_taxa($uid) {
   }
   return $tsubscriptions ? $tsubscriptions : array();
 }
+
+function subscriptions_get_types($uid) {
+  $result = db_query('SELECT stype FROM {subscriptions} WHERE uid = %d', $uid);
+  while ($typesub = db_fetch_object($result)) {
+  	if(substr($typesub->stype,0,4)=='type'){
+      $tsubscriptions[] = substr($typesub->stype,4);
+    }
+  }
+  return $tsubscriptions ? $tsubscriptions : array();
+}
+
 function subscriptions_get_taxa_count() {
   $result = db_query('SELECT sid, count(*) as tcount FROM {subscriptions} WHERE stype=\'taxa\' GROUP BY sid');
   while ($taxasub = db_fetch_object($result)) {
@@ -538,6 +637,8 @@ function subscriptions_get_taxa_count() {
   }
   return $tsubscriptions ? $tsubscriptions : array();
 }
+
+
 function subscriptions_gen_taxa_links($tid, $taxa) {
   if (in_array($tid, $taxa)) {
     $link = l(t('unsubscribe'), 'subscriptions/del/taxa/'. $tid, array('title' => t('Unsubscribe from this category.')));
@@ -547,9 +648,21 @@ function subscriptions_gen_taxa_links($tid, $taxa) {
   }
   return $link;
 }
+
+function subscriptions_gen_type_links($type, $types) {
+  if (in_array($type, $types)) {
+    $link = l(t('unsubscribe'), 'subscriptions/del/type'. $type . '/0', array('title' => t('Unsubscribe from this node type.')));
+  }
+  else {
+    $link = l(t('subscribe'), 'subscriptions/add/type'. $type . '/0', array('title' => t('Subscribe to this node type.')));
+  }
+  return $link;
+}
+
 function subscriptions_add($sid, $uid, $stype) {
   db_query('INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES (%d , %d, \'%s\')', $sid, $uid, $stype);
 }
+
 /*
  * Menu callback:
  * Pages where users add and delete their subscriptions to nodes
@@ -585,7 +698,7 @@ function subscriptions_page() {
 		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
 	}else {
 		// split $_SERVER['HTTP_REFERER'] at "q="
-		$istart = strpos($_SERVER['HTTP_REFERER'], 'q=') + 2;
+		$istart = strpos($_SERVER['HTTP_REFERER'], 'q=');
 		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
 	}
   	$return = $_SERVER['HTTP_REFERER'];
@@ -610,6 +723,7 @@ function subscriptions_page() {
     case 'admin':
       // get all subscriptions for all users
       $subscriptions = subscriptions_get_summary();
+      //dprint_r($subscriptions);
       // build node rows
       foreach ($subscriptions['node'] as $nsub) {
         $subrowsn[] = array(t('thread'), l($nsub->title, 'node/'. $nsub->nid), $nsub->ncount);
@@ -632,9 +746,18 @@ function subscriptions_page() {
           $subrowst[] = array(t('category'), $vocab->name .': '. l($term->name, 'taxonomy/term/'. $term->tid), is_null($taxa[$term->tid]) ? '0' : $taxa[$term->tid]);
         }
       }
+      // build content type rows
+      $tree = node_get_types();
+			foreach($tree as $ntype=>$nname){
+				$count = 0;
+			  foreach ($subscriptions['type'] as $tpsub) {
+			  	if(substr($tpsub->stype,4)== $ntype){$count = $tpsub->ncount;}
+        }
+        $subrowstp[] = array(t('content type'), l($nname,$ntype), $count);
+      }
       // concatentate the arrays
       $headers = array(t('type'), t('title'), t('subscribers'));
-      $subrows = array_merge((array) $subrowsn, (array) $subrowsb, (array) $subrowst);
+      $subrows = array_merge((array) $subrowsn, (array) $subrowsb, (array) $subrowst, (array) $subrowstp);
       // assemble output
       if (!$subrows) {
         $message .= t('<p>No threads or categories are currently subscribed.</p>');
@@ -647,6 +770,17 @@ function subscriptions_page() {
       break;
     // determines the user's subscription status and displays the right option to change it
     default:
+			// determine submenu type
+			if(arg(0)=='user'){
+				$subtype = arg(3);
+			}else{
+			  $subtype = arg(1);
+		  }
+			if(strlen($subtype)==0){
+				$submenu = 'node';
+			}else{
+				$submenu = $subtype;
+			}
       // get all subscriptions and write to table rows
       $subscriptions = subscriptions_get_user();
       // build node rows
@@ -671,11 +805,36 @@ function subscriptions_page() {
           $subrowst[] = array(t('category'), $vocab->name .': '. l($term->name, 'taxonomy/term/'. $term->tid), '['. subscriptions_gen_taxa_links($term->tid, $taxa) .']');
         }
       }
+      // get list of all subscribed node types
+      $types = subscriptions_get_types($uid);
+      // get list of available node types
+      $tree = node_get_types();
+			foreach($tree as $ntype=>$nname){
+        $subrowsct[] = array(t('content type'), l($nname,$ntype), '['. subscriptions_gen_type_links($ntype, $types) .']');
+      }
       // concatentate the arrays
       $headers = array(t('type'), t('title'), t('operations'));
-      $subrows = array_merge((array) $subrowsn, (array) $subrowsb, (array) $subrowst);
+			// set rows
+      switch ($submenu) {
+      	case 'blogs':
+         $subrows = $subrowsb;
+         $nfound = t('You are not currently subscribed to any active blogs');
+         break;
+      	case 'taxa':
+         $subrows = $subrowst;
+         $nfound = t('There are no active categories.');
+         break;
+      	case 'node':
+         $subrows = $subrowsn;
+         $nfound = t('You are not currently subscribed to any active threads');
+         break;
+      	case 'type':
+         $subrows = $subrowsct;
+         $nfound = t('There are no active content types');
+         break;
+      }
       if (!$subrows) {
-        $message .= t('<p>You are not currently subscribed to any active threads or categories.</p>');
+        $message .= "<p>$nfound</p>";
       }
       else {
         $message .= theme('table', $headers, $subrows, array('id' => 'subscriptions'));
