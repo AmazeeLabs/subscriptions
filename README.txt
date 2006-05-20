@@ -50,14 +50,8 @@ subscriptions from another test account.
 Try entering "http://yoursite.com/cron.php" in the URL.  The blank screen is 
 normal.
 
-Credits / Contact
+Credits
 ------------------------------------------------------------------------------
-
-The original author (and maintainer) of this module is Dan Ziemecki, who can be
-contacted through the Drupal site at http://drupal.org/user/4532/contact.  Tom
-Dobes provided additional fixes and upgraded the module to function with Drupal
-post-4.3 CVS.
-
 The following people have contributed patches and translations:
 trew
 michelef
@@ -76,13 +70,30 @@ jpetso
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
 
+Sponsors
+------------------------------------------------------------------------------
+People who actually put their money where their mouth was:
+
+brashquido
+
+Contact
+------------------------------------------------------------------------------
+The original author (and maintainer) of this module is Dan Ziemecki, who can be
+contacted through the Drupal site at http://drupal.org/user/4532/contact.  Tom
+Dobes provided additional fixes and upgraded the module to function with Drupal
+post-4.3 CVS.
+
 Change Log
 ------------------------------------------------------------------------------
+05/19/2006 (dan ziemecki)
+---------
+- fixed problem with blog subscription link.  Associated with #64509
+
 05/18/2006 (dan ziemecki)
 ---------
-- added my account\my subscriptions menu
-- split subscription management into submenus by subscription type
-- added content types as a subscription option
+- added my account\my subscriptions menu (#58191)
+- split subscription management into submenus by subscription type (#58191)
+- added content types as a subscription option (#58191)
 - added "autosubscribe by default" admin option
 
 05/08/2006 (dan ziemecki)
