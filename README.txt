@@ -25,6 +25,15 @@ Installation
     with something like:
     
         mysql -u username -ppassword drupal < subscriptions.mysql
+        
+Upgrade
+------------------------------------------------------------------------------
+
+At revision 1.4.2.1 for branch "DRUPAL-4-7", the base subscriptions table was
+altered.  If you already have content in that table, you should modify it to
+make the "stype" field wider:
+
+ALTER TABLE `subscriptions` MODIFY `stype` varchar(25) NOT NULL default '';
 
 Configuration
 ------------------------------------------------------------------------------
@@ -75,6 +84,7 @@ Sponsors
 People who actually put their money where their mouth was:
 
 brashquido
+Ramdak
 
 Contact
 ------------------------------------------------------------------------------
