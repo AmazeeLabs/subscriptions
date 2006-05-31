@@ -333,7 +333,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
    // if content type, get vars
   if ($stype == 'type') {
   	$typestr = 'type'.$sid;
-    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.stype =%d', $typestr);
+    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.stype =\''.$typestr.'\'');
     $strtype = 'content type';
     $nid = $ssid;
     $cid = NULL;
@@ -699,7 +699,7 @@ function subscriptions_page() {
 	}else {
 		// split $_SERVER['HTTP_REFERER'] at "q="
 		$istart = strpos($_SERVER['HTTP_REFERER'], 'q=');
-		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
+		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart+2);
 	}
   	$return = $_SERVER['HTTP_REFERER'];
   } // end determine return location

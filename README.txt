@@ -1,12 +1,12 @@
 subscriptions.module ReadMe
 ==============================================================================
 
-The subscriptions module allows users to subscribe to nodes or taxonomies.  A
-subscribed user will be e-mailed whenever a comment is updated or added to a
-node.  When this module is enabled, all nodes will display a new link,
-"(un)subscribe", which enable users to subscribe or unsubscribe to the node in 
-question.  A new menu option, "my subscriptions",  allows the user to
-view all current subscriptions and make modifications.
+The subscriptions module allows users to subscribe to nodes, node types, blogs,
+and taxonomies.  A subscribed user will be e-mailed whenever a comment is
+updated or added to a node.  When this module is enabled, all nodes will
+display a new link, "(un)subscribe", which enable users to subscribe or
+unsubscribe to the node in question.  A new menu option, "my subscriptions",
+allows the user to view all current subscriptions and make modifications.
 
 Postgres Compatibility:
 This module attempts to offer compatability with Postgres SQL, but has not
@@ -34,6 +34,9 @@ altered.  If you already have content in that table, you should modify it to
 make the "stype" field wider:
 
 ALTER TABLE `subscriptions` MODIFY `stype` varchar(25) NOT NULL default '';
+
+Note that this only works for mySQL.  Pgsql doesn't type that tightly and
+doesn't require this modification.
 
 Configuration
 ------------------------------------------------------------------------------
@@ -95,6 +98,11 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+05/31/2006 (dan ziemecki)
+---------
+- Fixed problem with return page on subscription change
+- Fixed problem with unrequested notifications being sent out (#66018)
+
 05/19/2006 (dan ziemecki)
 ---------
 - fixed problem with blog subscription link.  Associated with #64509
