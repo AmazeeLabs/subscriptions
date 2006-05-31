@@ -325,7 +325,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   if ($stype == 'node') {
     $result = db_query('SELECT title FROM {node} WHERE nid = %d', $sid);
     $subj = db_result($result);
-    $result = db_query('SELECT u.uid, u.name, u.mail, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'node\'', $sid);
+    $result = db_query('SELECT u.uid, u.name, u.mail, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE u.status= 1 AND s.sid = %d AND s.stype = \'node\'', $sid);
     $strtype = 'thread';
     $nid = $sid;
     $cid = "comment-$ssid";
@@ -333,7 +333,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
    // if content type, get vars
   if ($stype == 'type') {
   	$typestr = 'type'.$sid;
-    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.stype =\''.$typestr.'\'');
+    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE u.status= 1 AND s.stype =\''.$typestr.'\'');
     $strtype = 'content type';
     $nid = $ssid;
     $cid = NULL;
@@ -342,7 +342,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   if ($stype == 'taxa' && !is_null($sid)) {
     $result = db_query('SELECT name FROM {term_data} WHERE tid = %d', $sid);
     $subj = db_result($result);
-    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND stype = \'taxa\'', $sid);
+    $result = db_query('SELECT u.mail, u.name, u.uid, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE u.status= 1 AND s.sid = %d AND stype = \'taxa\'', $sid);
     $strtype = 'category';
     $nid = $ssid;
     $cid = NULL;
@@ -351,7 +351,7 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   if ($stype == 'blog') {
     $result = db_query('SELECT name FROM {users} WHERE uid = %d', $uid);
     $subj = t('new blog for ') . db_result($result);
-    $result = db_query('SELECT u.uid, u.name, u.mail, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE s.sid = %d AND s.stype = \'blog\'', $sid);
+    $result = db_query('SELECT u.uid, u.name, u.mail, u.language FROM {users} u INNER JOIN {subscriptions} s ON u.uid = s.uid WHERE u.status= 1 AND s.sid = %d AND s.stype = \'blog\'', $sid);
     $strtype = 'blog';
     $nid = $ssid;
     $cid = NULL;
@@ -698,8 +698,12 @@ function subscriptions_page() {
 		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
 	}else {
 		// split $_SERVER['HTTP_REFERER'] at "q="
-		$istart = strpos($_SERVER['HTTP_REFERER'], 'q=');
-		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart+2);
+		if(strpos($_SERVER['HTTP_REFERER'],'q=')>0){
+		  $istart = strpos($_SERVER['HTTP_REFERER'], 'q='+2);
+		}else{
+			  $istart = 0;
+		}
+		$rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
 	}
   	$return = $_SERVER['HTTP_REFERER'];
   } // end determine return location

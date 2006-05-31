@@ -102,6 +102,7 @@ Change Log
 ---------
 - Fixed problem with return page on subscription change
 - Fixed problem with unrequested notifications being sent out (#66018)
+- Filtered out blocked users from notifications (#25995)
 
 05/19/2006 (dan ziemecki)
 ---------
