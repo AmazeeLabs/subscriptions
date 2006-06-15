@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: drupal pl arche\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-08-04 11:48+0200\n"
-"PO-Revision-Date: 2006-04-08 16:17+0100\n"
+"PO-Revision-Date: 2006-06-15 12:42+0100\n"
 "Last-Translator: Arche Twist <arche#letwist.net>\n"
 "Language-Team: Arche Twist <arche#letwist.net>\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: subscriptions.module:11
+#: subscriptions.module:10
 msgid ""
 "\n"
 "        <p>This module enables users to subscribe to be notified of changes to threads or categories.\n"
@@ -21,234 +21,349 @@ msgid ""
 "        Additionally, all users will be given an account option to auto-subscribe to any thread to which they post.\n"
 "        No configuration is required for this module, although roles must be given permission to\n"
 "        use it.</p>\n"
+"        <p>While no configuration is required, administrators are offered a few configurable options:</p>\n"
+"\t\t\t\t<p>\"<b>Omitted vocabularies</b>\" allows the admin to exclude certain node categories from this list of those\n"
+"\t\t\t\tavailable for subscription.</p>\n"
+"\t\t\t\t<p>\"<b>Use cron for notifications</b>\" allows you to postpone subscription\n"
+"\t\t\t\tnotifications until the next cron job is run.  Default behavior is to notify all subscribers immediately\n"
+"\t\t\t\tupon content change.  This behavior is probably best for low volume sites, but high volume sites could\n"
+"\t\t\t\tobserve appreciable pauses upon node or comment insert, and should probably use the cron option.\n"
+"\t\t\t\t<p>\"<b>Display watchdog entries for successful mailings</b>\" should also probably be disabled for high volume sites,\n"
+"\t\t\t\tas a large number of mailings could completely fill the log.</p>\n"
+"\t\t\t\t<p>\"<b>Test held posts prior to sending</b>\" tells Subscriptions to test if a node or comment\n"
+"\t\t\t\tis still active\\published prior toi sending a notification.  This is mainly to avoid sending\n"
+"\t\t\t\tnotifications for for posts that have been deleted.  This will result in a small performance\n"
+"\t\t\t\thit, and only makes sense if you are delaying the notifications with \"Use cron for notifications\".</p>\n"
 "\n"
-"        <p>Note that because this module causes the comment insert to pause while all\n"
-"        subscribers are notified, it may not be practical for large sites.</p>"
+"\t\t\t\t<p>\"<b>Show Subscriptions users menu on main menu</b>\" tells Subscriptions to display the\n"
+"\t\t\t\tSubscriptions user menu, used to manage one's own subscriptions, on the main menu.  The default\n"
+"\t\t\t\tsetting is OFF.</p>\n"
+"\t\t\t\t\n"
+"\t\t\t\t<p>\"<b>Show Subscriptions users menu under 'my account'</b>\" tells Subscriptions to display the\n"
+"\t\t\t\tSubscriptions user menu, used to manage one's own subscriptions, under the 'My Account' menu.  The default\n"
+"\t\t\t\tsetting is ON.</p>\n"
+"\t\t\t\t\n"
+"\t\t\t\t<p>\"<b>Set all users to 'autosubscribe' by default</b>\" set's the default value of the 'autosubscribe'\n"
+"\t\t\t\toption in each user's account to ON.  This value will not be set, however, until the user saves their\n"
+"\t\t\t\taccount preferences.  This, essentially, pre-checks the option associated with 'autosubscribe'. The\n"
+"\t\t\t\tdefault value is OFF.</p>\n"
+"\n"
+"\t\t\t\t"
 msgstr ""
-"\n"
-"        <p>Ten moduł umożliwia użytkownikom subskrybowanie powiadomień o nowościach w wątkach lub kategoriach.\n"
-"        Gdy włączony, wszystkie segmenty zostaną wyposażone w dodatkowy odnośnik, poprzez który użytkownicy będą mogli je zasubskrybować lub cofnąć ich subskrypcję.\n"
-"        Wszyscy użytkownicy będą mogli także włączyć automatyczną subsrypcję powiadomień o nowościach we wszystkich wątkach, w których zabrali głos.\n"
-"        Moduł ten nie wymaga konfiguracji, jednak konieczne jest nadanie właściwych uprawnień odpowiednim rangom użytkowników.</p>\n"
-"\n"
-"        <p>Ponieważ moduł sprawia, że dodawanie odpowiedzi zostaje wstrzymane podczas wysyłania powiadomień, może nie być odpowiedni dla dużych stron.</p>"
 
-#: subscriptions.module:22
+#: subscriptions.module:46
 msgid "Allows users to subscribe to nodes and taxonomy terms."
 msgstr "Pozwala użytkownikom na subskrybowanie powiadomień o nowościach w segmentach i terminach taksonomii."
 
-#: subscriptions.module:60
+#: subscriptions.module:64
 msgid "Subscription settings"
-msgstr "Ustawienia subskrypcji"
+msgstr "Ustawienia powiadomień"
 
-#: subscriptions.module:60
-msgid "Automatically subscribe to threads in which you post."
-msgstr "Automatycznie subskrybuj powiadomienia o nowościach w wątkach, w których piszesz."
+#: subscriptions.module:70
+msgid "Autosubscribe"
+msgstr "Automatyczna subskrypcja powiadomień"
 
-#: subscriptions.module:60
+#: subscriptions.module:72
 msgid "Checking this box allows you to be automatically subscribe to any thread you create or post a comment to."
 msgstr "Wybranie tej opcji pozwala Ci na otrzymywania automatycznych powiadomień o zmianach w wątkach, które stworzyłeś, lub w których odpowiedziałeś."
 
-#: subscriptions.module:70
+#: subscriptions.module:84
 msgid "none"
 msgstr "brak"
 
-#: subscriptions.module:74
+#: subscriptions.module:91
 msgid "Omitted vocabularies"
 msgstr "Pomijane słowniki"
 
-#: subscriptions.module:74
+#: subscriptions.module:94
 msgid "Select vocabularies which should be <strong>omitted</strong> from subscription listings."
 msgstr "Posty powiązane z którymi ze słowników mają być <strong>pomijane</strong>?"
 
-#: subscriptions.module:170
+#: subscriptions.module:100
+msgid "Use cron for notifications"
+msgstr "Używaj demona cron"
+
+#: subscriptions.module:102
+msgid "Sends subscription notification when cron module runs.  Default is to send upon node update.  <br /><em>Note:  Currently only tested with MySQL.</em>"
+msgstr "Wysyła powiadomienia w trakcie wykonywania zadania przez program cron.  Domyślnym ustawieniem jest jednak wysyłanie powiadomień przy każdej aktualizacji segmentu.  <br /><em>Uwaga: przetestowane tylko z MySQL.</em>"
+
+#: subscriptions.module:106
+msgid "Display watchdog entries for successful mailings"
+msgstr "Zapisuj informacje o wysłaniu powiadomień do dziennika"
+
+#: subscriptions.module:108
+msgid "Inserts notification of successful mailings in the watchdog log.  Default is ON."
+msgstr "Umieszcza w dzienniku obserwatora komunikaty o pomyślnym przesłaniu powiadomień.  Opcja domyślnie włączona."
+
+#: subscriptions.module:112
+msgid "Test held posts prior to sending"
+msgstr "Sprawdzaj posty przed wysłaniem powiadomień"
+
+#: subscriptions.module:114
+msgid "Tests to see if a post about to be sent by cron is still active.  Adds a small amount of overhead.  Default is OFF."
+msgstr "Sprawdza czy post, którego ma dotyczyć powiadomienie jeszcze istnieje.  Opcja ta jest domyślnie wyłączona, a jej włączenie może powodować małe dodatkowe obciążenie dla serwera."
+
+#: subscriptions.module:118
+msgid "Show Subscriptions users menu on main menu"
+msgstr "Wyświetlaj polecenie <em>Powiadomienia</em> w menu głównym."
+
+#: subscriptions.module:120
+msgid "Displays the Subscriptions users menu on the main menu. Default is OFF."
+msgstr "Wyświetla odnośnik do strony umożliwiającej konfigurację powiadomień w menu użytkownika. Opcja domyślnie wyłączona."
+
+#: subscriptions.module:124
+msgid "Show Subscriptions users menu under \"my account\""
+msgstr "Wyświetlaj polecenie <em>Powiadomienia</em> na karcie strony <em>moje konto</em>"
+
+#: subscriptions.module:126
+msgid "Displays the Subscriptions users menu as a tab under \"my Account\". Default is ON."
+msgstr "Wyświetla odnośnik do strony umożliwiającej konfigurację powiadomień jako kartę na stronie konfiguracji konta. Opcja domyślnie włączona."
+
+#: subscriptions.module:130
+msgid "Set all users to \"autosubscribe\" by default"
+msgstr "Ustaw opcję \"automatyczne powiadomienia\" jako domyślną"
+
+#: subscriptions.module:132
+msgid "Set's each users \"autosubscribe\" profile option. Default is OFF."
+msgstr "Zmienia ustawienie \"automatycznych powiadomień\" dla wszystkich użytkowników. Opcja ta jest domyślnie wyłączona."
+
+#: subscriptions.module:145
+#: ;171;198
+msgid "my subscriptions"
+msgstr "powiadomienia"
+
+#: subscriptions.module:150
+#: ;176
+msgid "blogs"
+msgstr "blogi"
+
+#: subscriptions.module:154
+#: ;180
+msgid "threads"
+msgstr "wątki"
+
+#: subscriptions.module:158
+#: ;187
+msgid "categories"
+msgstr "kategorie"
+
+#: subscriptions.module:162
+#: ;191
+msgid "content types"
+msgstr "rodzaje zawartości"
+
+#: subscriptions.module:165
+#: ;194
+msgid "rss feed"
+msgstr "kanał RSS"
+
+#: subscriptions.module:183
+msgid "my content types"
+msgstr "moje rodzaje zawartości"
+
+#: subscriptions.module:202
+#: ;0
+msgid "subscriptions"
+msgstr "powiadomienia"
+
+#: subscriptions.module:305
 msgid "subscription notification for "
 msgstr "powiadomienie dla"
 
-#: subscriptions.module:173
+#: subscriptions.module:309
 msgid "error mailing subscription notification: "
 msgstr "błąd podczas wysyłania powiadomienia:"
 
-#: subscriptions.module:211
+#: subscriptions.module:353
 msgid "new blog for "
 msgstr "nowy blog dla"
 
-#: subscriptions.module:229
+#: subscriptions.module:369
 msgid "[%site] %type subscription update for %name : %subject"
 msgstr "Powiadomienie o nowościach na %site: %subject, %name (%type)"
 
-#: subscriptions.module:230
+#: subscriptions.module:370
 msgid ""
 "Greetings, %name.\n"
 "\n"
-"A %type to which you have subscribed has been updated.  To view the thread,\n"
-"navigate to %url\n"
+"A %type to which you have subscribed has been updated.\n"
+"To view the thread, navigate to %url \n"
 "\n"
 "--\n"
-"This is an automatic mail from %site.\n"
+"This is an automatic message from %site.\n"
 "To manage your subscriptions, browse to %manage-url"
 msgstr ""
-"Witaj, %name.\n"
+"Witaj %name,\n"
 "\n"
 "Segment (%type), o zmianach w którym chcialeś być powiadamiany, został zaktualizowany.\n"
-" By go obejrzeć, skorzystaj z odnośnika %url\n"
+"By go obejrzeć, skorzystaj z odnośnika %url\n"
 "\n"
 "--\n"
 "Wiadomość ta została wysłana automatycznie z %site.\n"
 "By zmienić ustawienia subskrypcji powiadomień, przejdź na stronę %manage-url"
 
-#: subscriptions.module:315
-msgid "Subscribe"
-msgstr "Subskrybuj"
+#: subscriptions.module:576
+msgid "Subscriptions"
+msgstr "Powiadomienia"
 
-#: subscriptions.module:315
-msgid "Receive notification of replies to this %name."
+#: subscriptions.module:582
+msgid "Subscribe"
+msgstr "Subskrybuj powiadomienia"
+
+#: subscriptions.module:583
+msgid "Receive notification of replies or comments to this node."
 msgstr "Otrzymuj powiadomienia o nowych odpowiedziach."
 
-#: subscriptions.module:328
-msgid "my subscriptions"
-msgstr "moje subskrypcje"
-
-#: subscriptions.module:331;0
-msgid "subscriptions"
-msgstr "subskrypcje"
-
-#: subscriptions.module:347
+#: subscriptions.module:599
 msgid "unsubscribe blog"
-msgstr "cofnij subskrypcję bloga"
+msgstr "cofnij subskrypcję powiadomień z tego bloga"
 
-#: subscriptions.module:347
+#: subscriptions.module:599
 msgid "Stop receiving an e-mail whenever a new entry is made to this person's blog."
 msgstr "Powoduje zaprzestanie przesyłania wiadomości e-mail z powiadomieniami o nowych wpisach w tym blogu."
 
-#: subscriptions.module:350
+#: subscriptions.module:602
 msgid "subscribe blog"
-msgstr "subskrybuj bloga"
+msgstr "subskrybuj blog"
 
-#: subscriptions.module:350
+#: subscriptions.module:602
 msgid "Receive an e-mail whenever a new entry is made to this person's blog."
 msgstr "Powoduje przesyłanie wiadomości e-mail z powiadomieniami o nowych wpisach w tym blogu."
 
-#: subscriptions.module:354
+#: subscriptions.module:606
 msgid "unsubscribe post"
-msgstr "cofnij subskrypcję posta"
+msgstr "cofnij subskrypcję"
 
-#: subscriptions.module:354
+#: subscriptions.module:606
 msgid "Stop receiving an e-mail whenever a new comment is posted to this %n."
 msgstr "Powoduje zaprzestanie przesyłania wiadomości e-mail z powiadomieniami o nowościach."
 
-#: subscriptions.module:357
+#: subscriptions.module:609
 msgid "subscribe post"
 msgstr "subskrybuj"
 
-#: subscriptions.module:357
+#: subscriptions.module:609
 msgid "Receive an e-mail whenever a comment is posted to this %n."
 msgstr "Powoduje przesyłanie wiadomości e-mail z powiadomieniami o nowościach."
 
-#: subscriptions.module:381;492;496
+#: subscriptions.module:644
+#: ;654;792;796
 msgid "unsubscribe"
 msgstr "cofnij subskrypcję"
 
-#: subscriptions.module:381
+#: subscriptions.module:644
 msgid "Unsubscribe from this category."
 msgstr "Cofa subskrypcję powiadomień dla tej kategorii."
 
-#: subscriptions.module:384
+#: subscriptions.module:647
+#: ;657
 msgid "subscribe"
 msgstr "subskrybuj"
 
-#: subscriptions.module:384
+#: subscriptions.module:647
 msgid "Subscribe to this category."
 msgstr "Włącza subskrypcję powiadomień dla tej kategorii."
 
-#: subscriptions.module:420
-msgid "<p>Your subscription was activated.</p>"
-msgstr "<p>Subskrybowanie zostało włączone</p>"
+#: subscriptions.module:654
+msgid "Unsubscribe from this node type."
+msgstr "Cofnij subskrypcję powiadomień dotyczących zawartości tego typu."
 
-#: subscriptions.module:423
-msgid "Return to the blog"
-msgstr "Powróć do bloga"
+#: subscriptions.module:657
+msgid "Subscribe to this node type."
+msgstr "Subskrybuj powiadomienia dotyczące zawartości tego typu."
 
-#: subscriptions.module:426;439
-msgid "Return to the thread"
-msgstr "Powróć do wątku"
+#: subscriptions.module:715
+msgid "Your subscription was activated."
+msgstr "Powiadomienia zostały włączone."
 
-#: subscriptions.module:429;441
-msgid "Return to the subscriptions"
-msgstr "Powróć do listy subskrypcji"
+#: subscriptions.module:722
+msgid "Your subscription was deactivated."
+msgstr "Powiadomienia zostały wyłączone."
 
-#: subscriptions.module:430
-msgid "Subscription Activated"
-msgstr "Subskrybowanie włączone"
-
-#: subscriptions.module:437
-msgid "<p>Your subscription was deactivated.</p>"
-msgstr "<p>Subskrybowanie zostało wyłączone</p>"
-
-#: subscriptions.module:442
-msgid "Subscription Deactivated"
-msgstr "Subskrypcja wyłączona"
-
-#: subscriptions.module:452;492
+#: subscriptions.module:733
+#: ;792
 msgid "thread"
 msgstr "wątek"
 
-#: subscriptions.module:456;496
+#: subscriptions.module:737
+#: ;796
 msgid "blog"
 msgstr "blog"
 
-#: subscriptions.module:469;509
+#: subscriptions.module:750
+#: ;809
 msgid "category"
 msgstr "kategoria"
 
-#: subscriptions.module:473;514
+#: subscriptions.module:760
+#: ;817
+msgid "content type"
+msgstr "rodzaj zawartości"
+
+#: subscriptions.module:763
+#: ;820
 msgid "type"
 msgstr "typ"
 
-#: subscriptions.module:473;514
+#: subscriptions.module:763
+#: ;820
 msgid "title"
 msgstr "tytuł"
 
-#: subscriptions.module:473
+#: subscriptions.module:763
 msgid "subscribers"
 msgstr "subskrybenci"
 
-#: subscriptions.module:477
+#: subscriptions.module:767
 msgid "<p>No threads or categories are currently subscribed.</p>"
 msgstr "<p>Żadne wątki ani kategorie nie są w tej chwili subskrybowane</p>"
 
-#: subscriptions.module:482
+#: subscriptions.module:772
 msgid "Subscriptions Summary"
-msgstr "Podsumowanie subskrypcji"
+msgstr "Podsumowanie powiadomień"
 
-#: subscriptions.module:492
+#: subscriptions.module:792
 msgid "Unsubscribe from this thread."
-msgstr "Cofnij subskrypcję tego wątku"
+msgstr "Cofnij subskrypcję powiadomień o nowościach w tym wątku."
 
-#: subscriptions.module:496
+#: subscriptions.module:796
 msgid "Unsubscribe from this user's blog."
-msgstr "Cofnij subskrypcję bloga tego użytkownika"
+msgstr "Cofnij subskrypcję powiadomień z bloga tego użytkownika."
 
-#: subscriptions.module:514
+#: subscriptions.module:820
 msgid "operations"
 msgstr "czynności"
 
-#: subscriptions.module:517
-msgid "<p>You are not currently subscribed to any active threads or categories.</p>"
-msgstr "<p>Nie subskrybujesz w tej chwili powiadomień z żadnych wątków czy kategorii</p>"
+#: subscriptions.module:825
+msgid "You are not currently subscribed to any active blogs"
+msgstr "W tej chwili nie subskrybujesz powiadomień o nowościach w żadnych blogach"
 
-#: subscriptions.module:170
+#: subscriptions.module:829
+msgid "There are no active categories."
+msgstr "Brak aktywnych kategorii"
+
+#: subscriptions.module:833
+msgid "You are not currently subscribed to any active threads"
+msgstr "W tej chwili nie subskrybujesz powiadomień o nowościach w żadnych wątkach"
+
+#: subscriptions.module:837
+msgid "There are no active content types"
+msgstr "Brak aktywnych rodzajów zawartości"
+
+#: subscriptions.module:850
+#: ;883
+msgid "%name Subscriptions"
+msgstr "Subskrypcje powiadomień użytkownika %name"
+
+#: subscriptions.module:305
 msgid "regular"
 msgstr "zwykły"
 
-#: subscriptions.module:173
+#: subscriptions.module:309
 msgid "error"
 msgstr "błąd"
 
-#: subscriptions.module:30
+#: subscriptions.module:53
 msgid "maintain subscriptions"
 msgstr "zarządzanie powiadomieniami"
 
-#: subscriptions.module
-msgid "my subscriptions feed"
-msgstr "kanał moich powiadomień"
