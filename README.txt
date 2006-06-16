@@ -98,6 +98,16 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+06/15/2006 (dan ziemecki)
+---------
+- Fixed several minor "isset" errors
+- Implemented FormsAPI for subscriptions maintenance pages (#6183, 6130)
+
+06/8/2006 (dan ziemecki)
+---------
+- Fixed problem with .install not configuring subscriptions table correctly
+ (#68057)
+
 05/31/2006 (dan ziemecki)
 ---------
 - Fixed problem with return page on subscription change
