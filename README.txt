@@ -78,6 +78,7 @@ jmiccolis
 samc
 introfini
 jpetso
+mindless
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
@@ -98,6 +99,22 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+06/20/2006 (dan ziemecki)
+---------
+- Displayed and ordered node subscriptions by node type (#68637)
+- Enabled option to exclude certain content types from the content type
+subscription form (#24603)
+- Extended both content type and taxonomy exclusion to hide subscription
+links at node level
+- Added an option to notify a poster of their own posts
+- Implemented a final node access test before sending out notifications (#13502)
+- Fixed bug preventing the subscription checkbox from appearing at create node
+(#68198)
+- Replaced up a bunch of tabs with double spaces
+- Added node title to notification
+- Hid subscriptions reports stub, awaiting better content
+- Corrected a bug with taxonomy subscriptions not displaying on form
+
 06/15/2006 (dan ziemecki)
 ---------
 - Fixed several minor "isset" errors
@@ -161,7 +178,7 @@ Change Log
 - corrected a grouping error in psql
 - aded troubleshooting section
 
-03/31/2006
+03/31/2006 (dan ziemecki)
 ---------
 - modified form element construction for new 4.7 api (fixes bug #31041)
 - added subscriptions.install file
