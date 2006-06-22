@@ -253,7 +253,7 @@ function subscriptions_get_user($account = NULL) {
     $queryb .= '({subscriptions} s LEFT JOIN {users} u ON u.uid = s.sid) ';
     $queryb .= 'WHERE u.status = 1 AND s.uid = %d AND s.stype = \'blog\'';
     // query string for category subscriptions
-    $queryt .= 'SELECT td.tid, td.name FROM ';
+    $queryt = 'SELECT td.tid, td.name FROM ';
     $queryt .= '{subscriptions} s INNER JOIN {term_data} td ON td.tid = s.sid ';
     $queryt .= 'WHERE s.uid = %d AND s.stype = \'taxa\'';
     $resultn = db_query($queryn, $account->uid);
@@ -644,10 +644,13 @@ function subscriptions_link($type, $node = 0, $main) {
   $omittypes = variable_get('subscriptions_omitted_content_types', array());
   $omittaxa = variable_get('subscriptions_omitted_taxa', array());
   $taxaclear=true;
+  $links = array();
 	// loop throu possibly muliple taxa to determine if any are on omit list
+	if (!isset($node->taxonomy)){$node->taxonomy=array();}
 	foreach($node->taxonomy as $taxa){
 		if(in_array($taxa->tid,$omittaxa)){$taxaclear = false;}
 	}
+	if (!isset($node->type)){$node->type='';}
 	if($taxaclear && !in_array($node->type,$omittypes)){
     if (user_access('maintain subscriptions') && $type == 'node' && $node->comment == 2) {
       $subscriptions = subscriptions_get_user();
@@ -807,11 +810,7 @@ function subscriptions_taxa($account = NULL){
     $account = $user;
   }
   // query string for category subscriptions
-  $query = 'SELECT s.sid FROM ';
-  $query .= '{subscriptions} s  ';
-  $query .= 'WHERE s.uid = %d AND s.stype = \'taxa\'';
-  $result = db_query($query, $account->uid);
-  $subs = db_fetch_object($result);
+  $subs = subscriptions_get_taxa($account->uid);
   // traverse the taxonomy tree
   $taxa = subscriptions_get_taxa_count();
   // omit undesired vocabularies from listing

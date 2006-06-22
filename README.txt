@@ -55,8 +55,9 @@ Troubleshooting:
  If this module isn't working for you, some key things to test include ...
 
  1) Make sure you're not posting to your own subscriptions and expecting to 
-notified of it.  That is quite deliberately turned off.  Try posting to your 
-subscriptions from another test account.
+notified of it.  That is quite deliberately turned off be default.  Try posting
+changing the changing the settng for "Notify poster of own posts" under
+admin/settings/subscriptions.
 
  2) If you've enabled cron sending, you'll need to run cron to see any email.  
 Try entering "http://yoursite.com/cron.php" in the URL.  The blank screen is 
@@ -79,6 +80,7 @@ samc
 introfini
 jpetso
 mindless
+demeester_roel
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
@@ -99,6 +101,11 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+06/21/2006 (dan ziemecki)
+---------
+- Cleared up some uninitialized variables (#70037)
+- Corrected problem with incomplete result set (#70096)
+
 06/20/2006 (dan ziemecki)
 ---------
 - Displayed and ordered node subscriptions by node type (#68637)
@@ -111,7 +118,7 @@ links at node level
 - Fixed bug preventing the subscription checkbox from appearing at create node
 (#68198)
 - Replaced up a bunch of tabs with double spaces
-- Added node title to notification
+- Added node title to notification (#68989)
 - Hid subscriptions reports stub, awaiting better content
 - Corrected a bug with taxonomy subscriptions not displaying on form
 
