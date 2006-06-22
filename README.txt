@@ -101,6 +101,10 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+06/22/2006 (dan ziemecki)
+----------
+- reset a re-used array (#70078)
+
 06/21/2006 (dan ziemecki)
 ---------
 - Cleared up some uninitialized variables (#70037)

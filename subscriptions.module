@@ -101,6 +101,7 @@ function subscriptions_settings() {
       '#multiple'      => TRUE
     );
   }
+  $select = array();
   $nodetypes = node_get_types();
   foreach($nodetypes as $ntype=>$nname){
     $select[$ntype] = $nname;
