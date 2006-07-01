@@ -101,6 +101,14 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+07/01/2006 (dan ziemecki)
+----------
+- cleaned up an uninitialized variable in subscriptions_comment()
+- corrected a misnamed variable in subscriptions_cron()
+- corrected a misnamed variable in subscriptions_testpost() (#71008)
+- backed out code that prevents sending an update on node edit (rather than
+insert or publish).  It didn't work, anyway. (#70268)
+
 06/22/2006 (dan ziemecki)
 ----------
 - reset a re-used array (#70078)
