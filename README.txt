@@ -35,7 +35,7 @@ make the "stype" field wider:
 
 ALTER TABLE `subscriptions` MODIFY `stype` varchar(25) NOT NULL default '';
 
-Note that this only works for mySQL.  Pgsql doesn't type that tightly and
+Note that this only applies to mySQL.  Pgsql doesn't type that tightly and
 doesn't require this modification.
 
 Configuration
@@ -55,9 +55,8 @@ Troubleshooting:
  If this module isn't working for you, some key things to test include ...
 
  1) Make sure you're not posting to your own subscriptions and expecting to 
-notified of it.  That is quite deliberately turned off be default.  Try posting
-changing the changing the settng for "Notify poster of own posts" under
-admin/settings/subscriptions.
+notified of it.  That is quite deliberately turned off be default.  Try changing
+the setting for "Notify poster of own posts" under admin/settings/subscriptions.
 
  2) If you've enabled cron sending, you'll need to run cron to see any email.  
 Try entering "http://yoursite.com/cron.php" in the URL.  The blank screen is 
@@ -81,6 +80,7 @@ introfini
 jpetso
 mindless
 demeester_roel
+Andrew Sterling
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
@@ -101,6 +101,11 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+07/26/2006 (dan ziemecki)
+----------
+- moved a variable initialization in subscriptions_comment()
+ for compatibility with PHP5. (#73031)
+
 07/01/2006 (dan ziemecki)
 ----------
 - cleaned up an uninitialized variable in subscriptions_comment()

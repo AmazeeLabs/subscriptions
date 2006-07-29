@@ -537,9 +537,8 @@ function subscriptions_comment_taxa($comment){
 function subscriptions_comment($comment, $op) {
   global $user;
   $strsent = '!';
-  $nid = $comment['nid'];
-  // TODO: it appears the comment status is not provided by this hook... we'll have to look into that later
-  if (/* $comment['status'] == 0 && */ ($op == 'insert' || ($op == 'update' && $comment->status == 1))) { // ignore deactivated comments
+  if ($op == 'insert' || ($op == 'update' && $comment->status == 1)) { // ignore deactivated comments
+    $nid = $comment['nid'];
     //  if use_cron is set, insert node actions into holding table
     if(variable_get('subscriptions_usecron', 0)){
       subscriptions_hold( $comment, 'comment' , $op, $user->uid );
