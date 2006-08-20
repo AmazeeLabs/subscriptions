@@ -81,6 +81,7 @@ jpetso
 mindless
 demeester_roel
 Andrew Sterling
+smsimms
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
@@ -101,10 +102,12 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
-07/26/2006 (dan ziemecki)
+08/20/2006 (dan ziemecki)
 ----------
 - moved a variable initialization in subscriptions_comment()
  for compatibility with PHP5. (#73031)
+- Added an aggregate function to subscriptions_feed() SQL for PostGre
+ compatibility. (#77840)
 
 07/01/2006 (dan ziemecki)
 ----------

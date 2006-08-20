@@ -1089,7 +1089,7 @@ function subscriptions_feed($account = NULL) {
   if ($cond) {
     $sql.= " WHERE ". implode(' OR ', $cond);
   }
-  $sql .= " GROUP BY n.nid ORDER BY n.created DESC";
+  $sql .= " GROUP BY n.nid ORDER BY MAX(n.created) DESC";
   $result = db_query_range(db_rewrite_sql($sql), 0, variable_get('feed_default_items', 10));
   $channel['title'] = t("%name Subscriptions", array('%name' => $account->name));
   $channel['link'] = url("subscriptions/feed", NULL, NULL, TRUE);
