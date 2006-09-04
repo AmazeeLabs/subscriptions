@@ -9,9 +9,8 @@ unsubscribe to the node in question.  A new menu option, "my subscriptions",
 allows the user to view all current subscriptions and make modifications.
 
 Postgres Compatibility:
-This module attempts to offer compatability with Postgres SQL, but has not
+This module attempts to offer compatibility with Postgres SQL, but has not
 yet been tested due to the unavailability of a suitable test environment.
-
 
 Installation
 ------------------------------------------------------------------------------
@@ -23,9 +22,9 @@ Installation
     do the work.  If this is not the initial install or if the *.install
     process does not work for some reason, you can create the tables manually
     with something like:
-    
+
         mysql -u username -ppassword drupal < subscriptions.mysql
-        
+
 Upgrade
 ------------------------------------------------------------------------------
 
@@ -42,9 +41,9 @@ Configuration
 ------------------------------------------------------------------------------
 
   - Enable the module as usual from Drupal's admin pages.
-  - Under module settings, select any vocabularies you wish to hide from the 
+  - Under module settings, select any vocabularies you wish to hide from the
     subscriptions page (optional).
-  - Grant permissions to the groups you wish to be able to subscribe 
+  - Grant permissions to the groups you wish to be able to subscribe
     ("maintain subscriptions").
 
  NOTE:  This module requires e-mail addresses, so anonymous users don't make
@@ -54,12 +53,12 @@ Troubleshooting:
 ------------------------------------------------------------------------------
  If this module isn't working for you, some key things to test include ...
 
- 1) Make sure you're not posting to your own subscriptions and expecting to 
+ 1) Make sure you're not posting to your own subscriptions and expecting to
 notified of it.  That is quite deliberately turned off be default.  Try changing
 the setting for "Notify poster of own posts" under admin/settings/subscriptions.
 
- 2) If you've enabled cron sending, you'll need to run cron to see any email.  
-Try entering "http://yoursite.com/cron.php" in the URL.  The blank screen is 
+ 2) If you've enabled cron sending, you'll need to run cron to see any email.
+Try entering "http://yoursite.com/cron.php" in the URL.  The blank screen is
 normal.
 
 Credits
@@ -102,6 +101,11 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+09/04/2006 (dan ziemecki)
+----------
+- change the subscriptions_comment() function to use object notation for better
+ compatability with PHP5. (#73666)
+
 08/20/2006 (dan ziemecki)
 ----------
 - moved a variable initialization in subscriptions_comment()
@@ -171,11 +175,11 @@ links at node level
 
 05/08/2006 (dan ziemecki)
 ---------
-- added german translation (request #62412)
+- added German translation (request #62412)
 
 05/05/2006 (dan ziemecki)
 ---------
-- added portuguese translation (request #61988)
+- added Portuguese translation (request #61988)
 
 05/04/2006 (dan ziemecki)
 - enabled taxa subscription notifications for comments (fixes bug #61567)
@@ -203,7 +207,7 @@ links at node level
 04/06/2006 (dan ziemecki)
 ---------
 - corrected a grouping error in psql
-- aded troubleshooting section
+- added troubleshooting section
 
 03/31/2006 (dan ziemecki)
 ---------
@@ -320,3 +324,4 @@ logged on before prompting viewer to subscribe. (fixes bug #26130)
 11/9/2003 (dan ziemecki)
 ---------
 - initial release
+
