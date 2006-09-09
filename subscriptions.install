@@ -14,7 +14,7 @@ function subscriptions_install(){
 			db_query("CREATE TABLE {subscriptions} (
           sid int(10) unsigned NOT NULL,
           uid int(10) unsigned NOT NULL,
-          stype varchar(4) NOT NULL
+          stype varchar(25) NOT NULL
       ) TYPE=MyISAM /*!40100 DEFAULT CHARACTER SET utf8 */;");
       drupal_set_message(t('subscriptions database tables have been installed.'));
     break;
