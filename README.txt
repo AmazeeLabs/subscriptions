@@ -81,6 +81,8 @@ mindless
 demeester_roel
 Andrew Sterling
 smsimms
+LUTi
+jvandyk
 
 Special thanks to the many who helped on this module prior to me taking the
 names down. :)
@@ -101,9 +103,23 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+09/09/2006 (dan ziemecki)
+----------
+- Changed subscriptions_link() to call the vid rather than the tid, correcting
+ a problem where vocabulary exclusions could fail to work. (#79774)
+- Modified subscriptions_taxa() to display the vocabulary (parent) along with
+ the term name for better clarity. (#79774)
+- Added an if/then clause to handle an error when taxonomies are disabled.
+ (#79807)
+- Added a translation tag for node types displayed on the "my subscriptions"
+ page. (#76901)
+- changed the subscriptions_comment() function to use object notation OR array
+ notatation for better compatability with PHP4 AND PHP5. (#73666)
+- Added translation tag for %type in emails. (#77054)
+
 09/04/2006 (dan ziemecki)
 ----------
-- change the subscriptions_comment() function to use object notation for better
+- changed the subscriptions_comment() function to use object notation for better
  compatability with PHP5. (#73666)
 
 08/20/2006 (dan ziemecki)

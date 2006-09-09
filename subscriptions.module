@@ -336,7 +336,7 @@ function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
   }
 }
 /*
- * Get e-mail varsc
+ * Get e-mail vars
  */
 function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   global $base_url;
@@ -414,9 +414,9 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
       $subject = t('[%site] %type subscription update for %name : %subject', array('%site' => variable_get('site_name', 'drupal'), '%type' => $strtype, '%name' => $subscriptions->name, '%subject' => $subj));
       $body = t("Greetings, %name.\n\nA %type to which you have subscribed has been updated.\n%title\n%teaser\nTo view the thread, navigate to %url \n\n--\nThis is an automatic message from %site.\nTo manage your subscriptions, browse to %manage-url",
       array('%name' => $subscriptions->name,
-			'%type' => $strtype,
+			'%type' => t($strtype),
       '%url' => url('node/'. $nid, NULL, $cid, 1),
-      '%site' => variable_get('site_name', 'drupal'),
+      '%site' => t(variable_get('site_name', 'drupal')),
       '%manage-url' => url('subscriptions', NULL, NULL, 1),
       '%title' => $nobj->title, '%teaser'=> $teaser));
       // revert to original locale
@@ -537,13 +537,15 @@ function subscriptions_comment_taxa($comment){
 function subscriptions_comment($comment, $op) {
   global $user;
   $strsent = '!';
-  $nid = $comment->nid;
+  // $comment can be an object or an array.
+  // frankly, not sure why, but it may have to do with php version
+  $nid = is_null($comment->nid) ? $comment['nid'] : $comment->nid;
   if ($op == 'insert' || ($op == 'update' && $comment->status == 1)) { // ignore deactivated comments
     //  if use_cron is set, insert node actions into holding table
     if(variable_get('subscriptions_usecron', 0)){
       subscriptions_hold( $comment, 'comment' , $op, $user->uid );
     } else {  // if cron is not used
-      $cid = $comment->cid;
+      $cid = is_null($comment->cid) ? $comment['cid'] : $comment->cid;
       $nobj = node_load($nid);
       // send node subscriptions
       $strsent = $strsent . subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
@@ -640,7 +642,7 @@ function subscriptions_link($type, $node = 0, $main) {
 	// loop throu possibly muliple taxa to determine if any are on omit list
 	if (!isset($node->taxonomy)){$node->taxonomy=array();}
 	foreach($node->taxonomy as $taxa){
-		if(in_array($taxa->tid,$omittaxa)){$taxaclear = false;}
+		if(in_array($taxa->vid,$omittaxa)){$taxaclear = false;}
 	}
 	if (!isset($node->type)){$node->type='';}
 	if($taxaclear && !in_array($node->type,$omittypes)){
@@ -741,7 +743,7 @@ function subscriptions_nodes($account = NULL){
     }
   if(!isset($subs)){$subs[$account->uid]['node']=array();}
   foreach ($subs[$account->uid]['node'] as $nsub) {
-        $title = l($nsub->title, 'node/'. $nsub->nid) . " [".$nsub->type."]";
+        $title = l($nsub->title, 'node/'. $nsub->nid) . " [".t($nsub->type)."]";
         $subsrows['subform']['subs'.$nsub->nid] = array('#type' => 'checkbox', '#title' => $title, '#default_value' => 1);
       }
   $subsrows['user'] = array('#type' => 'hidden', '#value' => $account->uid);
@@ -806,7 +808,7 @@ function subscriptions_taxa($account = NULL){
   // traverse the taxonomy tree
   $taxa = subscriptions_get_taxa_count();
   // omit undesired vocabularies from listing
-  $vocabularies = taxonomy_get_vocabularies();
+  $vocabularies = function_exists('taxonomy_help') ? taxonomy_get_vocabularies() : array();
   $omits = variable_get('subscriptions_omitted_taxa', array());
   foreach ($omits as $omit) {
     unset($vocabularies[$omit]);
@@ -820,7 +822,7 @@ function subscriptions_taxa($account = NULL){
         if($tid == $term->tid){$defval = 1;}
       }
       $orgstate[] = array($term->tid,$account->uid,'taxa',$defval);
-      $title = l($term->name, 'taxonomy/term/'. $term->tid);
+      $title = l($vocab->name . ": " . $term->name, 'taxonomy/term/'. $term->tid);
       $subsrows['subform']['subs'.$term->tid] = array('#type' => 'checkbox', '#title' => $title, '#default_value' => $defval);
     }
   }
