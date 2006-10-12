@@ -41,9 +41,6 @@ function subscriptions_help($section) {
         default value is OFF.</p>
 
         ');
-    case 'admin/modules#description':
-      // appears on the admin module selection page
-      return t('Allows users to subscribe to nodes and taxonomy terms.');
   }
 }
 /**
@@ -83,6 +80,21 @@ function subscriptions_user($type, $edit, &$user, $category = NULL) {
   }
 }
 /**
+ * administer module settings
+ */
+function subscriptions_menu($maycache) {
+ $items[] = array(
+    'path' => 'admin/settings/subscriptions',
+    'title' => t('Subscriptions'),
+    'description' => t('Enables site settings for user subscriptions.'),
+    'callback' => 'drupal_get_form',
+    'callback arguments' => 'yourmodule_admin_settings',
+    'access' => user_access('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM, // optional
+   );
+}
+
+/**
  * Implementation of hook_settings().
  */
 function subscriptions_settings() {
@@ -91,7 +103,7 @@ function subscriptions_settings() {
   foreach ($vocabularies as $vocabulary) {
     $select[$vocabulary->vid] = $vocabulary->name;
   }
-  if (module_exist('taxonomy')){
+  if (module_exists('taxonomy')){
     $form['sub_settings']['subscriptions_omitted_taxa'] = array(
       '#type'          => 'select',
       '#title'         => t('Omitted vocabularies'),
@@ -171,7 +183,7 @@ function subscriptions_menu($may_cache) {
         'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
         'type' => MENU_LOCAL_TASK);
       // My Subscriptios submenus
-      if(module_exist('blog')){
+      if(module_exists('blog')){
         $items[] = array('path' => "user/$user->uid/subscriptions/blogs", 'title' => t('blogs'),
           'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
           'type' => MENU_LOCAL_TASK);
@@ -179,7 +191,7 @@ function subscriptions_menu($may_cache) {
        $items[] = array('path' => "user/$user->uid/subscriptions/node", 'title' => t('threads'),
         'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
         'type' => MENU_DEFAULT_LOCAL_TASK, 'weight' => -1);
-      if (module_exist('taxonomy')){
+      if (module_exists('taxonomy')){
         $items[] = array('path' => "user/$user->uid/subscriptions/taxa", 'title' => t('categories'),
           'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
           'type' => MENU_LOCAL_TASK);
@@ -197,7 +209,7 @@ function subscriptions_menu($may_cache) {
         'access' => user_access('maintain subscriptions'),
         'callback' => 'subscriptions_page');
       // My Subscriptios submenus
-      if(module_exist('blog')){
+      if(module_exists('blog')){
         $items[] = array('path' => "subscriptions/blogs", 'title' => t('blogs'),
           'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
           'type' => MENU_LOCAL_TASK);
@@ -208,7 +220,7 @@ function subscriptions_menu($may_cache) {
       $items[] = array('path' => "user/$user->uid/subscriptions/type", 'title' => t('my content types'),
         'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
         'type' => MENU_LOCAL_TASK);
-      if (module_exist('taxonomy')){
+      if (module_exists('taxonomy')){
         $items[] = array('path' => "subscriptions/taxa", 'title' => t('categories'),
           'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
           'type' => MENU_LOCAL_TASK);
@@ -325,7 +337,7 @@ function subscriptions_get_summary() {
  * Formats the mail and sends it.
  */
 function subscriptions_sendmail($name, $to, $subject, $body, $headers) {
-  $mail_success = user_mail($to, $subject, $body, $headers);
+  $mail_success = drupal_mail('subscriptions-sendmail',$to, $subject, $body, $headers);
   if ($mail_success) {
     if(variable_get('subscriptions_watchgood', 1) == 1){
       watchdog('regular', t('subscription notification for ') .'"'. $name .'" &lt;'. $to .'&gt;');
@@ -482,12 +494,14 @@ function subscriptions_testpost($content, $ptype){
   $valid = false;
   switch ($ptype) {
   case 'comment':  // comment handling
-    $result = db_query('SELECT pid, status FROM {comments} WHERE cid = %d', $content['cid']);
+    $cid = is_null($content->cid) ? $content['cid']: $content->cid;
+    $result = db_query('SELECT pid, status FROM {comments} WHERE cid = %d', $cid);
     $row = db_fetch_object($result);
     if(!is_null($row->pid) && ($row->pid != 0) &&  ($row->status != 1)){$valid = true;}
     break;
   case 'node':  // node handling
-    $result = db_query('SELECT status FROM {node} WHERE nid = %d', $content['nid']);
+    $nid = is_null($content->nid) ? $content['nid'] : $content->nid;
+    $result = db_query('SELECT status FROM {node} WHERE nid = %d', $nid);
     if(db_result($result)==1){$valid = true;}
     break;
   }
@@ -527,7 +541,8 @@ function subscriptions_cron() {
  * given a comment, return an array of associated taxonomies
  */
 function subscriptions_comment_taxa($comment){
-  $result = db_query('SELECT tid FROM {term_node} WHERE nid = "%s"', $comment['nid']);
+  $nid = is_null($comment->nid) ? $comment['nid'] : $comment->nid;
+  $result = db_query('SELECT tid FROM {term_node} WHERE nid = "%s"', $nid);
   return db_fetch_object($result);
 }
 
@@ -570,7 +585,11 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
   global $user;
   $strsent = '!';
   switch ($op) {
-    case 'update':  // fall through
+    case 'update':
+    if($node->status == '0'){break;} // unpublished. don't notify
+    // prevent already published edits from sending notifications
+    if($node->status == '1' && $node->subscriptions_currentstatus == '1'){break;}
+    // else, fall through
     case 'insert':
     if (variable_get('subscriptions_usecron', 0)) {
       // using cron to send notifications
@@ -609,23 +628,29 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
  */
 function subscriptions_form_alter($form_id, &$form) {
   global $user;
+  $node = $form['#node'];
   if ($user->uid && !$user->subscriptions_auto
       && isset($form['type']) && $form['type']['#value'] .'_node_form' == $form_id
       && $form['#node']->comment == COMMENT_NODE_READ_WRITE) {
-    $node = $form['#node'];
+		$form['subscriptions'] = array(
+		'#type'        => 'fieldset',
+		'#title'       => t('Subscriptions'),
+		'#collapsible' => TRUE,
+		'#weight'      => 1,
+		);
     $allsubs = subscriptions_get_user();
     $val = isset($node->subscriptions_subscribe) ? $node->subscriptions_subscribe : $allsubs['node'][$node->nid] ? 1 : $user->subscriptions_subscribe;
-      $form['subscriptions'] = array(
-        '#type'        => 'fieldset',
-        '#title'       => t('Subscriptions'),
-        '#collapsible' => TRUE,
-        '#weight'      => 1,
-      );
       $form['subscriptions']['subscriptions_subscribe'] = array(
         '#type'          => 'checkbox',
         '#title'         => t('Subscribe'),
         '#description'   => t('Receive notification of replies or comments to this node.'),
         '#default_value' => $val,
+      );
+    }
+    if (isset($node->status)) {
+			$form['subscriptions']['subscriptions_currentstatus'] = array(
+			'#type'          => 'value',
+			'#value' => $node->status
       );
     }
 }
@@ -651,17 +676,37 @@ function subscriptions_link($type, $node = 0, $main) {
       $name = node_get_name($node->type);
       if ($node->type == 'blog') {
         if (isset($subscriptions['blog'][$node->uid])) {
-          $links[] = l(t('unsubscribe blog'), 'subscriptions/del/blog/'. $node->uid, array('title' => t('Stop receiving an e-mail whenever a new entry is made to this person\'s blog.')));
+        	$links['subscriptions_del_blog'] = array(
+            'title' => t('unsubscribe blog'),
+            'href' => "subscriptions/del/blog/$node->uid",
+            'attributes' => array('title' => t('Stop receiving an e-mail whenever a new entry is made to this person\'s blog.'))
+            );
+          //**OLD**$links[] = l(t('unsubscribe blog'), 'subscriptions/del/blog/'. $node->uid, array('title' => t('Stop receiving an e-mail whenever a new entry is made to this person\'s blog.')));
         }
         else {
-          $links[] = l(t('subscribe blog'), 'subscriptions/add/blog/'. $node->uid, array('title' => t('Receive an e-mail whenever a new entry is made to this person\'s blog.')));
+        	  $links['subscriptions_add_blog'] = array(
+            'title' => t('subscribe blog'),
+            'href' => "subscriptions/add/blog/$node->uid",
+            'attributes' => array('title' => t('Receive an e-mail whenever a new entry is made to this person\'s blog.'))
+            );
+          //**OLD**$links[] = l(t('subscribe blog'), 'subscriptions/add/blog/'. $node->uid, array('title' => t('Receive an e-mail whenever a new entry is made to this person\'s blog.')));
         }
       }
       if (isset($subscriptions['node'][$node->nid])) {
-        $links[] = l(t('unsubscribe post'), 'subscriptions/del/node/'. $node->nid, array('title' => t('Stop receiving an e-mail whenever a new comment is posted to this %n.', array('%n' => $name))));
+  	    $links['subscriptions_del_node'] = array(
+        'title' => t('unsubscribe post'),
+        'href' => "subscriptions/del/node/$node->nid",
+        'attributes' => array('title' => t('Stop receiving an e-mail whenever a new comment is posted to this %n.'), array('%n' => $name))
+        );
+        //**OLD**$links[] = l(t('unsubscribe post'), 'subscriptions/del/node/'. $node->nid, array('title' => t('Stop receiving an e-mail whenever a new comment is posted to this %n.', array('%n' => $name))));
       }
       else {
-        $links[] = l(t('subscribe post'), 'subscriptions/add/node/'. $node->nid, array('title' => t('Receive an e-mail whenever a comment is posted to this %n.', array('%n' => $name))));
+  	    $links['subscriptions_add_node'] = array(
+        'title' => t('subscribe post'),
+        'href' => "subscriptions/add/node/$node->nid",
+        'attributes' => array('title' => t('Receive an e-mail whenever a comment is posted to this %n.'),array('%n' => $name))
+        );
+        //**OLD**$links[] = l(t('subscribe post'), 'subscriptions/add/node/'. $node->nid, array('title' => t('Receive an e-mail whenever a comment is posted to this %n.', array('%n' => $name))));
       }
     }
   }

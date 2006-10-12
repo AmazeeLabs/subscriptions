@@ -63,7 +63,7 @@ normal.
 
 Credits
 ------------------------------------------------------------------------------
-The following people have contributed patches and translations:
+The following people have contributed patches, snippets, and translations:
 trew
 michelef
 Gerard Farras
@@ -103,6 +103,15 @@ post-4.3 CVS.
 
 Change Log
 ------------------------------------------------------------------------------
+10/11/2006 (dan ziemecki)
+----------
+- Created the info file for v5.0.
+- Implemented hook_link for v5.0.
+- Changed module_exist() to module_exists() for v5.0.
+- Added filter on notifications for edits to already published nodes. (#86818)
+- Made several variable initializations more flexible vis a vis PHP version.
+ (#73031)
+
 09/09/2006 (dan ziemecki)
 ----------
 - Changed subscriptions_link() to call the vid rather than the tid, correcting
@@ -214,11 +223,11 @@ links at node level
 
 04/19/2006 (dan ziemecki)
 ---------
-- Correct improper node call (another fix for bug #57844)
+- Corrected improper node call (another fix for bug #57844)
 
 04/16/2006 (dan ziemecki)
 ---------
-- Correct improper node call (fixes bug #57844)
+- Corrected improper node call (fixes bug #57844)
 
 04/06/2006 (dan ziemecki)
 ---------
