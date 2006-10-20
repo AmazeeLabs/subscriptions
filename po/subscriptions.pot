@@ -1,0 +1,317 @@
+# LANGUAGE translation of Drupal (subscriptions.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: subscriptions.module,v 1.38.2.3.2.16 2006/09/09 18:25:16 c0c0c0
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2006-10-19 04:57-0400\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: subscriptions.module:10
+msgid "\n        <p>This module enables users to subscribe to be notified of changes to threads, categories and content types.\n        Once enabled, all nodes will have an additional link that allows the user to subscribe to them.\n        Additionally, all users will be given an account option to auto-subscribe to any thread to which they post.\n        No configuration is required for this module, although roles must be given permission to\n        use it.</p>\n        <p>While no configuration is required, administrators are offered a few configurable options:</p>\n        <p>\"<b>Omitted vocabularies</b>\" allows the admin to exclude certain node categories from this list of those\n        available for subscription.</p>\n        <p>\"<b>Omitted content types</b>\" allows the admin to exclude certain content types from this list of those\n        available for subscription.</p>\n        <p>\"<b>Notify poster of own posts</b>\" sends a notification to a node poster about their own posts. Useful principally during testing. Default is OFF.</p>\n        <p>\"<b>Use cron for notifications</b>\" allows you to postpone subscription\n        notifications until the next cron job is run.  Default behavior is to notify all subscribers immediately\n        upon content change.  This behavior is probably best for low volume sites, but high volume sites could\n        observe appreciable pauses upon node or comment insert, and should probably use the cron option.\n        <p>\"<b>Display watchdog entries for successful mailings</b>\" should also probably be disabled for high volume sites,\n        as a large number of mailings could completely fill the log.</p>\n        <p>\"<b>Test held posts prior to sending</b>\" tells Subscriptions to test if a node or comment\n        is still active\\published prior toi sending a notification.  This is mainly to avoid sending\n        notifications for for posts that have been deleted.  This will result in a small performance\n        hit, and only makes sense if you are delaying the notifications with \"Use cron for notifications\".</p>\n        <p>\"<b>Show Subscriptions users menu on main menu</b>\" tells Subscriptions to display the\n        Subscriptions user menu, used to manage one's own subscriptions, on the main menu.  The default\n        setting is OFF.</p>\n        <p>\"<b>Show Subscriptions users menu under 'my account'</b>\" tells Subscriptions to display the\n        Subscriptions user menu, used to manage one's own subscriptions, under the 'My Account' menu.  The default\n        setting is ON.</p>\n        <p>\"<b>Set all users to 'autosubscribe' by default</b>\" set's the default value of the 'autosubscribe'\n        option in each user's account to ON.  This value will not be set, however, until the user saves their\n        account preferences.  This, essentially, pre-checks the option associated with 'autosubscribe'. The\n        default value is OFF.</p>\n\n        "
+msgstr ""
+
+#: subscriptions.module:46
+msgid "Allows users to subscribe to nodes and taxonomy terms."
+msgstr ""
+
+#: subscriptions.module:64
+msgid "Subscription settings"
+msgstr ""
+
+#: subscriptions.module:70
+msgid "Autosubscribe"
+msgstr ""
+
+#: subscriptions.module:72
+msgid "Checking this box allows you to be automatically subscribe to any thread you create or post a comment to."
+msgstr ""
+
+#: subscriptions.module:90
+msgid "none"
+msgstr ""
+
+#: subscriptions.module:97
+msgid "Omitted vocabularies"
+msgstr ""
+
+#: subscriptions.module:100
+msgid "Select vocabularies which should be <strong>omitted</strong> from subscription listings."
+msgstr ""
+
+#: subscriptions.module:111
+msgid "Omitted content types"
+msgstr ""
+
+#: subscriptions.module:114
+msgid "Select content types which should be <strong>omitted</strong> from subscription listings."
+msgstr ""
+
+#: subscriptions.module:119
+msgid "Notify poster of own posts"
+msgstr ""
+
+#: subscriptions.module:121
+msgid "Notifies a node poster about their own posts.  Useful principally during testing.  Default is OFF."
+msgstr ""
+
+#: subscriptions.module:125
+msgid "Use cron for notifications"
+msgstr ""
+
+#: subscriptions.module:127
+msgid "Sends subscription notification when cron module runs.  Default is to send upon node update.  <br /><em>Note:  Currently only tested with MySQL.</em>"
+msgstr ""
+
+#: subscriptions.module:131
+msgid "Display watchdog entries for successful mailings"
+msgstr ""
+
+#: subscriptions.module:133
+msgid "Inserts notification of successful mailings in the watchdog log.  Default is ON."
+msgstr ""
+
+#: subscriptions.module:137
+msgid "Test held posts prior to sending"
+msgstr ""
+
+#: subscriptions.module:139
+msgid "Tests to see if a post about to be sent by cron is still active.  Adds a small amount of overhead.  Default is OFF."
+msgstr ""
+
+#: subscriptions.module:143
+msgid "Show Subscriptions users menu on main menu"
+msgstr ""
+
+#: subscriptions.module:145
+msgid "Displays the Subscriptions users menu on the main menu. Default is OFF."
+msgstr ""
+
+#: subscriptions.module:149
+msgid "Show Subscriptions users menu under \"my account\""
+msgstr ""
+
+#: subscriptions.module:151
+msgid "Displays the Subscriptions users menu as a tab under \"my Account\". Default is ON."
+msgstr ""
+
+#: subscriptions.module:155
+msgid "Set all users to \"autosubscribe\" by default"
+msgstr ""
+
+#: subscriptions.module:157
+msgid "Set's each users \"autosubscribe\" profile option. Default is OFF."
+msgstr ""
+
+#: subscriptions.module:170;196;223
+msgid "my subscriptions"
+msgstr ""
+
+#: subscriptions.module:175;201
+msgid "blogs"
+msgstr ""
+
+#: subscriptions.module:179;205
+msgid "threads"
+msgstr ""
+
+#: subscriptions.module:183;212
+msgid "categories"
+msgstr ""
+
+#: subscriptions.module:187;216
+msgid "content types"
+msgstr ""
+
+#: subscriptions.module:190;219
+msgid "rss feed"
+msgstr ""
+
+#: subscriptions.module:208
+msgid "my content types"
+msgstr ""
+
+#: subscriptions.module:331
+msgid "subscription notification for "
+msgstr ""
+
+#: subscriptions.module:335
+msgid "error mailing subscription notification: "
+msgstr ""
+
+#: subscriptions.module:379
+msgid "new blog for "
+msgstr ""
+
+#: subscriptions.module:414
+msgid "[%site] %type subscription update for %name : %subject"
+msgstr ""
+
+#: subscriptions.module:415
+msgid "Greetings, %name.\n\nA %type to which you have subscribed has been updated.\n%title\n%teaser\nTo view the thread, navigate to %url \n\n--\nThis is an automatic message from %site.\nTo manage your subscriptions, browse to %manage-url"
+msgstr ""
+
+#: subscriptions.module:620
+msgid "Subscriptions"
+msgstr ""
+
+#: subscriptions.module:626
+msgid "Subscribe"
+msgstr ""
+
+#: subscriptions.module:627
+msgid "Receive notification of replies or comments to this node."
+msgstr ""
+
+#: subscriptions.module:654
+msgid "unsubscribe blog"
+msgstr ""
+
+#: subscriptions.module:654
+msgid "Stop receiving an e-mail whenever a new entry is made to this person's blog."
+msgstr ""
+
+#: subscriptions.module:657
+msgid "subscribe blog"
+msgstr ""
+
+#: subscriptions.module:657
+msgid "Receive an e-mail whenever a new entry is made to this person's blog."
+msgstr ""
+
+#: subscriptions.module:661
+msgid "unsubscribe post"
+msgstr ""
+
+#: subscriptions.module:661
+msgid "Stop receiving an e-mail whenever a new comment is posted to this %n."
+msgstr ""
+
+#: subscriptions.module:664
+msgid "subscribe post"
+msgstr ""
+
+#: subscriptions.module:664
+msgid "Receive an e-mail whenever a comment is posted to this %n."
+msgstr ""
+
+#: subscriptions.module:702;712
+msgid "unsubscribe"
+msgstr ""
+
+#: subscriptions.module:702
+msgid "Unsubscribe from this category."
+msgstr ""
+
+#: subscriptions.module:705;715
+msgid "subscribe"
+msgstr ""
+
+#: subscriptions.module:705
+msgid "Subscribe to this category."
+msgstr ""
+
+#: subscriptions.module:712
+msgid "Unsubscribe from this node type."
+msgstr ""
+
+#: subscriptions.module:715
+msgid "Subscribe to this node type."
+msgstr ""
+
+#: subscriptions.module:750;785;830;877
+msgid "Save"
+msgstr ""
+
+#: subscriptions.module:762;797;845;892;958
+msgid "Your subscription was deactivated."
+msgstr ""
+
+#: subscriptions.module:849;896;951
+msgid "Your subscription was activated."
+msgstr ""
+
+#: subscriptions.module:968
+msgid "thread"
+msgstr ""
+
+#: subscriptions.module:972
+msgid "blog"
+msgstr ""
+
+#: subscriptions.module:985
+msgid "category"
+msgstr ""
+
+#: subscriptions.module:995
+msgid "content type"
+msgstr ""
+
+#: subscriptions.module:998
+msgid "type"
+msgstr ""
+
+#: subscriptions.module:998
+msgid "title"
+msgstr ""
+
+#: subscriptions.module:998
+msgid "subscribers"
+msgstr ""
+
+#: subscriptions.module:1002
+msgid "<p>No threads or categories are currently subscribed.</p>"
+msgstr ""
+
+#: subscriptions.module:1007
+msgid "Subscriptions Summary"
+msgstr ""
+
+#: subscriptions.module:1030
+msgid "You are not currently subscribed to any active blogs"
+msgstr ""
+
+#: subscriptions.module:1038;1040
+msgid "There are no active categories."
+msgstr ""
+
+#: subscriptions.module:1047
+msgid "You are not currently subscribed to any active threads"
+msgstr ""
+
+#: subscriptions.module:1055
+msgid "There are no active content types."
+msgstr ""
+
+#: subscriptions.module:1063;1096
+msgid "%name Subscriptions"
+msgstr ""
+
+#: subscriptions.module:331
+msgid "regular"
+msgstr ""
+
+#: subscriptions.module:335
+msgid "error"
+msgstr ""
+
+#: subscriptions.module:53
+msgid "maintain subscriptions"
+msgstr ""
+
+#: subscriptions.module:0
+msgid "subscriptions"
+msgstr ""
+
+#: subscriptions.install:19;34
+msgid "subscriptions database tables have been installed."
+msgstr ""
+
