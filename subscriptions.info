@@ -1,0 +1,4 @@
+; $Id$
+name = Subscriptions
+description = Allows users to subscribe to nodes and taxonomy terms.
+package = "Mail"
