@@ -182,8 +182,11 @@ function subscriptions_menu($may_cache) {
   if ($may_cache) {
     if (variable_get('subscriptions_usersmenu', 0)){
       global $user;
-      $items[] = array('path' => "user/$user->uid/subscriptions", 'title' => t('my subscriptions'),
-        'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
+      $items[] = array(
+        'path' => "user/$user->uid/subscriptions", 
+        'title' => t('my subscriptions'),
+        'callback' => 'subscriptions_page', 
+        'access' => user_access('maintain subscriptions'),
         'type' => MENU_LOCAL_TASK);
       // My Subscriptios submenus
       if(module_exists('blog')){
@@ -202,7 +205,10 @@ function subscriptions_menu($may_cache) {
       $items[] = array('path' => "user/$user->uid/subscriptions/type", 'title' => t('content types'),
         'callback' => 'subscriptions_page', 'access' => user_access('maintain subscriptions'),
         'type' => MENU_LOCAL_TASK);
-      $items[] = array('path' => "user/$user->uid/subscriptions/feed", 'title' => t('rss feed'),
+        
+      $items[] = array(
+        'path' => "user/$user->uid/subscriptions/feed", 
+        'title' => t('rss feed'),
         'access' => user_access('maintain subscriptions'),
         'callback' => 'subscriptions_feed','type' => MENU_LOCAL_TASK, 'weight' => 1);
      }
@@ -288,6 +294,7 @@ function subscriptions_get_user($account = NULL) {
   }
   return $subscriptions[$account->uid];
 }
+
 /*
  * Returns a summary of all subscriptions
  */
@@ -769,11 +776,15 @@ function subscriptions_add($sid, $uid, $stype) {
   db_query('INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES (%d , %d, \'%s\')', $sid, $uid, $stype);
 }
 
+/* ******************************************************* */
+/*  form functions */
+/* ******************************************************* */
+
 /*
- *  form functions
+ * query to get list of subscibed nodes
+ * 
  */
-// return node subscriptions form
-function subscriptions_nodes($account = NULL){
+function subscriptions_nodes($account = NULL){	
   global $user;
   if (is_null($account)) {
     $account = $user;
@@ -785,8 +796,20 @@ function subscriptions_nodes($account = NULL){
   $query .= 'LEFT JOIN {term_data} td ON td.tid = tn.tid ';
   $query .= 'WHERE n.status = 1 AND s.uid = %d AND s.stype = \'node\' ';
   $query .= 'ORDER BY n.type, n.title';
-  $result = db_query($query, $account->uid);
-  while ($sub = db_fetch_object($result)) {
+  $results = db_query($query, $account->uid);
+
+  $output = drupal_get_form('subscriptions_nodes_list_form', $results);
+
+  return $output;
+}
+
+
+/*
+ * return node subscriptions form
+ */
+function subscriptions_nodes_list_form($results){
+	
+  while ($sub = db_fetch_object($results)) {
       $subs[$account->uid]['node'][$sub->nid] = $sub;
     }
   if(!isset($subs)){$subs[$account->uid]['node']=array();}
@@ -796,21 +819,40 @@ function subscriptions_nodes($account = NULL){
       }
   $subsrows['user'] = array('#type' => 'hidden', '#value' => $account->uid);
   $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
-  $output = drupal_get_form('subscriptions_nodes', $subsrows);
-  if(count($subs[$account->uid]['node'])==0){$output = NULL;}
-  return $output;
+  
+  if(count($subs[$account->uid]['node'])==0){$subsrows = NULL;}
+  
+  return $subsrows;
 }
-function subscriptions_nodes_submit($form_id, $form_values) {
-  foreach($form_values as $n=>$v){
-    if(substr($n,0,4)=='subs' && $v==0){
-      // if value != 1, delete associated subscription row
-      db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', substr($n,4), $form_values['user'], 'node');
-   }
- }
-  drupal_set_message(t('Your subscription was deactivated.'));
+
+/**
+ * submit the subscriptions_node_list form
+ */
+function subscriptions_nodes_list_form_submit($form_id, $form_values) {
+  if ($form_id == "subscriptions_nodes_list_form") {
+  	
+  	if ($form_values['user']){
+  	  $uid = $form_values['user'];
+  	} else {
+  	  global $user;
+  	  $uid = $user->uid;
+  	}
+  	
+    foreach($form_values as $n=>$v){
+  	
+      if(substr($n,0,4)=='subs' && $v==0){
+        // if value != 1, delete associated subscription row
+        db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', substr($n,4), $uid, 'node');
+      }
+    }
+    drupal_set_message(t('Your subscription(s) was deactivated.'));
+  }
 }
-// return blog subscriptions form
-function subscriptions_blogs($account = NULL){
+
+/**
+ * Return the blogs rss link
+ */
+function subscriptions_blogs_form($account = NULL){
   global $user;
   static $subs;
   if (is_null($account)) {
@@ -835,6 +877,7 @@ function subscriptions_blogs($account = NULL){
   if(count($subs[$account->uid]['blog'])==0){$output = NULL;}
   return $output;
 }
+
 function subscriptions_blogs_submit($form_id, $form_values) {
   foreach($form_values as $n=>$v){
     if(substr($n,0,4)=='subs' && $v==0){
@@ -844,7 +887,50 @@ function subscriptions_blogs_submit($form_id, $form_values) {
  }
   drupal_set_message(t('Your subscription was deactivated.'));
 }
-// return taxa subscriptions form
+
+/**
+ * Returns the taxonomy subscription link
+ */
+function subscriptions_taxa_form($account = NULL){
+  global $user;
+  static $subs;
+  if (is_null($account)) {
+    $account = $user;
+  }
+  // query string for category subscriptions
+  $subs = subscriptions_get_taxa($account->uid);
+  // traverse the taxonomy tree
+  $taxa = subscriptions_get_taxa_count();
+  // omit undesired vocabularies from listing
+  $vocabularies = function_exists('taxonomy_help') ? taxonomy_get_vocabularies() : array();
+  $omits = variable_get('subscriptions_omitted_taxa', array());
+  foreach ($omits as $omit) {
+    unset($vocabularies[$omit]);
+  }
+  foreach ($vocabularies as $vocab) {
+   $tree = taxonomy_get_tree($vocab->vid);
+   foreach ($tree as $term) {
+      $defval = 0;
+      if(!isset($subs)){$subs=array();}
+      foreach($subs as $tid){
+        if($tid == $term->tid){$defval = 1;}
+      }
+      $orgstate[] = array($term->tid,$account->uid,'taxa',$defval);
+      $title = l($vocab->name . ": " . $term->name, 'taxonomy/term/'. $term->tid);
+      $subsrows['subform']['subs'.$term->tid] = array('#type' => 'checkbox', '#title' => $title, '#default_value' => $defval);
+    }
+  }
+  $subsrows['orgstate'] = array('#type' => 'hidden', '#value' => serialize($orgstate));
+  $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  $output = drupal_get_form('subscriptions_taxa', $subsrows);
+  if(count($tree)==0){$output = NULL;}
+  return $output;
+}
+
+
+/**
+ * Returns the taxonomy subscription link
+ */
 function subscriptions_taxa($account = NULL){
   global $user;
   static $subs;
@@ -901,6 +987,7 @@ function subscriptions_taxa_submit($form_id, $form_values) {
     }
   }
 }
+
 // return content type subscriptions form
 function subscriptions_type($account = NULL){
   global $user;
@@ -949,9 +1036,8 @@ function subscriptions_type_submit($form_id, $form_values) {
   }
 }
 
-/*
- * Pages where users add and delete their subscriptions to nodes
- */
+
+
 function subscriptions_page() {
   global $user;
   $subscribed = false;
@@ -970,27 +1056,28 @@ function subscriptions_page() {
       $nid = $sid;
     }
   }
-
+  
   //  determine return location
   if(is_null($_SERVER['HTTP_REFERER'])){
     $rtnloc = "node/$node->nid";
   } else {
-  if(variable_get('clean_url', 0) == 1){  // clean URLs on
+    if(variable_get('clean_url', 0) == 1){  // clean URLs on
       global $base_url;
-    // extract $base_url from $_SERVER['HTTP_REFERER']
-    $istart = strlen($base_url) + 1;
-    $rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
-  }else {
-    // split $_SERVER['HTTP_REFERER'] at "q="
-    if(strpos($_SERVER['HTTP_REFERER'],'q=')>0){
-      $istart = strpos($_SERVER['HTTP_REFERER'], 'q='+2);
-    }else{
+      // extract $base_url from $_SERVER['HTTP_REFERER']
+      $istart = strlen($base_url) + 1;
+      $rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
+    }else {
+      // split $_SERVER['HTTP_REFERER'] at "q="
+      if(strpos($_SERVER['HTTP_REFERER'],'q=')>0){
+        $istart = strpos($_SERVER['HTTP_REFERER'], 'q='+2);
+      }else{
         $istart = 0;
-    }
+      }
     $rtnloc = substr($_SERVER['HTTP_REFERER'],$istart);
-  }
+    }
     $return = $_SERVER['HTTP_REFERER'];
   } // end determine return location
+
   $message = "";
   switch ($op) {
     // inserts a new subscription into the subscriptions_nodes table
@@ -1055,6 +1142,7 @@ function subscriptions_page() {
       drupal_set_title(t('Subscriptions Summary'));
       return $message;
       break;
+      
     // determines the user's subscription status and displays the right option to change it
     default:
       // determine submenu type
@@ -1068,6 +1156,7 @@ function subscriptions_page() {
       }else{
         $submenu = $subtype;
       }
+      
       // set rows
       switch ($submenu) {
         case 'blogs':
@@ -1079,18 +1168,20 @@ function subscriptions_page() {
           }
          break;
         case 'taxa':
-          $fmoutput = subscriptions_taxa();
-          if($fmoutput != NULL){
-            $output = $fmoutput;
+          //$fmoutput = drupal_get_form('subscriptions_taxa_form', null);
+          if($fmoutput != ""){
+          	$output = t('You can view your taxonomy subscriptions via this RSS feed');
+            $output .= $fmoutput;
           }else{
             $output = t('There are no active categories.');
            }
          $nfound = t('There are no active categories.');
          break;
         case 'node':
-         $fmoutput = subscriptions_nodes();
-         if($fmoutput != NULL){
-           $output = $fmoutput;
+         $fmoutput = subscriptions_nodes();;
+         if($fmoutput != ""){
+           $output = t('You can view your node subscriptions via this RSS feed');
+           $output .= $fmoutput;
          }else{
            $output = t('You are not currently subscribed to any active threads');
           }
@@ -1113,7 +1204,12 @@ function subscriptions_page() {
       return $message;
       break;
   }
+	
+	
 }
+	
+
+
 
 function subscriptions_feed($account = NULL) {
   if (is_null($account)) {
