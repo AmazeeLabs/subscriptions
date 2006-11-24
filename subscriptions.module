@@ -1,5 +1,11 @@
 <?php
 // $Id$
+
+/*
+ * @TODO figure out why taxonomies can't be subscribed to
+ * @TODO figure out why taxonomy subscription page isn't working
+ */
+
 /**
  * Implementation of hook_help().
  */
@@ -777,10 +783,11 @@ function subscriptions_add($sid, $uid, $stype) {
 }
 
 /* ******************************************************* */
-/*  form functions */
+/*  user screens: display, edit functions */
 /* ******************************************************* */
 
-/*
+
+/**
  * query to get list of subscibed nodes
  * 
  */
@@ -798,16 +805,19 @@ function subscriptions_nodes($account = NULL){
   $query .= 'ORDER BY n.type, n.title';
   $results = db_query($query, $account->uid);
 
-  $output = drupal_get_form('subscriptions_nodes_list_form', $results);
+  if ( db_num_rows($results) == 0 ){
+    return null;
+  }
 
+  $output = drupal_get_form('subscriptions_nodes_list_form', $results, $account);
   return $output;
 }
 
 
-/*
+/**
  * return node subscriptions form
  */
-function subscriptions_nodes_list_form($results){
+function subscriptions_nodes_list_form($results, $account){
 	
   while ($sub = db_fetch_object($results)) {
       $subs[$account->uid]['node'][$sub->nid] = $sub;
@@ -820,7 +830,7 @@ function subscriptions_nodes_list_form($results){
   $subsrows['user'] = array('#type' => 'hidden', '#value' => $account->uid);
   $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
   
-  if(count($subs[$account->uid]['node'])==0){$subsrows = NULL;}
+  if(count($subs[$account->uid]['node']) == 0){$subsrows = NULL;}
   
   return $subsrows;
 }
@@ -830,19 +840,12 @@ function subscriptions_nodes_list_form($results){
  */
 function subscriptions_nodes_list_form_submit($form_id, $form_values) {
   if ($form_id == "subscriptions_nodes_list_form") {
-  	
-  	if ($form_values['user']){
-  	  $uid = $form_values['user'];
-  	} else {
-  	  global $user;
-  	  $uid = $user->uid;
-  	}
-  	
+
     foreach($form_values as $n=>$v){
   	
       if(substr($n,0,4)=='subs' && $v==0){
         // if value != 1, delete associated subscription row
-        db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', substr($n,4), $uid, 'node');
+        db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', substr($n,4), $form_values['user'], 'node');
       }
     }
     drupal_set_message(t('Your subscription(s) was deactivated.'));
@@ -850,9 +853,9 @@ function subscriptions_nodes_list_form_submit($form_id, $form_values) {
 }
 
 /**
- * Return the blogs rss link
+ * get list of blog entries, return form
  */
-function subscriptions_blogs_form($account = NULL){
+function subscriptions_blogs($account = NULL){
   global $user;
   static $subs;
   if (is_null($account)) {
@@ -862,23 +865,44 @@ function subscriptions_blogs_form($account = NULL){
   $query = 'SELECT u.uid, u.name, s.stype, s.sid FROM ';
   $query .= '({subscriptions} s LEFT JOIN {users} u ON u.uid = s.sid) ';
   $query .= 'WHERE u.status = 1 AND s.uid = %d AND s.stype = \'blog\'';
-  $result = db_query($query, $account->uid);
-  while ($sub = db_fetch_object($result)) {
+  $results = db_query($query, $account->uid);
+  
+  if(db_num_rows($results) == 0) {
+    return null;
+  }
+  
+  $output = drupal_get_form('subscriptions_blogs_form', $results, $account);
+  return $output;
+
+}
+
+
+/**
+ * returns blog subscription form
+ */
+function subscriptions_blogs_form($results, $account){
+  
+  while ($sub = db_fetch_object($results)) {
       $subs[$account->uid]['blog'][$sub->uid] = $sub;
     }
   if(!isset($subs)){$subs[$account->uid]['blog']=array();}
+  
   foreach ($subs[$account->uid]['blog'] as $bsub) {
-        $title = l($bsub->name, 'blog/'. $bsub->uid);
-        $subsrows['subform']['subs'.$bsub->uid] = array('#type' => 'checkbox', '#title' => $title, '#default_value' => 1);
-      }
+    $title = l($bsub->name, 'blog/'. $bsub->uid);
+    $subsrows['subform']['subs'.$bsub->uid] = array('#type' => 'checkbox', '#title' => $title, '#default_value' => 1);
+  }
   $subsrows['user'] = array('#type' => 'hidden', '#value' => $account->uid);
   $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
-  $output = drupal_get_form('subscriptions_blogs', $subsrows);
-  if(count($subs[$account->uid]['blog'])==0){$output = NULL;}
-  return $output;
+  
+  if(count($subs[$account->uid]['blog'])==0){$subsrows = NULL;}
+  
+  return $subsrows;
 }
 
-function subscriptions_blogs_submit($form_id, $form_values) {
+/**
+ * save blog subscription preferences
+ */
+function subscriptions_blogs_form_submit($form_id, $form_values) {
   foreach($form_values as $n=>$v){
     if(substr($n,0,4)=='subs' && $v==0){
       // if value != 1, delete associated subscription row
@@ -888,52 +912,12 @@ function subscriptions_blogs_submit($form_id, $form_values) {
   drupal_set_message(t('Your subscription was deactivated.'));
 }
 
-/**
- * Returns the taxonomy subscription link
- */
-function subscriptions_taxa_form($account = NULL){
-  global $user;
-  static $subs;
-  if (is_null($account)) {
-    $account = $user;
-  }
-  // query string for category subscriptions
-  $subs = subscriptions_get_taxa($account->uid);
-  // traverse the taxonomy tree
-  $taxa = subscriptions_get_taxa_count();
-  // omit undesired vocabularies from listing
-  $vocabularies = function_exists('taxonomy_help') ? taxonomy_get_vocabularies() : array();
-  $omits = variable_get('subscriptions_omitted_taxa', array());
-  foreach ($omits as $omit) {
-    unset($vocabularies[$omit]);
-  }
-  foreach ($vocabularies as $vocab) {
-   $tree = taxonomy_get_tree($vocab->vid);
-   foreach ($tree as $term) {
-      $defval = 0;
-      if(!isset($subs)){$subs=array();}
-      foreach($subs as $tid){
-        if($tid == $term->tid){$defval = 1;}
-      }
-      $orgstate[] = array($term->tid,$account->uid,'taxa',$defval);
-      $title = l($vocab->name . ": " . $term->name, 'taxonomy/term/'. $term->tid);
-      $subsrows['subform']['subs'.$term->tid] = array('#type' => 'checkbox', '#title' => $title, '#default_value' => $defval);
-    }
-  }
-  $subsrows['orgstate'] = array('#type' => 'hidden', '#value' => serialize($orgstate));
-  $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
-  $output = drupal_get_form('subscriptions_taxa', $subsrows);
-  if(count($tree)==0){$output = NULL;}
-  return $output;
-}
-
 
 /**
- * Returns the taxonomy subscription link
+ * Returns a list of taxonomy subscriptions
  */
 function subscriptions_taxa($account = NULL){
   global $user;
-  static $subs;
   if (is_null($account)) {
     $account = $user;
   }
@@ -947,6 +931,18 @@ function subscriptions_taxa($account = NULL){
   foreach ($omits as $omit) {
     unset($vocabularies[$omit]);
   }
+
+  $output = drupal_get_form('subscriptions_taxa_form', $vocabularies, $account);
+  
+  if(count($tree)==0){$output = NULL;}
+  return $output;
+}
+
+/**
+ * Returns the taxonomy subscription form
+ */
+function subscriptions_taxa_form($vocabularies, $account){
+  static $subs;
   foreach ($vocabularies as $vocab) {
    $tree = taxonomy_get_tree($vocab->vid);
    foreach ($tree as $term) {
@@ -962,11 +958,12 @@ function subscriptions_taxa($account = NULL){
   }
   $subsrows['orgstate'] = array('#type' => 'hidden', '#value' => serialize($orgstate));
   $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
-  $output = drupal_get_form('subscriptions_taxa', $subsrows);
-  if(count($tree)==0){$output = NULL;}
-  return $output;
+ 
+  return $subsrows;
 }
-function subscriptions_taxa_submit($form_id, $form_values) {
+
+
+function subscriptions_taxa_form_submit($form_id, $form_values) {
   $orgstate = unserialize($form_values['orgstate']);
   foreach($form_values as $n=>$v){
     if(substr($n,0,4)=='subs'){
@@ -1003,18 +1000,32 @@ function subscriptions_type($account = NULL){
   foreach ($omits as $omit) {
     unset($tree[$omit]);
   }
+
+  $output = drupal_get_form('subscriptions_type_form', $tree, $account, $types);
+ 
+  return $output;
+}
+
+// return content type subscriptions form
+function subscriptions_type_form($tree, $account, $types ){
+  static $subs;
+ 
   foreach($tree as $ntype=>$nname){
     if (in_array($ntype, $types)) {$defval = 1;}else{$defval = 0;}
     $orgstate[] = array(0,$account->uid,'type'.$ntype,$defval);
-    $subsrows['subform']['substype'.$ntype] = array('#type' => 'checkbox', '#title' => $nname, '#default_value' => $defval);
-  }
+    $subsrows['subform']['substype'.$ntype] = array('#type' => 'checkbox', 
+                     '#title' => $nname->name, 
+                     '#default_value' => $defval);
+    }
   $subsrows['orgstate'] = array('#type' => 'hidden', '#value' => serialize($orgstate));
   $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
-  $output = drupal_get_form('subscriptions_type', $subsrows);
-  if(count($tree)==0){$output = NULL;}
-  return $output;
+  
+  
+  if(count($tree)==0){$subsrows = NULL;}
+  return $subsrows;
 }
-function subscriptions_type_submit($form_id, $form_values) {
+
+function subscriptions_type_form_submit($form_id, $form_values) {
   $orgstate = unserialize($form_values['orgstate']);
   foreach($form_values as $n=>$v){
     if(substr($n,0,4)=='subs'){
@@ -1170,7 +1181,7 @@ function subscriptions_page() {
         case 'taxa':
           //$fmoutput = drupal_get_form('subscriptions_taxa_form', null);
           if($fmoutput != ""){
-          	$output = t('You can view your taxonomy subscriptions via this RSS feed');
+          	$output = t('You are currently subscribed to the following:');
             $output .= $fmoutput;
           }else{
             $output = t('There are no active categories.');
@@ -1178,9 +1189,9 @@ function subscriptions_page() {
          $nfound = t('There are no active categories.');
          break;
         case 'node':
-         $fmoutput = subscriptions_nodes();;
-         if($fmoutput != ""){
-           $output = t('You can view your node subscriptions via this RSS feed');
+         $fmoutput = subscriptions_nodes();
+         if($fmoutput != null){
+           $output = t('You are currently subscribed to the following:');
            $output .= $fmoutput;
          }else{
            $output = t('You are not currently subscribed to any active threads');
