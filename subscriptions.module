@@ -2,8 +2,7 @@
 // $Id$
 
 /*
- * @TODO figure out why taxonomies can't be subscribed to
- * @TODO figure out why taxonomy subscription page isn't working
+ * @TODO mail testing with cron and non-cron setups
  */
 
 /**
@@ -194,6 +193,7 @@ function subscriptions_menu($may_cache) {
         'callback' => 'subscriptions_page', 
         'access' => user_access('maintain subscriptions'),
         'type' => MENU_LOCAL_TASK);
+        
       // My Subscriptios submenus
       if(module_exists('blog')){
         $items[] = array('path' => "user/$user->uid/subscriptions/blogs", 'title' => t('blogs'),
@@ -349,6 +349,7 @@ function subscriptions_get_summary() {
   }
   return $subssumm;
 }
+
 /*
  * Formats the mail and sends it.
  */
@@ -454,7 +455,8 @@ function subscriptions_mailvars($sid, $ssid, $uid, $stype, $strsent) {
   }
   return $strsent;
 }
-/*
+
+/**
  * Subscribes users to nodes in which they post, if not already subscribed
  */
 function subscriptions_autosubscribe($uid, $nid) {
@@ -469,6 +471,7 @@ function subscriptions_autosubscribe($uid, $nid) {
     }
   }
 }
+
 /**
  * handling for held nodes
  */
@@ -487,6 +490,7 @@ function subscriptions_heldnodes($heldnode, $poster){
     }
   }
 }
+
 /**
  * handling for held comments
  */
@@ -495,6 +499,7 @@ function subscriptions_heldcomments($heldcomment, $poster){
   $ocom = unserialize($heldcomment);
   subscriptions_mailvars($ocom['nid'], $ocom['cid'], $poster, 'node', $strsent);
 }
+
 /**
  * store node changes for later handling
  */
@@ -502,6 +507,7 @@ function subscriptions_hold( $content, $ptype , $op, $pid ) {
   $strqry = 'INSERT INTO {subscriptions_holding} ( content, ptype , op, pid )  VALUES (\'%s\', \'%s\', \'%s\', %d)';
   db_query($strqry, serialize($content), $ptype, $op, $pid);
 }
+
 /**
  * Test to see if a post is still active before notifications are sent
  */
@@ -594,6 +600,7 @@ function subscriptions_comment($comment, $op) {
     subscriptions_autosubscribe($user->uid, $nid);
   }
 }
+
 /**
  * Implementation of hook_nodeapi().
  */
@@ -639,6 +646,7 @@ function subscriptions_nodeapi(&$node, $op, $arg = 0) {
   break;
   }
 }
+
 /**
  * Implementation of hook_form_alter().
  */
@@ -726,8 +734,13 @@ function subscriptions_link($type, $node = 0, $main) {
       }
     }
   }
+  
   return $links ? $links : array();
 }
+
+/* *********************************************** */
+/* Taxonomy functions */
+/* *********************************************** */
 
 function subscriptions_get_taxa($uid) {
   $result = db_query('SELECT sid FROM {subscriptions} WHERE uid = %d and stype=\'taxa\'', $uid);
@@ -757,7 +770,6 @@ function subscriptions_get_taxa_count() {
   return $tsubscriptions ? $tsubscriptions : array();
 }
 
-
 function subscriptions_gen_taxa_links($tid, $taxa) {
   if (in_array($tid, $taxa)) {
     $link = l(t('unsubscribe'), 'subscriptions/del/taxa/'. $tid, array('title' => t('Unsubscribe from this category.')));
@@ -765,6 +777,7 @@ function subscriptions_gen_taxa_links($tid, $taxa) {
   else {
     $link = l(t('subscribe'), 'subscriptions/add/taxa/'. $tid, array('title' => t('Subscribe to this category.')));
   }
+  print "here";
   return $link;
 }
 
@@ -781,6 +794,8 @@ function subscriptions_gen_type_links($type, $types) {
 function subscriptions_add($sid, $uid, $stype) {
   db_query('INSERT INTO {subscriptions} ( sid , uid, stype )  VALUES (%d , %d, \'%s\')', $sid, $uid, $stype);
 }
+
+
 
 /* ******************************************************* */
 /*  user screens: display, edit functions */
@@ -921,20 +936,20 @@ function subscriptions_taxa($account = NULL){
   if (is_null($account)) {
     $account = $user;
   }
-  // query string for category subscriptions
-  $subs = subscriptions_get_taxa($account->uid);
+  
   // traverse the taxonomy tree
   $taxa = subscriptions_get_taxa_count();
+  
   // omit undesired vocabularies from listing
   $vocabularies = function_exists('taxonomy_help') ? taxonomy_get_vocabularies() : array();
+  
   $omits = variable_get('subscriptions_omitted_taxa', array());
   foreach ($omits as $omit) {
     unset($vocabularies[$omit]);
   }
-
   $output = drupal_get_form('subscriptions_taxa_form', $vocabularies, $account);
   
-  if(count($tree)==0){$output = NULL;}
+  if(count($vocabularies)==0){$output = NULL;}
   return $output;
 }
 
@@ -943,12 +958,16 @@ function subscriptions_taxa($account = NULL){
  */
 function subscriptions_taxa_form($vocabularies, $account){
   static $subs;
+  
+  // query string for category subscriptions
+  $subs = subscriptions_get_taxa($account->uid);
+  
   foreach ($vocabularies as $vocab) {
    $tree = taxonomy_get_tree($vocab->vid);
    foreach ($tree as $term) {
       $defval = 0;
-      if(!isset($subs)){$subs=array();}
-      foreach($subs as $tid){
+      if(!isset($subs)){$subs=array();}      
+      foreach($subs as $tid){       
         if($tid == $term->tid){$defval = 1;}
       }
       $orgstate[] = array($term->tid,$account->uid,'taxa',$defval);
@@ -974,15 +993,17 @@ function subscriptions_taxa_form_submit($form_id, $form_values) {
           if($v == 0){  // if unchecked
             db_query('DELETE FROM {subscriptions} WHERE sid = %d AND uid = %d AND stype = \'%s\'', $taxid, $orgsub[1], 'taxa');
             drupal_set_message(t('Your subscription was deactivated.'));
-          }else{  // if checked
+          }else{  // if checked         
             $strqry = 'INSERT INTO {subscriptions} ( sid, uid , stype )  VALUES (\'%d\', \'%d\', \'%s\')';
             db_query($strqry, $taxid, $orgsub[1], 'taxa');
+            print "taxid = $taxid | orgsub = " . $orgsub[1] ;
             drupal_set_message(t('Your subscription was activated.'));
           }
         }
       }
     }
   }
+        	
 }
 
 // return content type subscriptions form
@@ -1179,7 +1200,7 @@ function subscriptions_page() {
           }
          break;
         case 'taxa':
-          //$fmoutput = drupal_get_form('subscriptions_taxa_form', null);
+          $fmoutput = subscriptions_taxa();
           if($fmoutput != ""){
           	$output = t('You are currently subscribed to the following:');
             $output .= $fmoutput;
