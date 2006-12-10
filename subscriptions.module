@@ -777,7 +777,7 @@ function subscriptions_gen_taxa_links($tid, $taxa) {
   else {
     $link = l(t('subscribe'), 'subscriptions/add/taxa/'. $tid, array('title' => t('Subscribe to this category.')));
   }
-  print "here";
+
   return $link;
 }
 
@@ -995,8 +995,7 @@ function subscriptions_taxa_form_submit($form_id, $form_values) {
             drupal_set_message(t('Your subscription was deactivated.'));
           }else{  // if checked         
             $strqry = 'INSERT INTO {subscriptions} ( sid, uid , stype )  VALUES (\'%d\', \'%d\', \'%s\')';
-            db_query($strqry, $taxid, $orgsub[1], 'taxa');
-            print "taxid = $taxid | orgsub = " . $orgsub[1] ;
+            db_query($strqry, $taxid, $orgsub[1], 'taxa');          
             drupal_set_message(t('Your subscription was activated.'));
           }
         }
