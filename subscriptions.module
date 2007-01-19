@@ -584,6 +584,7 @@ function subscriptions_comment($comment, $op) {
     } else {  // if cron is not used
       $cid = is_null($comment->cid) ? $comment['cid'] : $comment->cid;
       $nobj = node_load($nid);
+      if(!$nobj->status) return;  // node is unpublished
       // send node subscriptions
       $strsent = $strsent . subscriptions_mailvars($nid, $cid, $user->uid, 'node', $strsent);
       // get subscription->node->taxonomy
@@ -1262,9 +1263,9 @@ function subscriptions_feed($account = NULL) {
     $cond[] = "tn.tid IN ($tids)";
   }
   // content types link differently and will be excluded from this list
-  $sql = "SELECT n.nid FROM {node} n LEFT JOIN {term_node} tn ON n.nid=tn.nid";
+  $sql = "SELECT n.nid FROM {node} n LEFT JOIN {term_node} tn ON n.nid=tn.nid WHERE n.status=1";
   if ($cond) {
-    $sql.= " WHERE ". implode(' OR ', $cond);
+    $sql.= " AND ( ". implode(' OR ', $cond). " )";
   }
   $sql .= " GROUP BY n.nid ORDER BY MAX(n.created) DESC";
   $result = db_query_range(db_rewrite_sql($sql), 0, variable_get('feed_default_items', 10));
