@@ -189,7 +189,7 @@ function subscriptions_menu($may_cache) {
       global $user;
       $items[] = array(
         'path' => "user/$user->uid/subscriptions", 
-        'title' => t('my subscriptions'),
+        'title' => t('My subscriptions'),
         'callback' => 'subscriptions_page', 
         'access' => user_access('maintain subscriptions'),
         'type' => MENU_LOCAL_TASK);
