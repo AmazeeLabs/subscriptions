@@ -110,7 +110,7 @@ function subscriptions_settings() {
   $select = array();
   $nodetypes = node_get_types();
   foreach($nodetypes as $ntype=>$nname){
-    $select[] = t($ntype);
+    $select[$ntype] =  $ntype;
   }
   
   $form['sub_settings']['subscriptions_omitted_content_types'] = array(
@@ -1018,6 +1018,7 @@ function subscriptions_type($account = NULL){
   // get list of available node types
   $tree = node_get_types();
   $omits = variable_get('subscriptions_omitted_content_types', array());
+  
   foreach ($omits as $omit) {
     unset($tree[$omit]);
   }
@@ -1030,16 +1031,18 @@ function subscriptions_type($account = NULL){
 // return content type subscriptions form
 function subscriptions_type_form($tree, $account, $types ){
   static $subs;
- 
   foreach($tree as $ntype=>$nname){
-    if (in_array($ntype, $types)) {$defval = 1;}else{$defval = 0;}
+    if (in_array($ntype, $types)) {
+     $defval = 1; }
+    else {
+      $defval = 0;}
     $orgstate[] = array(0,$account->uid,'type'.$ntype,$defval);
     $subsrows['subform']['substype'.$ntype] = array('#type' => 'checkbox', 
                      '#title' => $nname->name, 
                      '#default_value' => $defval);
     }
-  $subsrows['orgstate'] = array('#type' => 'hidden', '#value' => serialize($orgstate));
-  $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+    $subsrows['orgstate'] = array('#type' => 'hidden', '#value' => serialize($orgstate));
+    $subsrows['submit'] = array('#type' => 'submit', '#value' => t('Save'));
   
   
   if(count($tree)==0){$subsrows = NULL;}
