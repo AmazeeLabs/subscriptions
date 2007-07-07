@@ -171,7 +171,7 @@ msgid "Receive notification of replies or comments to this node."
 msgstr "קבלת עדכונים על תגובות לפרסום זה."
 
 #: subscriptions.module:654
-msgid "unsubscribe blog"
+msgid "Unsubscribe blog"
 msgstr "ביטול הרשמה ליומן אישי"
 
 #: subscriptions.module:654
@@ -179,7 +179,7 @@ msgid "Stop receiving an e-mail whenever a new entry is made to this person's bl
 msgstr "הפסק לשלוח דואר אלקטרוני כל פעם שיש הודעה חדשה ביומן האישי של חבר זה באתר."
 
 #: subscriptions.module:657
-msgid "subscribe blog"
+msgid "Subscribe blog"
 msgstr "מנוי ליומן"
 
 #: subscriptions.module:657
@@ -187,7 +187,7 @@ msgid "Receive an e-mail whenever a new entry is made to this person's blog."
 msgstr "קבל דואר אלקטרוני בכל פעם שיש הודעה חדשה ביומן של חבר זה."
 
 #: subscriptions.module:661
-msgid "unsubscribe post"
+msgid "Unsubscribe post"
 msgstr "ביטול הרשמה לעדכונים"
 
 #: subscriptions.module:661
@@ -195,7 +195,7 @@ msgid "Stop receiving an e-mail whenever a new comment is posted to this %n."
 msgstr "הפסק לשלוח דואר אלקטרוני בכל פעם שיש תגובה חדשה ל%n."
 
 #: subscriptions.module:664
-msgid "subscribe post"
+msgid "Subscribe post"
 msgstr "הודע לי כשהעמוד מתעדכן"
 
 #: subscriptions.module:664
