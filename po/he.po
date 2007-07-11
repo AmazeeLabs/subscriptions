@@ -111,7 +111,7 @@ msgid "Set's each users \"autosubscribe\" profile option. Default is OFF."
 msgstr "עבור משתמשים חדשים, הדלק את הסימון של 'מנוי אוטומטי לעדכונים' . ברירת המחדל היא כבוי."
 
 #: subscriptions.module:170;196;223
-msgid "my subscriptions"
+msgid "My subscriptions"
 msgstr "העדכונים שלי"
 
 #: subscriptions.module:175;201
