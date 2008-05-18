@@ -1,0 +1,24 @@
+CHANGELOG for Subscriptions 2.x for Drupal 5
+
+Subscriptions 5.x-2.x-dev:
+  Enhancements:
+    - 259377: Add French translation.
+  Bugs fixed:
+    - 259551: Keep CCK field variables from accumulating values.
+
+  
+Subscriptions 5.x-2.1 (2008-05-12):
+  Enhancements:
+    - #256444: Clear mail_edit's cache on install to ensure that our mailkeys show up.
+    - Add explanations to the settings pages, including German translation.
+    - Display a reminder on the admin/settings/subscriptions page if less than the standard selection of modules is installed.
+    - Add a conditional text example to the Mail Templates section in README.txt.
+    - Remove all stored variables during uninstall().
+  Bugs fixed:
+    - Auto-convert node/nid subscriptions to node/type also for new posts (auto-subscribe!).
+    - #181334: Convert the 5.x-1.9-dev email template variables to 2.x.
+    - #251779: Fix support for posts by anonymous users.
+
+  
+Subscriptions 5.x-2.0 (2008-04-26):
+  Initial release.

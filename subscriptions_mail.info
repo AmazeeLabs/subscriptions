@@ -1,0 +1,5 @@
+; $Id$
+name = Subscriptions Mail
+description = Sends out mails with drupal_mail, relying on the separate mail_edit module.
+package = "Subscriptions"
+dependencies = mail_edit subscriptions

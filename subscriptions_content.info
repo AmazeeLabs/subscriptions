@@ -1,0 +1,5 @@
+; $Id$
+name = Content Subscriptions
+description = Allows users to subscribe to nodes.
+package = "Subscriptions"
+dependencies = subscriptions
