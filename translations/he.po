@@ -1,7 +1,6 @@
-# translation of he.po to Hebrew
 # $Id$
-# LANGUAGE translation of Drupal (general)
-# Copyright YEAR NAME <EMAIL@ADDRESS>
+#
+# Hebrew translation of Drupal (general)
 # Generated from files:
 #  subscriptions.admin.inc,v 1.1.2.14 2008/02/02 01:47:35 chx
 #  subscriptions_ui.module,v 1.1.2.6 2008/02/02 01:47:35 chx

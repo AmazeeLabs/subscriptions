@@ -84,12 +84,12 @@ t('| Comment: !comment_title
 }
 
 function subscriptions_mail_template($key) {
-  global $locale;
+  global $language;
   static $templates;
-  if (!isset($templates[$locale][$key])) {
-    $templates[$locale][$key] = subscriptions_mail_template_raw($key);
+  if (!isset($templates[$language->language][$key])) {
+    $templates[$language->language][$key] = subscriptions_mail_template_raw($key);
   }
-  return $templates[$locale][$key];
+  return $templates[$language->language][$key];
 }
 
 

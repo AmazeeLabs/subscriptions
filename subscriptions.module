@@ -19,108 +19,160 @@
  */
 
 /**
+ * Implementation of hook_init().
+ *
+ * @ingroup hooks
+ * @ingroup init
+ */
+function subscriptions_init() {
+  define('SUBSCRIPTIONS_UNAVAILABLE', '<span class="error" title="'. t('(unavailable to regular users)') .'">&curren;</span>');
+  if (arg(0) == 'subscriptions' || arg(2) == 'subscriptions') {
+    include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.admin.inc';  // TODO: do we need this?
+  }
+}
+
+/**
  * Implementation of hook_menu().
  *
  * @ingroup hooks
  * @ingroup menu
  */
-function subscriptions_menu($may_cache) {
+function subscriptions_menu() {
   global $user;  // we need the user to to build some urls
 
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/settings/subscriptions',
-      'title' => t('Subscriptions'),
-      'description' => t('Enables site settings for user subscriptions.'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => 'subscriptions_settings_form',
-      'access' => user_access('administer site configuration'),
+  $items['admin/settings/subscriptions'] = array(
+    'title' => 'Subscriptions',
+    'description' => 'Enables site settings for user subscriptions.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('subscriptions_settings_form'),
+    'access arguments' => array('administer site configuration'),
+  );
+  $items['admin/settings/subscriptions/settings'] = array(
+    'title' => 'Site settings',
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/settings/subscriptions/userdefaults'] = array(
+    'title' => 'User defaults',
+    'weight' => -5,
+    'page callback' => 'subscriptions_page_user_overview',
+    'page arguments' => array(NULL),
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer site configuration'),
+  );
+  $items['admin/settings/subscriptions/userdefaults/settings'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Overview',
+    'weight' => -10,
+  );
+  $items['admin/settings/subscriptions/intervals'] = array(
+    'title' => 'Interval',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('subscriptions_intervals'),
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer site configuration'),
+  );
+  $items['user/%user/subscriptions'] = array(
+    'title' => 'Subscriptions',
+    'page callback' => 'subscriptions_page_user_overview',
+    'page arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => '_subscriptions_access',
+    'access arguments' => array(1),
+  );
+  $items['user/%user/subscriptions/overview'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Overview',
+    'weight' => -10,
+  );
+  
+  foreach (subscriptions_types() as $stype => $data) {
+    $items['subscriptions/add/'. $stype] = array(
+      'title' => 'Add subscription',
+      'type' => MENU_CALLBACK,
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('subscriptions_add_form', $stype),
+      'access arguments' => array($data['access']),
     );
-    $items[] = array(
-      'path' => 'admin/settings/subscriptions/settings',
-      'title' => t('Site settings'),
-      'weight' => -10,
-      'type' => MENU_DEFAULT_LOCAL_TASK,
+    $items['subscriptions/del/'. $stype] = array(
+      'title' => 'Remove subscription',
+      'type' => MENU_CALLBACK,
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('subscriptions_del_form', $stype),
+      'access arguments' => array($data['access']),
     );
-    $items[] = array(
-      'path' => 'admin/settings/subscriptions/userdefaults',
-      'title' => t('User defaults'),
-      'weight' => -5,
-      'callback' => 'subscriptions_page_user_overview',
-      'callback arguments' => array(NULL),
-      'type' => MENU_LOCAL_TASK,
-    );
-    $items[] = array(
-      'path' => 'admin/settings/subscriptions/intervals',
-      'title' => t('Interval'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('subscriptions_intervals'),
-      'type' => MENU_LOCAL_TASK,
-    );
-  }
-  else {
-    define('SUBSCRIPTIONS_UNAVAILABLE', '<span class="error" title="'. t('(unavailable to regular users)') .'">&curren;</span>');
 
-    if (arg(0) == 'subscriptions' || arg(2) == 'subscriptions') {
-      include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.admin.inc';
+    if (empty($data['page'])) {
+      continue;  // no page
     }
-    if ($user->uid && arg(0) == 'admin' && arg(1) == 'settings') {
-      if ($items = _subscriptions_menu($account, 'admin/settings/subscriptions/userdefaults')) {
-        foreach ($items as $key => $item) {
-          if ($item['path'] == 'admin/settings/subscriptions/userdefaults/node') {
-            unset($items[$key]);  // remove thread subscriptions page from site settings
-          }
-        }
-        $items[] = array(
-          'path' => 'admin/settings/subscriptions/userdefaults',
-          'type' => MENU_LOCAL_TASK,
-          'title' => t('Subscriptions'),
-          'callback' => 'subscriptions_page_user_overview',
-          'callback arguments' => array(NULL),
-        );
-        $items[] = array(
-          'path' => 'admin/settings/subscriptions/userdefaults/settings',
-          'type' => MENU_DEFAULT_LOCAL_TASK,
-          'title' => t('Overview'),
-          'weight' => -10,
-        );
-      }
+    $items['user/%user/subscriptions/'. $stype] = array(
+      'title' => $data['title'],
+      'type' => MENU_LOCAL_TASK,
+      'file' => 'subscriptions.admin.inc',
+      'page callback' => 'subscriptions_page',
+      'page arguments' => array(1, $stype),
+      'access callback' => '_subscriptions_access',
+      'access arguments' => array(1, $data['access']),
+      'weight' => (isset($data['weight']) ? $data['weight'] : 0),
+    );
+    
+    if ($stype == 'node') {
+      continue;  // not in site settings
     }
-    if ($user->uid && arg(0) == 'user' && is_numeric(arg(1)) && ($user->uid == arg(1) || user_access('administer user subscriptions')) && ($account = user_load(array('uid' => arg(1))))) {
-      // User subscription pages
-      if (($user->uid == $account->uid) || user_access('administer user subscriptions')) {
-        if ($items = _subscriptions_menu($account, 'user/'. $account->uid .'/subscriptions')) {
-          $items[] = array(
-            'path' => 'user/'. $account->uid .'/subscriptions',
-            'type' => MENU_LOCAL_TASK,
-            'title' => t('Subscriptions'),
-            'callback' => 'subscriptions_page_user_overview',
-            'callback arguments' => array($account)
-          );
-          $items[] = array(
-            'path' => 'user/'. $account->uid .'/subscriptions/overview',
-            'type' => MENU_DEFAULT_LOCAL_TASK,
-            'title' => t('Overview'),
-            'weight' => -10,
-          );
-        }
-      }
-    }
-    if (arg(0) == 'subscriptions') {
-      $items = _subscriptions_menu($user, 'subscriptions');
-    }
-    // Unsubscribe links
-    if (arg(0) == 's' && arg(1) == 'del' && arg(7) == md5(drupal_get_private_key() . arg(2) . arg(3) . arg(4) . arg(5) . arg(6))) {
-      $items[] = array(
-        'path' => 's/del',
-        'access' => TRUE,
-        'callback' => 'drupal_get_form',
-        'callback arguments' => array('subscriptions_delete_form'),
-        'type' => MENU_CALLBACK,
-      );
-    }
+    $items['admin/settings/subscriptions/userdefaults/'. $stype] = array(
+      'title' => $data['title'],
+      'type' => MENU_LOCAL_TASK,
+      'file' => 'subscriptions.admin.inc',
+      'page callback' => 'subscriptions_page',
+      'page arguments' => array(NULL, $stype),
+      'access arguments' => array('administer site configuration'),
+      'weight' => (isset($data['weight']) ? $data['weight'] : 0),
+    );
   }
+  
+  $items['subscriptions/add/node'] = array(
+    'title' => 'Add subscription',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('subscriptions_add_form', 'nid'),  // TODO: was 'node', now 'nid'  -- do we need this at all?
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('subscribe to content'),
+  );
+
+  // Unsubscribe links
+  //if (arg(0) == 's' && arg(1) == 'del' && arg(7) == md5(drupal_get_private_key() . arg(2) . arg(3) . arg(4) . arg(5) . arg(6))) {
+  //  $items['s/del'] = array(
+  //          ^^^^^   Can't make it that short anymore, can we?
+  $items['subscriptions/rem/%/%/%/%/%/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('subscriptions_delete_form', 2, 3, 4, 5, 6),
+    'type' => MENU_CALLBACK,
+    'access callback' => '_subscriptions_rem_access',
+    'access arguments' => array(2, 3, 4, 5, 6, 7),
+  );
   return $items;
+}
+
+function _subscriptions_rem_access($a2, $a3, $a4, $a5, $a6, $md) {
+  return $md == md5(drupal_get_private_key() . $a2 . $a3 . $a4 . $a5 . $a6);
+}
+
+function _subscriptions_access($account, $access = NULL) {
+  global $user;
+  if ($account && $account->uid) {
+    if (isset($access)) {
+      $has_access = user_access($access, $account);
+    }
+    else {
+      foreach (subscriptions_types() as $stype => $data) {
+        if (user_access($data['access'], $account)) {
+          $has_access = TRUE;
+        }
+      }
+    }
+    return !empty($has_access) && ($account->uid == $user->uid || user_access('administer user subscriptions'));
+  }
+  return FALSE;
 }
 
 /**
@@ -302,10 +354,10 @@ function subscriptions_delete_form($module, $field, $value, $author_uid, $recipi
   return confirm_form($form, t('Are you sure you want to unsubscribe?'), '<front>', NULL, t('Unsubscribe'));
 }
 
-function subscriptions_delete_form_submit($form_id, $form_values) {
-  db_query("DELETE FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d", $form_values['data']);
+function subscriptions_delete_form_submit($form, &$form_state) {
+  db_query("DELETE FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d", $form_state['values']['data']);
   drupal_set_message(t('Your subscription was deactivated.'));
-  return '<front>';
+  $form_state['redirect'] = '<front>';
 }
 
 /**
@@ -380,71 +432,15 @@ function subscriptions_types($field = NULL, $type = NULL) {
 }
 
 /**
- * Given a base url, returns the user menu definition for given user account.
+ * Implementation of hook_theme().
  */
-function _subscriptions_menu($account, $base) {
-  global $user;
-
-  if ($base == 'subscriptions' && user_access('subscribe to content')) {
-    $items[] = array(
-      'path' => $base .'/add/node',
-      'title' => t('Add subscription'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('subscriptions_add_form', 'nid'),
-      'access' => TRUE,
-      'type' => MENU_CALLBACK,
-    );
-  }
-
-  foreach (subscriptions_types() as $stype => $data) {
-    if (!strncmp('user/', $base, 5) && (user_access('administer user subscriptions') || user_access($data['access'])) ||
-        !strncmp('admin/', $base, 6) && user_access('administer site configuration')) {
-      if (!empty($data['page'])) {
-        $items[] = array(
-          'path' => $base .'/'. $stype,
-          'title' => $data['title'],
-          'callback' => 'subscriptions_page',
-          'access' => TRUE,
-          'type' => MENU_LOCAL_TASK,
-          'weight' => (isset($data['weight']) ? $data['weight'] : 0),  // $weight,
-          'callback arguments' => array($account, $stype),
-        );
-      }
-    }
-    if ($base == 'subscriptions' && user_access($data['access'])) {
-      $items[] = array(
-        'path' => $base .'/add/'. $stype,
-        'title' => t('Add subscription'),
-        'callback' => 'drupal_get_form',
-        'callback arguments' => array('subscriptions_add_form', $stype),
-        'access' => TRUE,
-        'type' => MENU_CALLBACK,
-      );
-      $items[] = array(
-        'path' => $base .'/del/'. $stype,
-        'title' => t('Remove subscription'),
-        'callback' => 'drupal_get_form',
-        'callback arguments' => array('subscriptions_del_form', $stype),
-        'access' => TRUE,
-        'type' => MENU_CALLBACK,
-      );
-      /*
-      if ($type == MENU_DEFAULT_LOCAL_TASK) {
-        // RSS feed of subscriptions
-        $items[] = array(
-          'path' => $base .'/feed',
-          'title' => t('rss feed'),
-          'access' => TRUE,
-          'callback' => 'subscriptions_feed',
-          'type' => MENU_CALLBACK,
-          'weight' => 1,
-          'callback arguments' => array($account, 'feed'),
-        );
-      }
-      */
-    }
-  }
-  return $items;
+function subscriptions_theme() {
+  return array(
+    'subscriptions_form_table' => array(
+      'file' => 'subscriptions.admin.inc',
+      'arguments' => array('element' => NULL),
+    )
+  );
 }
 
 /**
@@ -473,7 +469,7 @@ function _subscriptions_cmp_by_weight($a, $b) {
  */
 function _subscriptions_get_setting($name, $account) {
   global $user;
-  if (!isset($account) || empty($account->uid) || is_numeric($account) && $account <= 0 ) {
+  if (!isset($account) || is_object($account) && empty($account->uid) || is_numeric($account) && $account <= 0 ) {
     $uid = -DRUPAL_AUTHENTICATED_RID;
     unset($account);
   }
@@ -487,7 +483,7 @@ function _subscriptions_get_setting($name, $account) {
       unset($account);
     }
   }
-  if (is_object($account)) {
+  if (isset($account)) {
     $uid = $account->uid;
   }
 
@@ -497,6 +493,7 @@ function _subscriptions_get_setting($name, $account) {
     while ($s = db_fetch_array($result)) {
       $defaults[$s['uid']] = $s;
     }
+    $defaults[$uid]['uses_defaults'] = FALSE;
     foreach ($defaults[$uid] as $key => $value) {
       if ($value < 0) {  // not set, use site dft
         $defaults[$uid][$key] = $defaults[-DRUPAL_AUTHENTICATED_RID][$key];

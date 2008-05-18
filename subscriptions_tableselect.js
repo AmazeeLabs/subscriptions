@@ -22,9 +22,7 @@ Drupal.subscriptions_tableSelect = function() {
   }
 }
 
-// Global Killswitch
-if (Drupal.jsEnabled) {
-  $(document).ready(function() {
-    $('form table[th.subscriptions-table]').each(Drupal.subscriptions_tableSelect);
-  });
-}
+Drupal.behaviors.subscriptions_tableSelect = function (context) {
+  $('form table:has(th.subscriptions-table):not(.subscriptions_tableSelect-processed)', context)
+  .addClass('subscriptions_tableSelect-processed').each(Drupal.subscriptions_tableSelect);
+};

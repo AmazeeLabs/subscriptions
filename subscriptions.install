@@ -1,158 +1,114 @@
 <?php
 // $Id$
 
+
+
+/**
+ * Implementation of hook_schema().
+ */
+function subscriptions_schema() {
+
+  $schema['subscriptions'] = array(
+    'fields'          => array(
+      'sid'           => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'),
+      'module'        => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
+      'field'         => array('type' => 'varchar', 'length' => '32', 'not null' => FALSE),
+      'value'         => array('type' => 'varchar', 'length' => '237', 'not null' => FALSE),
+      'recipient_uid' => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+      'send_interval' => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'author_uid'    => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+      'send_updates'  => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4'),
+      'send_comments' => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4')),
+    'primary key'     => array('sid'),
+    'indexes'         => array(
+      'module'        => array('module', 'field', 'value'),
+      'recipient_uid' => array('recipient_uid')),
+  );
+
+
+  $schema['subscriptions_queue'] = array(
+    'fields'          => array(
+      'sqid'          => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'),
+      'uid'           => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'name'          => array('type' => 'varchar', 'length' => '60', 'not null' => FALSE),
+      'mail'          => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
+      'language'      => array('type' => 'varchar', 'length' => '12', 'not null' => FALSE),
+      'module'        => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
+      'field'         => array('type' => 'varchar', 'length' => '32', 'not null' => FALSE),
+      'value'         => array('type' => 'varchar', 'length' => '237', 'not null' => FALSE),
+      'author_uid'    => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'send_interval' => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'digest'        => array('type' => 'int', 'size' => 'tiny', 'not null' => FALSE, 'disp-width' => '4'),
+      'load_args'     => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
+      'load_function' => array('type' => 'varchar', 'length' => '60', 'not null' => TRUE, 'default' => ''),
+      'is_new'        => array('type' => 'int', 'size' => 'tiny', 'not null' => FALSE, 'disp-width' => '4'),
+      'last_sent'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10')),
+    'primary key'     => array('sqid'),
+    'indexes'         => array(
+      'load_args'     => array('load_args', 'load_function', 'uid')),
+  );
+
+
+  $schema['subscriptions_mail_edit'] = array(
+    'fields'          => array(
+      'mailkey'       => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE),
+      'item_body'     => array('type' => 'text', 'not null' => FALSE)),
+    'primary key'     => array('mailkey'),
+  );
+
+
+  $schema['subscriptions_user'] = array(
+    'fields'                  => array(
+      'uid'                   => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+      'digest'                => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'send_interval'         => array('type' => 'int', 'not null' => TRUE, 'default' => -1, 'disp-width' => '11'),
+      'send_updates'          => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'send_comments'         => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'send_interval_visible' => array('type' => 'int', 'not null' => TRUE, 'default' => -1, 'disp-width' => '11'),
+      'send_updates_visible'  => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'send_comments_visible' => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'autosub_on_post'       => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'autosub_on_update'     => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'autosub_on_comment'    => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'send_self'             => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'last_sent'             => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10')),
+    'primary key'             => array('uid'),
+  );
+
+
+  return $schema;
+}
+
 /**
  * Implementation of hook_install().
  */
 function subscriptions_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {subscriptions} (
-          sid int unsigned NOT NULL auto_increment,
-          module varchar(64) default NULL,
-          field varchar(32) default NULL,
-          value varchar(237) default NULL,
-          recipient_uid int NOT NULL,
-          send_interval int default NULL,
-          author_uid int NOT NULL,
-          send_updates tinyint NOT NULL default 0,
-          send_comments tinyint NOT NULL default 0,
-          PRIMARY KEY (sid),
-          KEY (module, field, value),
-          KEY (recipient_uid)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-      db_query("CREATE TABLE {subscriptions_queue} (
-          sqid int unsigned NOT NULL auto_increment,
-          uid int default NULL,
-          name varchar(60) default NULL,
-          mail varchar(64) default NULL,
-          language varchar(12) default NULL,
-          module varchar(64) default NULL,
-          field varchar(32) default NULL,
-          value varchar(237) default NULL,
-          author_uid int default NULL,
-          send_interval int default NULL,
-          digest tinyint default NULL,
-          load_args varchar(255) NOT NULL default '',
-          load_function varchar(60) NOT NULL default '',
-          is_new tinyint default NULL,
-          last_sent int unsigned NOT NULL default '0',
-          PRIMARY KEY (sqid),
-          KEY (load_args, load_function, uid)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-      db_query("CREATE TABLE {subscriptions_mail_edit} (
-          mailkey varchar(255) NOT NULL,
-          item_body TEXT,
-          PRIMARY KEY (mailkey)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-      db_query("CREATE TABLE {subscriptions_user} (
-          uid integer NOT NULL,
-          digest tinyint NOT NULL default -1,
-          send_interval int NOT NULL default -1,
-          send_updates tinyint NOT NULL default -1,
-          send_comments tinyint NOT NULL default -1,
-          send_interval_visible tinyint NOT NULL default -1,
-          send_updates_visible tinyint NOT NULL default -1,
-          send_comments_visible tinyint NOT NULL default -1,
-          autosub_on_post tinyint NOT NULL default -1,
-          autosub_on_update tinyint NOT NULL default -1,
-          autosub_on_comment tinyint NOT NULL default -1,
-          send_self tinyint NOT NULL default -1,
-          last_sent int unsigned NOT NULL default 0,
-          PRIMARY KEY (uid)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-    break;
-    case 'pgsql':
-      db_query("CREATE TABLE {subscriptions} (
-          sid serial,
-          module varchar(64) default NULL,
-          field varchar(32) default NULL,
-          value varchar(237) default NULL,
-          recipient_uid integer NOT NULL,
-          send_interval integer default NULL,
-          author_uid integer NOT NULL,
-          send_updates smallint NOT NULL default 0,
-          send_comments smallint NOT NULL default 0,
-          PRIMARY KEY (sid)
-        )");
-      db_query("CREATE INDEX {subscriptions}_module_field_value_index ON {subscriptions} (module, field, value)");
-      db_query("CREATE INDEX {subscriptions}_recipient_uid_index ON {subscriptions} (recipient_uid)");
-      db_query("CREATE TABLE {subscriptions_queue} (
-          sqid serial,
-          uid integer default NULL,
-          name varchar(60) default NULL,
-          mail varchar(64) default NULL,
-          language varchar(12) default NULL,
-          module varchar(64) default NULL,
-          field varchar(32) default NULL,
-          value varchar(237) default NULL,
-          author_uid integer default NULL,
-          send_interval integer default NULL,
-          digest smallint default NULL,
-          load_args varchar(255) NOT NULL default '',
-          load_function varchar(60) NOT NULL default '',
-          is_new smallint default NULL,
-          last_sent int_unsigned NOT NULL default 0,
-          PRIMARY KEY (sqid)
-        )");
-      db_query("CREATE INDEX {subscriptions_queue}_load_args_load_function_uid_index ON {subscriptions_queue} (load_args, load_function, uid)");
-      db_query("CREATE TABLE {subscriptions_mail_edit} (
-          mailkey varchar(255) NOT NULL,
-          item_body TEXT,
-          PRIMARY KEY (mailkey)
-        )");
-      db_query("CREATE TABLE {subscriptions_user} (
-          uid integer NOT NULL,
-          digest smallint NOT NULL default -1,
-          send_interval integer NOT NULL default -1,
-          send_updates smallint NOT NULL default -1,
-          send_comments smallint NOT NULL default -1,
-          send_interval_visible smallint NOT NULL default -1,
-          send_updates_visible smallint NOT NULL default -1,
-          send_comments_visible smallint NOT NULL default -1,
-          autosub_on_post smallint NOT NULL default -1,
-          autosub_on_update smallint NOT NULL default -1,
-          autosub_on_comment smallint NOT NULL default -1,
-          send_self smallint NOT NULL default -1,
-          last_sent int_unsigned NOT NULL default 0,
-          PRIMARY KEY (uid)
-        )");
-      break;
-  }
+  $ret = drupal_install_schema('subscriptions');
+
   db_query("INSERT INTO {subscriptions_user} (uid, digest, send_interval, send_updates, send_comments, send_interval_visible, send_updates_visible, send_comments_visible, autosub_on_post, autosub_on_update, autosub_on_comment, send_self) VALUES(". -DRUPAL_AUTHENTICATED_RID .", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1)");
   db_query("INSERT INTO {subscriptions_user} (uid) SELECT uid FROM {users} WHERE uid > 0");
   include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.install.inc';
   _subscriptions_install_information();
+  return $ret;
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function subscriptions_uninstall() {
-  if (db_table_exists('subscriptions')) {
-    db_query("DROP TABLE {subscriptions}");
-  }
+  $ret = drupal_uninstall_schema('subscriptions');
+
   if (db_table_exists('subscriptions_old')) {
-    db_query("DROP TABLE {subscriptions_old}");           // old backup from 5.x-1.x
+    db_drop_table($ret, 'subscriptions_old');            // old backup from 5.x-1.x
   }
   if (db_table_exists('subscriptions_holding')) {
-    db_query("DROP TABLE {subscriptions_holding}");       // old left-over from 5.x-1.x
+    db_drop_table($ret, 'subscriptions_holding');        // old left-over from 5.x-1.x
   }
   if (db_table_exists('subscriptions_holding_old')) {
-    db_query("DROP TABLE {subscriptions_holding_old}");   // old backup from 5.x-1.x
-  }
-  if (db_table_exists('subscriptions_queue')) {
-    db_query("DROP TABLE {subscriptions_queue}");
+    db_drop_table($ret, 'subscriptions_holding_old');    // old backup from 5.x-1.x
   }
   if (db_table_exists('subscriptions_sent')) {            // old left-over from first
-    db_query("DROP TABLE {subscriptions_sent}");          // incarnation of 5.x-2.0
-  }
-  if (db_table_exists('subscriptions_mail_edit')) {
-    db_query("DROP TABLE {subscriptions_mail_edit}");
-  }
-  if (db_table_exists('subscriptions_user')) {
-    db_query("DROP TABLE {subscriptions_user}");
+    db_drop_table($ret, 'subscriptions_sent');           // incarnation of 5.x-2.0
   }
 
   variable_del('subscriptions_blocked_content_types');
@@ -189,27 +145,17 @@ function subscriptions_uninstall() {
  * Database update function 1 for first incarnation of 5.x-2.0.
  */
 function subscriptions_update_1() {
-  $ret = array();
 
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("CREATE TABLE {subscriptions_mail_edit} (
-          mailkey varchar(255) NOT NULL,
-          item_body TEXT,
-          PRIMARY KEY (mailkey)
-         ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-      $ret[] = update_sql("ALTER TABLE {subscriptions} ADD send_interval int(10) unsigned default '0' NOT NULL");
-      break;
-    case 'pgsql':
-      $ret[] = update_sql("CREATE TABLE {subscriptions_mail_edit} (
-          mailkey varchar(255) NOT NULL,
-          item_body TEXT,
-          PRIMARY KEY (mailkey)
-        )");
-      db_add_column($ret, 'subscriptions', 'send_interval', 'integer', array('default' => 0, 'not null' => TRUE));
-      break;
-  }
+  $schema['subscriptions_mail_edit'] = array(
+    'fields'      => array(
+      'mailkey'   => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE),
+      'item_body' => array('type' => 'text', 'not null' => FALSE)),
+    'primary key' => array('mailkey'),
+  );
+
+  db_create_table($ret, 'subscriptions_mail_edit', $schema['subscriptions_mail_edit']);
+
+  db_add_field($ret, 'subscriptions', 'send_interval', array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'));
 
   if (variable_get('subscriptions_usecron', 0)) {
     $ret[] = update_sql("UPDATE {subscriptions} SET send_interval = 1");
@@ -236,16 +182,7 @@ function subscriptions_update_3() {
   $t = get_t();
 
   if (db_table_exists('subscriptions_holding') && !db_table_exists('subscriptions_holding_old')) {
-    switch ($GLOBALS['db_type']) {
-      case 'mysql':
-      case 'mysqli':
-        $ret[] = update_sql('RENAME TABLE {subscriptions_holding} TO {subscriptions_holding_old}');
-        break;
-
-      case 'pgsql':
-        $ret[] = update_sql('ALTER TABLE {subscriptions_holding} RENAME TO {subscriptions_holding_old}');
-        break;
-    }
+    db_rename_table($ret, subscriptions_holding, subscriptions_holding_old);
     if ($ret[count($ret)-1]['success']) {
       drupal_set_message($t('The obsolete "!subscriptions_holding" table has been renamed to "!subscriptions_holding_old". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back.',
         array(
@@ -257,49 +194,32 @@ function subscriptions_update_3() {
   }
 
   if (db_table_exists('subscriptions_sent')) {                // old left-over from first
-    $ret[] = update_sql("DROP TABLE {subscriptions_sent}");   // incarnation of 5.x-2.0
+    db_drop_table($ret, 'subscriptions_sent');                // incarnation of 5.x-2.0
   }
   
   if (!db_table_exists('subscriptions_old')) {
-    switch ($GLOBALS['db_type']) {
-      case 'mysql':
-      case 'mysqli':
-        $ret[] = update_sql('RENAME TABLE {subscriptions} TO {subscriptions_old}');
-        $ret[] = update_sql("CREATE TABLE {subscriptions} (
-            sid int unsigned NOT NULL auto_increment,
-            module varchar(64) default NULL,
-            field varchar(32) default NULL,
-            value varchar(237) default NULL,
-            recipient_uid int NOT NULL,
-            send_interval int default NULL,
-            author_uid int NOT NULL,
-            send_updates tinyint NOT NULL default 0,
-            send_comments tinyint NOT NULL default 0,
-            PRIMARY KEY (sid),
-            KEY (module, field, value),
-            KEY (recipient_uid)
-          ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-        break;
 
-      case 'pgsql':
-        $ret[] = 'ALTER TABLE {subscriptions} RENAME TO {subscriptions_old}';
-        $ret[] = update_sql("CREATE TABLE {subscriptions} (
-            sid serial,
-            module varchar(255) default NULL,
-            field varchar(255) default NULL,
-            value varchar(255) default NULL,
-            recipient_uid integer NOT NULL,
-            send_interval integer default NULL,
-            author_uid integer NOT NULL,
-            send_updates smallint NOT NULL default 0,
-            send_comments smallint NOT NULL default 0,
-            PRIMARY KEY (sid)
-          )");
-        $ret[] = update_sql("CREATE INDEX {subscriptions}_module_field_value_index ON {subscriptions} (module, field, value)");
-        $ret[] = update_sql("CREATE INDEX {subscriptions}_recipient_uid_index ON {subscriptions} (recipient_uid)");
-        break;
-    }
-    
+    db_rename_table($ret, subscriptions, subscriptions_old);
+
+    $schema['subscriptions'] = array(
+      'fields'          => array(
+        'sid'           => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'),
+        'module'        => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
+        'field'         => array('type' => 'varchar', 'length' => '32', 'not null' => FALSE),
+        'value'         => array('type' => 'varchar', 'length' => '237', 'not null' => FALSE),
+        'recipient_uid' => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+        'send_interval' => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+        'author_uid'    => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+        'send_updates'  => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4'),
+        'send_comments' => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4')),
+      'primary key'     => array('sid'),
+      'indexes'         => array(
+        'module'        => array('module', 'field', 'value'),
+        'recipient_uid' => array('recipient_uid')),
+    );
+    db_create_table($ret, 'subscriptions', $schema['subscriptions']);
+
+
     $ret[] = update_sql("INSERT INTO {subscriptions}
         (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
         SELECT 'node', 'nid', sid, uid, send_interval, -1, 0, 1
@@ -334,62 +254,42 @@ function subscriptions_update_3() {
     );
   }
 
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("CREATE TABLE {subscriptions_queue} (
-          sqid int unsigned NOT NULL auto_increment,
-          uid int default NULL,
-          name varchar(60) default NULL,
-          mail varchar(64) default NULL,
-          language varchar(12) default NULL,
-          module varchar(64) default NULL,
-          field varchar(32) default NULL,
-          value varchar(237) default NULL,
-          author_uid int default NULL,
-          send_interval int default NULL,
-          digest tinyint default NULL,
-          load_args varchar(255) NOT NULL default '',
-          load_function varchar(60) NOT NULL default '',
-          last_sent int unsigned NOT NULL default '0',
-          PRIMARY KEY (sqid),
-          KEY (load_args, load_function, uid)
-         ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-      $ret[] = update_sql("CREATE TABLE {subscriptions_user} (
-          uid integer NOT NULL,
-          digest tinyint NOT NULL default 0,
-          last_sent int unsigned NOT NULL default 0,
-          PRIMARY KEY (uid)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */");
-      break;
 
-    case 'pgsql':
-      $ret[] = update_sql("CREATE TABLE {subscriptions_queue} (
-          sqid serial,
-          uid integer default NULL,
-          name varchar(60) default NULL,
-          mail varchar(64) default NULL,
-          language varchar(12) default NULL,
-          module varchar(64) default NULL,
-          field varchar(32) default NULL,
-          value varchar(237) default NULL,
-          author_uid integer default NULL,
-          send_interval integer default NULL,
-          digest smallint default NULL,
-          load_args varchar(255) NOT NULL default '',
-          load_function varchar(60) NOT NULL default '',
-          last_sent int_unsigned NOT NULL default 0,
-          PRIMARY KEY (sqid)
-        )");
-      $ret[] = update_sql("CREATE INDEX {subscriptions_queue}_load_args_load_function_uid_index ON {subscriptions_queue} (load_args, load_function, uid)");
-      $ret[] = update_sql("CREATE TABLE {subscriptions_user} (
-          uid integer NOT NULL,
-          digest smallint NOT NULL default 0,
-          last_sent int_unsigned NOT NULL default 0,
-          PRIMARY KEY (uid)
-        )");
-      break;
-  }
+  $schema['subscriptions_queue'] = array(
+    'fields'          => array(
+      'sqid'          => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'),
+      'uid'           => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'name'          => array('type' => 'varchar', 'length' => '60', 'not null' => FALSE),
+      'mail'          => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
+      'language'      => array('type' => 'varchar', 'length' => '12', 'not null' => FALSE),
+      'module'        => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
+      'field'         => array('type' => 'varchar', 'length' => '32', 'not null' => FALSE),
+      'value'         => array('type' => 'varchar', 'length' => '237', 'not null' => FALSE),
+      'author_uid'    => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'send_interval' => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'digest'        => array('type' => 'int', 'size' => 'tiny', 'not null' => FALSE, 'disp-width' => '4'),
+      'load_args'     => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
+      'load_function' => array('type' => 'varchar', 'length' => '60', 'not null' => TRUE, 'default' => ''),
+      'last_sent'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10')),
+    'primary key'     => array('sqid'),
+    'indexes'         => array(
+      'load_args'     => array('load_args', 'load_function', 'uid')),
+  );
+  db_create_table($ret, 'subscriptions_queue', $schema['subscriptions_queue']);
+
+
+
+
+
+  $schema['subscriptions_user'] = array(
+    'fields'                  => array(
+      'uid'                   => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+      'digest'                => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'),
+      'last_sent'             => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'disp-width' => '10')),
+    'primary key'             => array('uid'),
+  );
+  db_create_table($ret, 'subscriptions_user', $schema['subscriptions_user']);
+
   $ret[] = update_sql("INSERT INTO {subscriptions_user} (uid) SELECT uid FROM {users} WHERE uid > 0");
 
   include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.install.inc';
@@ -402,20 +302,11 @@ function subscriptions_update_3() {
  */
 function subscriptions_update_4() {
   $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD send_interval int NOT NULL default -1 AFTER digest");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD send_updates tinyint NOT NULL default -1 AFTER send_interval");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD send_comments tinyint NOT NULL default -1 AFTER send_updates");
-      break;
 
-    case 'pgsql':
-      db_add_column($ret, 'subscriptions_user', 'send_interval', 'integer', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_user', 'send_updates', 'smallint', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_user', 'send_comments', 'smallint', array('default' => -1, 'not null' => TRUE));
-      break;
-  }
+  db_add_field($ret, 'subscriptions_user', 'send_interval', array('type' => 'int', 'not null' => TRUE, 'default' => -1, 'disp-width' => '11'));
+  db_add_field($ret, 'subscriptions_user', 'send_updates',  array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+  db_add_field($ret, 'subscriptions_user', 'send_comments', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+
   $ret[] = update_sql("DELETE FROM {subscriptions_user} WHERE uid = 0");
   $ret[] = update_sql("UPDATE {subscriptions_user} SET digest = -1");
   $ret[] = update_sql("INSERT INTO {subscriptions_user} (uid, digest, send_interval, send_updates, send_comments) VALUES(". -DRUPAL_AUTHENTICATED_RID .", 0, 1, 0, 0)");
@@ -427,22 +318,12 @@ function subscriptions_update_4() {
  */
 function subscriptions_update_5() {
   $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD send_interval_visible tinyint NOT NULL default -1 AFTER send_comments");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD send_updates_visible tinyint NOT NULL default -1 AFTER send_interval_visible");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD send_comments_visible tinyint NOT NULL default -1 AFTER send_updates_visible");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_queue} ADD is_new tinyint AFTER load_function");
-      break;
 
-    case 'pgsql':
-      db_add_column($ret, 'subscriptions_user', 'send_interval_visible', 'smallint', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_user', 'send_updates_visible', 'smallint', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_user', 'send_comments_visible', 'smallint', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_queue', 'is_new', 'smallint');
-      break;
-  }
+  db_add_field($ret, 'subscriptions_user', 'send_interval_visible', array('type' => 'int', 'not null' => TRUE, 'default' => -1, 'disp-width' => '11'));
+  db_add_field($ret, 'subscriptions_user', 'send_updates_visible',  array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+  db_add_field($ret, 'subscriptions_user', 'send_comments_visible', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+  db_add_field($ret, 'subscriptions_queue', 'is_new', array('type' => 'int', 'size' => 'tiny', 'not null' => FALSE, 'disp-width' => '4'));
+
   $ret[] = update_sql("UPDATE {subscriptions_user} SET send_interval_visible = 0, send_updates_visible = 0, send_comments_visible = 0 WHERE uid = ". -DRUPAL_AUTHENTICATED_RID);
   return $ret;
 }
@@ -452,22 +333,12 @@ function subscriptions_update_5() {
  */
 function subscriptions_update_6() {
   $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD autosub_on_post tinyint NOT NULL default -1 AFTER send_comments_visible");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD autosub_on_update tinyint NOT NULL default -1 AFTER autosub_on_post");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD autosub_on_comment tinyint NOT NULL default -1 AFTER autosub_on_update");
-      $ret[] = update_sql("ALTER TABLE {subscriptions_user} ADD send_self tinyint NOT NULL default -1 AFTER autosub_on_comment");
-      break;
 
-    case 'pgsql':
-      db_add_column($ret, 'subscriptions_user', 'autosub_on_post', 'smallint', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_user', 'autosub_on_update', 'smallint', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_user', 'autosub_on_comment', 'smallint', array('default' => -1, 'not null' => TRUE));
-      db_add_column($ret, 'subscriptions_user', 'send_self', 'smallint', array('default' => -1, 'not null' => TRUE));
-      break;
-  }
+  db_add_field($ret, 'subscriptions_user', 'autosub_on_post',    array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+  db_add_field($ret, 'subscriptions_user', 'autosub_on_update',  array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+  db_add_field($ret, 'subscriptions_user', 'autosub_on_comment', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+  db_add_field($ret, 'subscriptions_user', 'send_self',          array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1, 'disp-width' => '4'));
+
   return $ret;
 }
 
@@ -518,7 +389,7 @@ function subscriptions_update_7() {
 }
 
 /**
- * Database update function 8: Convert 5.x-1.9-dev email templates. 
+ * Database update function 8: Convert 5.x-1.9-dev email templates.
  */
 function subscriptions_update_8() {
   $ret = array();

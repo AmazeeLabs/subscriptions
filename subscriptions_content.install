@@ -14,3 +14,9 @@ function subscriptions_content_install() {
   // Make sure mail_edit picks up our new mailkeys.
   cache_clear_all('mail_edit_overview', 'cache');
 }
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function subscriptions_content_uninstall() {
+}

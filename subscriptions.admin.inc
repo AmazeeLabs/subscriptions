@@ -18,7 +18,7 @@ function subscriptions_settings_form() {
     '#weight' => -100,
   );
   $form['links'][] = array(
-    '#value' => '<div>'. l($tr('Access control'), 'admin/user/access', array(), NULL, 'module-subscriptions') .'</div>',
+    '#value' => '<div>'. l($tr('Permissions'), 'admin/user/permissions', array('fragment' => 'module-subscriptions')) .'</div>',
     '#weight' => -20,
     );
   if (module_exists('subscriptions_mail') && module_exists('mail_edit')) {
@@ -28,7 +28,7 @@ function subscriptions_settings_form() {
     );
   }
   $form['links'][] = array(
-    '#value' => '<div>'. l(t('Run cron manually!'), 'admin/logs/status/run-cron') .'</div>',
+    '#value' => '<div>'. l(t('Run cron manually!'), 'admin/reports/status/run-cron') .'</div>',
     '#weight' => 0,
   );
   $form['links'][] = array(
@@ -67,7 +67,7 @@ function subscriptions_settings_form() {
     }
     $form['subscriptions_show_install_info'] = array(
       '#type'          => 'checkbox',
-      '#title'         => t('Show the installation reminder above again.'),
+      '#title'         => t('Keep showing the installation reminder above.'),
       '#default_value' => variable_get('subscriptions_show_install_info', 1),
       '#description'   => t('Uncheck this box to permanently remove the reminder, if you have a reason for not enabling the standard selection of Subscriptions modules.'),
       '#weight'        => -101,
@@ -89,7 +89,7 @@ function subscriptions_settings_form() {
 function theme_subscriptions_form_table($element) {
   $output = '';
   $rows = array();
-  drupal_add_js(drupal_get_path('module', 'subscriptions') .'/subscriptions_tableselect.js', 'module');
+  drupal_add_js(drupal_get_path('module', 'subscriptions') .'/subscriptions_tableselect.js', 'module', 'header', FALSE, TRUE, FALSE);
   $columns['checkboxes']    = array('data' => '&nbsp;', 'width' => '20%', 'class' => 'subscriptions-table');
   if ($element['send_interval']['#access']) {
     $columns['send_interval'] = array('data' => t('Send interval'), 'width' => '20%');
@@ -136,19 +136,19 @@ function theme_subscriptions_form_table($element) {
  *
  * @ingroup form
  */
-function subscriptions_page_form_submit($form_id, $form_values) {
+function subscriptions_page_form_submit($form, &$form_state) {
   global $user;
-  if (isset($form_values['roles'])) {
-    $rid0 = current($form_values['roles']);
+  if (isset($form_state['values']['roles'])) {
+    $rid0 = current($form_state['values']['roles']);
   }
-  if ($form_values['op'] == $form_values['submit']) {
-    if (!$rid0) {
-      $form_values['roles'][] = -$form_values['uid'];  // will be negated again below
+  if ($form_state['values']['op'] == $form_state['values']['submit']) {
+    if (empty($rid0)) {
+      $form_state['values']['roles'][] = -$form_state['values']['uid'];  // will be negated again below
     }
-    $module = $form_values['module'];
-    $field = $form_values['field'];
-    $access_key = (isset($form_values['access_key']) ? $form_values['access_key'] : $module);
-    foreach ($form_values as $element_values) {
+    $module = $form_state['values']['module'];
+    $field = $form_state['values']['field'];
+    $access_key = (isset($form_state['values']['access_key']) ? $form_state['values']['access_key'] : $module);
+    foreach ($form_state['values'] as $element_values) {
       if (isset($element_values[0])) {
         $element_values = $element_values[0];
       }
@@ -163,14 +163,14 @@ function subscriptions_page_form_submit($form_id, $form_values) {
                 $element_values['send_comments'][$value][$author_uid] != $defaults['send_comments'][$value][$author_uid])) {
               $send_updates = ($element_values['send_updates'][$value][$author_uid] ? 1 : 0);
               $send_comments = ($element_values['send_comments'][$value][$author_uid] ? 1 : 0);
-              foreach ($form_values['roles'] as $uid) {
+              foreach ($form_state['values']['roles'] as $uid) {
                 subscriptions_write($access_key, $module, $field, $value, $author_uid, -$uid, $element_values['send_interval'][$value][$author_uid], $send_updates, $send_comments);
               }
               $changed = TRUE;
             }
             elseif (!$set_to_enabled && isset($defaults['checkboxes'][$value][$author_uid])) {
               // It was enabled but now it is not. Delete.
-              foreach ($form_values['roles'] as $uid) {
+              foreach ($form_state['values']['roles'] as $uid) {
                 db_query("DELETE FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d", $module, $field, $value, $author_uid, -$uid);
               }
               $changed = TRUE;
@@ -183,7 +183,7 @@ function subscriptions_page_form_submit($form_id, $form_values) {
       drupal_set_message(t('Your subscriptions were updated.'));
     }
   }
-  if ($rid0) {
+  if (!empty($rid0)) {
     drupal_goto('admin/settings/subscriptions/userdefaults/'. arg(4) .'/'. $rid0);
   }
 }
@@ -262,7 +262,7 @@ function subscriptions_page($account, $stype) {
   //  'href' => url('subscriptions/feed'),
   //));
   drupal_set_title(isset($account) ? check_plain($account->name) : t('Subscriptions'));
-  return theme('box', '', $output); // . theme('xml_icon', url("subscriptions/feed"));
+  return theme('box', '', $output); // . theme('xml_icon', url('subscriptions/feed'));
 }
 
 /**
@@ -293,7 +293,7 @@ function subscriptions_page_user_overview($account) {
   if ($uid < 0) {
     unset($types['node']);
   }
-  uasort($types, _subscriptions_cmp_by_weight);
+  uasort($types, '_subscriptions_cmp_by_weight');
   foreach ($types as $stype => $type) {
     $has_access = ($uid < 0 && user_access('administer site configuration')) || user_access($type['access'], $account);
     if ($has_access || user_access('administer user subscriptions')) {
@@ -303,11 +303,11 @@ function subscriptions_page_user_overview($account) {
       );
     }
   }
-  $output .= theme('table', $header, $rows);
-  $output .= theme('item', array('#description' => t('Note: The counts on this page may differ from the ones on the detail pages for various technical reasons.')));
+  $output  = theme('table', $header, $rows);
+  $output .= theme('item', array('#value' => '', '#description' => t('Note: The counts on this page may differ from the ones on the detail pages for various technical reasons.')));
   $output .= '<br />';
   
-  $output .= drupal_get_form(subscriptions_user_settings_form, $account);
+  $output .= drupal_get_form('subscriptions_user_settings_form', $account);
   drupal_set_title($uid < 0 ? t('Subscriptions') : check_plain($account->name));
   return $output;
 }
@@ -321,7 +321,7 @@ function subscriptions_page_user_overview($account) {
  *
  * @ingroup form
  */
-function subscriptions_user_settings_form($account) {
+function subscriptions_user_settings_form(&$form_state, $account) {
   global $user;
   
   $uid = (isset($account) ? $account->uid : -DRUPAL_AUTHENTICATED_RID);
@@ -449,7 +449,7 @@ function subscriptions_user_settings_form($account) {
       );
     $form['settings']['visibility']['info'][] = array(
       '#type'          => 'item',
-      '#value'         =>  
+      '#value'         =>
         t("Beyond defining the %Visible/%Hidden defaults for your users, you can",
           array(
             '%Visible' => $tr('Visible'),
@@ -475,7 +475,6 @@ function subscriptions_user_settings_form($account) {
       '#type'          => 'radios',
       '#options'       => $visibility_options,
       '#default_value' => 1-_subscriptions_get_setting('send_'. $parm .'_visible', $account),
-      '#description'   => $visibility_description,
       '#access'        => $control_access,
     );
     if ($control_access) {
@@ -505,23 +504,23 @@ function subscriptions_user_settings_form($account) {
  *
  * @ingroup form
  */
-function subscriptions_user_settings_form_submit($form_id, $form_values) {
-  if ($form_values['op'] == $form_values['reset']) {
+function subscriptions_user_settings_form_submit($form, &$form_state) {
+  if (isset($form_state['values']['reset']) && $form_state['values']['op'] == $form_state['values']['reset']) {
     if (($uid = arg(1))> 0) {
       db_query("UPDATE {subscriptions_user} SET digest = -1, send_interval = -1, send_updates = -1, send_comments = -1, send_interval_visible = -1, send_updates_visible = -1, send_comments_visible = -1, autosub_on_post = -1, autosub_on_update = -1, autosub_on_comment = -1, send_self = -1 WHERE uid = %d", $uid);
       drupal_set_message(t('The site defaults were restored.'));
     }
   }
-  elseif ($form_values['op'] == $form_values['save']) {
+  elseif ($form_state['values']['op'] == $form_state['values']['save']) {
     if (arg(0) == 'user') {
       $uid = arg(1);
     }
     else {
       $uid = -DRUPAL_AUTHENTICATED_RID;
     }
-    $send_interval_visible = 1-$form_values['send_interval_visible'];
-    $send_updates_visible = 1-$form_values['send_updates_visible'];
-    $send_comments_visible = 1-$form_values['send_comments_visible'];
+    $send_interval_visible = 1-$form_state['values']['send_interval_visible'];
+    $send_updates_visible = 1-$form_state['values']['send_updates_visible'];
+    $send_comments_visible = 1-$form_state['values']['send_comments_visible'];
     db_query("
       UPDATE {subscriptions_user}
       SET digest = %d, send_interval = %d, send_updates = %d, send_comments = %d,
@@ -529,15 +528,15 @@ function subscriptions_user_settings_form_submit($form_id, $form_values) {
           autosub_on_post = %d, autosub_on_update = %d, autosub_on_comment = %d,
           send_self = %d
       WHERE uid = %d",
-      $form_values['digest'],
-      ($uid > 0 && $send_interval_visible == -2 ? -1 : $form_values['send_interval']),
-      ($uid > 0 && $send_updates_visible == -2 ? -1 : $form_values['send_updates']),
-      ($uid > 0 && $send_comments_visible == -2 ? -1 : $form_values['send_comments']),
+      $form_state['values']['digest'],
+      ($uid > 0 && $send_interval_visible == -2 ? -1 : $form_state['values']['send_interval']),
+      ($uid > 0 && $send_updates_visible == -2 ? -1 : $form_state['values']['send_updates']),
+      ($uid > 0 && $send_comments_visible == -2 ? -1 : $form_state['values']['send_comments']),
       $send_interval_visible, $send_updates_visible, $send_comments_visible,
-      $form_values['autosub_post'],
-      $form_values['autosub_update'],
-      $form_values['autosub_comment'],
-      $form_values['sendself'],
+      $form_state['values']['autosub_post'],
+      $form_state['values']['autosub_update'],
+      $form_state['values']['autosub_comment'],
+      $form_state['values']['sendself'],
       $uid);
     drupal_set_message(t('The changes have been saved.'));
   }
@@ -575,9 +574,9 @@ function subscriptions_intervals() {
  *
  * @ingroup form
  */
-function subscriptions_intervals_submit($form_id, $form_values) {
+function subscriptions_intervals_submit($form, &$form_state) {
   $intervals = array();
-  foreach (explode("\n", $form_values['intervals']) as $line) {
+  foreach (explode("\n", $form_state['values']['intervals']) as $line) {
     if ($line) {
       $v = explode('|', $line);
       $intervals[$v[0]] = $v[1];
@@ -639,13 +638,13 @@ function subscriptions_add_form($stype, $sid, $author_uid = NULL) {
  *
  * @ingroup form
  */
-function subscriptions_add_form_submit($form_id, $form_values) {
-  if ($a = module_invoke_all('subscriptions', 'stype', $form_values['stype'], $form_values['sid'], (isset($form_values['author_uid']) ? $form_values['author_uid'] : -1))) {
+function subscriptions_add_form_submit($form, &$form_state) {
+  if ($a = module_invoke_all('subscriptions', 'stype', $form_state['values']['stype'], $form_state['values']['sid'], (isset($form_state['values']['author_uid']) ? $form_state['values']['author_uid'] : -1))) {
     list($module, $field, $value, $author_uid) = $a;
-    $uid = $form_values['uid'];
-    subscriptions_write_subscription($module, $field, $value, $author_uid, $uid, $form_values['send_interval'], $form_values['updates'], $form_values['comments']);
+    $uid = $form_state['values']['uid'];
+    subscriptions_write_subscription($module, $field, $value, $author_uid, $uid, $form_state['values']['send_interval'], $form_state['values']['updates'], $form_state['values']['comments']);
     drupal_set_message(t('Your subscription was activated.'));
-    return '<front>';
+    $form_state['redirect'] = '<front>';
   }
   drupal_set_message(t('Your subscription could not be activated.'));
 }
@@ -680,8 +679,8 @@ function subscriptions_del_form($stype, $sid, $author_uid = NULL) {
 /**
  * Remove Subscription form submit handler.
  */
-function subscriptions_del_form_submit($form_id, $form_values) {
-  return subscriptions_delete_form_submit($form_id, $form_values);
+function subscriptions_del_form_submit($form, &$form_state) {
+  subscriptions_delete_form_submit($form, &$form_state);
 }
 
 /**
@@ -741,7 +740,7 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
     $form[$name][$key][$author_uid] = array(
       '#type' => 'checkbox',
       '#title' => $index ? '' : $title,
-      '#default_value' => $defaults[$name][$key][$author_uid],
+      '#default_value' => !empty($defaults[$name][$key][$author_uid]),
     );
   }
 }

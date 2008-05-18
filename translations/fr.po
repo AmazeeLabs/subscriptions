@@ -1,3 +1,7 @@
+# $Id$
+#
+# French translation of Drupal (general)
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Subscriptions v2-beta12\n"

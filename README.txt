@@ -1,5 +1,5 @@
 
-README.txt for Subscriptions 5.x-2.x
+README.txt for Subscriptions 6.x-1.x
 
 
 
@@ -12,16 +12,10 @@ Acknowledgements
 ----------------
 
 Subscriptions 5.x-2.0 has been rewritten from scratch by chx and salvis.
+Ported to Drupal 6 by salvis.
 Doxygen documentation by develCuy, sponsored by www.transit.york.ac.uk.
-subscriptions_og.module by develCuy, sponsored by www.transit.york.ac.uk.
 
-The Organic Groups Subscriptions module is being developed independently.
-Special care is taken to document the Subscriptions APIs that need to be
-implemented and used for a non-trivial add-on module. As such it is an
-example for building other add-on modules.
-
-http://api.drupal-contrib.org/api/subscriptions provides great developer
-documentation.
+http://api.drupal-contrib.org/api/subscriptions provides on-line developer documentation.
 
 Initial Translations:
 - German:   salvis
@@ -30,9 +24,17 @@ Initial Translations:
 - Spanish:  develCuy
 - French:   matkeane
 
-Contributed Modules written and maintained by:
-- moderate_content_notifications:  beginner
+Contributed Modules:
+- moderate_content_notifications:  written and maintained by beginner.
 
+Known independent add-on modules:
+- subscriptions_author:  by develCuy, sponsored by www.transit.york.ac.uk.
+- subscriptions_og:      by develCuy, sponsored by www.transit.york.ac.uk.
+
+The Organic Groups Subscriptions module has been developed independently.
+Special care was taken to document the Subscriptions APIs that need to be
+implemented and used for a non-trivial add-on module. As such it is an
+example for building other add-on modules.
 
 
 
@@ -57,7 +59,7 @@ if it's installed.
 Upgrading from 5.x-1.x
 ----------------------
 
-Subscriptions 2.x is designed to smoothly upgrade and convert a 1.x 
+Subscriptions D6 is designed to smoothly upgrade and convert a 1.x 
 installation. If you currently have 1.x installed, we recommend to put
 your site in maintenance mode, remove the 1.x files (if you only move
 them to a different directory under the web root, Drupal will still find

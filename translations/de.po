@@ -1,6 +1,6 @@
 # $Id$
 #
-# LANGUAGE translation of Drupal (general)
+# German translation of Drupal (general)
 # Generated from files:
 #  subscriptions.admin.inc,v 1.1.2.10 2007/12/21 00:42:51 chx
 #  subscriptions_ui.module,v 1.1.2.3 2007/12/21 00:42:51 chx
