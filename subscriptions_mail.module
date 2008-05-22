@@ -317,6 +317,15 @@ function subscriptions_mail_form_mail_edit_form_alter(&$form, &$form_state) {
       $form['#submit'][] = 'subscriptions_mail_mail_edit_form_submit';
       $form['#submit'] = array_reverse($form['#submit']);
     }
+    foreach (array('!sender_name', '!sender_page') as $key) {
+      $expl = $form['help']['#variables'][$key];
+      if ($expl[strlen($expl)-1] == '.') {
+        $add_dot = TRUE;
+        $expl = substr($expl, 0, strlen($expl) - 1);
+      }
+      $expl .= ' '. t('(if the sender is visible)') . (!empty($add_dot) ? '.' : '');
+      $form['help']['#variables'][$key] = $expl;
+    }
   }
 }
 
