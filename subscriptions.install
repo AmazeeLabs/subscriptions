@@ -87,6 +87,8 @@ function subscriptions_install() {
 
   db_query("INSERT INTO {subscriptions_user} (uid, digest, send_interval, send_updates, send_comments, send_interval_visible, send_updates_visible, send_comments_visible, autosub_on_post, autosub_on_update, autosub_on_comment, send_self) VALUES(". -DRUPAL_AUTHENTICATED_RID .", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1)");
   db_query("INSERT INTO {subscriptions_user} (uid) SELECT uid FROM {users} WHERE uid > 0");
+  subscriptions_update_8();   // convert 1.x-dev template variables if found
+  
   include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.install.inc';
   _subscriptions_install_information();
   return $ret;
@@ -110,6 +112,8 @@ function subscriptions_uninstall() {
   if (db_table_exists('subscriptions_sent')) {            // old left-over from first
     db_drop_table($ret, 'subscriptions_sent');           // incarnation of 5.x-2.0
   }
+
+  db_query("DELETE FROM {mail_edit} WHERE mailkey LIKE 'subscriptions-%'");
 
   variable_del('subscriptions_blocked_content_types');
   variable_del('subscriptions_blocked_nodes');
@@ -389,7 +393,8 @@ function subscriptions_update_7() {
 }
 
 /**
- * Database update function 8: Convert 5.x-1.9-dev email templates.
+ * Database update function 8: Convert 5.x-1.x-dev email templates.
+ * (also called by subscriptions_install()!)
  */
 function subscriptions_update_8() {
   $ret = array();
