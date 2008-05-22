@@ -290,6 +290,50 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
 }
 
 /**
+ * Implementation of hook_form_alter().
+ *
+ * Possibly adds a warning and [Remove legacy template] button at
+ * admin/build/mail_edit/subscriptions-....
+ */
+function subscriptions_mail_form_mail_edit_form_alter(&$form, &$form_state) {
+  if (substr($form['mailkey']['#value'], 0, 14) == 'subscriptions-') {
+    if ($form['mailkey']['#value'] != SUBSCRIPTIONS_DIGEST_MAILKEY &&
+        (variable_get('subscriptions_email_body', '') || variable_get('subscriptions_email_subject', ''))) {
+      $form['legacy'] = array(
+        '#type'          => 'fieldset',
+        '#title'         => t('Legacy template'),
+        '#attributes'    => array('class' => 'error'),
+        '#weight'        => -101,
+      );
+      $form['legacy']['explain'] = array(
+        '#type'          => 'item',
+        '#value'         => t('You have Subscriptions 5.x-1.x-dev template variables defined in your database.<br />As long as these are in place, the template values below will be ignored!'),
+      );
+      $form['legacy']['remove_legacy'] = array(
+        '#type'          => 'submit',
+        '#value'         => t('Remove legacy template'),
+      );
+      $form['#submit'] = array_reverse($form['#submit']);  // we want to go first!
+      $form['#submit'][] = 'subscriptions_mail_mail_edit_form_submit';
+      $form['#submit'] = array_reverse($form['#submit']);
+    }
+  }
+}
+
+/**
+ * Mail Editor page submit handler.
+ *
+ * @ingroup form
+ */
+function subscriptions_mail_mail_edit_form_submit($form, &$form_state) {
+  if ($form_state['values']['op'] == $form_state['values']['remove_legacy']) {
+    variable_del('subscriptions_email_body');
+    variable_del('subscriptions_email_subject');
+    drupal_goto($_GET['q']);
+  }
+}
+
+/**
  * Assemble mail variables.
  */
 function subscriptions_mail_mail_edit_variables(&$variables, $mailkey = NULL) {

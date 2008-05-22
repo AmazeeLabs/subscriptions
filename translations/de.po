@@ -17,8 +17,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Subscriptions 5.x-2.x\n"
-"POT-Creation-Date: 2008-05-12 15:10+0200\n"
-"PO-Revision-Date: 2008-05-12 15:54+0100\n"
+"POT-Creation-Date: 2008-05-22 01:25+0200\n"
+"PO-Revision-Date: 2008-05-22 01:29+0100\n"
 "Last-Translator: Hans Salvisberg <drupal-xlat@salvisberg.com>\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr "Obenstehende Warnung weiterhin anzeigen."
 msgid "Uncheck this box to permanently remove the reminder, if you have a reason for not enabling the standard selection of Subscriptions modules."
 msgstr "Deaktivieren, um die Warnung nicht mehr anzuzeigen, wenn aus guten Gründen nicht die Standard-Auswahl von Subscriptions-Modulen verwendet werden soll."
 
-#: subscriptions.admin.inc:95;407;473;612
+#: subscriptions.admin.inc:95;408;474;612
 msgid "Send interval"
 msgstr "Zustellung"
 
@@ -94,12 +94,12 @@ msgstr "Laden"
 msgid "Current subscriptions:"
 msgstr "Aktuelle Abonnemente:"
 
-#: subscriptions.admin.inc:252
+#: subscriptions.admin.inc:253
 #: subscriptions_ui.module:212
 msgid "The master checkboxes on the left turn the given subscription on or off. Depending on the setup of the site, you may have additional options for active subscriptions."
 msgstr "Die Hauptankreuzfelder ganz links schalten ein Abonnement ein oder aus. Je nach Einstellung der Website kann es für eingeschaltete Abonnemente zusätzliche Optionen geben."
 
-#: subscriptions.admin.inc:264;311
+#: subscriptions.admin.inc:265;312
 #: subscriptions.module:33;77;96
 #: subscriptions_taxonomy.module:158
 #: subscriptions_ui.module:46
@@ -116,129 +116,129 @@ msgstr "Die Hauptankreuzfelder ganz links schalten ein Abonnement ein oder aus. 
 msgid "Subscriptions"
 msgstr "Abonnemente"
 
-#: subscriptions.admin.inc:291
+#: subscriptions.admin.inc:292
 msgid "Number"
 msgstr "Anzahl"
 
-#: subscriptions.admin.inc:307
+#: subscriptions.admin.inc:308
 msgid "Note: The counts on this page may differ from the ones on the detail pages for various technical reasons."
 msgstr "Anmerkung: Aus technischen Gründen können die Zahlen auf dieser Seite von denjenigen auf den Detail-Seiten abweichen."
 
-#: subscriptions.admin.inc:346
+#: subscriptions.admin.inc:347
 msgid "The subtabs here under %User_defaults mirror those found at !My_account_Subscriptions, except that the fieldsets here come up already expanded. Please go there now and familiarize yourself with what's there!"
 msgstr "Die Subtabs hier unter %User_defaults spiegeln diejenigen unter !My_account_Subscriptions wieder, ausser dass die aufklappbaren Teile hier bereits aufgeklappt dargestellt werden. Bitte folgen Sie dem Link und schauen Sie, welche Einstellmöglichkeiten es dort für Ihre Benutzer gibt."
 
-#: subscriptions.admin.inc:356
+#: subscriptions.admin.inc:357
 msgid "The default settings that you define here are used for those users that haven't (yet) saved their own settings."
 msgstr "Die hier definierten Standard-Einstellungen werden für diejenigen Benutzer verwendet, welche selbst (noch) keine eigenen Einstellungen gespeichert haben."
 
-#: subscriptions.admin.inc:372
+#: subscriptions.admin.inc:373
 msgid "Auto-subscribe to new content"
 msgstr "Inhalte automatisch abonnieren"
 
-#: subscriptions.admin.inc:374
+#: subscriptions.admin.inc:375
 msgid "Automatically subscribes you to items that you create."
 msgstr "Falls diese Option ausgewählt ist, wird beim Verfassen eines Beitrages gleichzeitig auch ein Abonnement für die entsprechende Diskussion eingerichtet."
 
-#: subscriptions.admin.inc:378
+#: subscriptions.admin.inc:379
 msgid "Auto-subscribe to updated content"
 msgstr "Inhalte bei Änderungen automatisch abonnieren"
 
-#: subscriptions.admin.inc:380
+#: subscriptions.admin.inc:381
 msgid "Automatically subscribes you to items that you update (if you have that permission)."
 msgstr "Falls diese Option ausgewählt ist, wird beim Ändern eines Beitrages (falls erlaubt) gleichzeitig auch ein Abonnement für die entsprechende Diskussion eingerichtet."
 
-#: subscriptions.admin.inc:384
+#: subscriptions.admin.inc:385
 msgid "Auto-subscribe to comments"
 msgstr "Kommentare automatisch abonnieren"
 
-#: subscriptions.admin.inc:386
+#: subscriptions.admin.inc:387
 msgid "Automatically subscribes you to items that you comment on (or where you update a comment, if you have that permission)."
 msgstr "Falls diese Option ausgewählt ist, wird beim Kommentieren eines Beitrages (bzw. Ändern eines Kommentars, falls erlaubt) gleichzeitig auch ein Abonnement für die entsprechende Diskussion eingerichtet."
 
-#: subscriptions.admin.inc:391
+#: subscriptions.admin.inc:392
 msgid "Notify poster of own posts"
 msgstr "Den Autor über die eigenen Beiträge benachrichtigen"
 
-#: subscriptions.admin.inc:393
+#: subscriptions.admin.inc:394
 msgid "Sends you notifications about your own posts (if you're subscribed)."
 msgstr "Benachrichtigungen auch für eigene Beiträge senden (falls abonniert)."
 
-#: subscriptions.admin.inc:397
+#: subscriptions.admin.inc:398
 msgid "Digest mode"
 msgstr "Zusammengefasste Benachrichtigungen"
 
-#: subscriptions.admin.inc:399
+#: subscriptions.admin.inc:400
 msgid "Merges your notifications into a single email, sent at the interval you specify."
 msgstr "Führt die Benachrichtigungen in einer einzigen E-Mail zusammen."
 
-#: subscriptions.admin.inc:403
+#: subscriptions.admin.inc:404
 msgid "Preferences"
 msgstr "Voreinstellungen"
 
-#: subscriptions.admin.inc:411
+#: subscriptions.admin.inc:412
 msgid "The frequency of notifications; it may take longer, but notifications will not be sent more frequently than indicated."
 msgstr "Die Häufigkeit der Benachrichtigungen; es kann auch länger dauern, aber die Benachrichtigungen werden nicht häufiger versandt, als angegeben."
 
-#: subscriptions.admin.inc:414;474
+#: subscriptions.admin.inc:415;475
 msgid "On updates"
 msgstr "Änderungen"
 
-#: subscriptions.admin.inc:417
+#: subscriptions.admin.inc:418
 msgid "Sends a notification when an item is updated."
 msgstr "Benachrichtigen, wenn ein Beitrag geändert wurde."
 
-#: subscriptions.admin.inc:420;474
+#: subscriptions.admin.inc:421;475
 msgid "On comments"
 msgstr "Kommentare"
 
-#: subscriptions.admin.inc:423
+#: subscriptions.admin.inc:424
 msgid "Sends a notification when an item receives a comment or reply."
 msgstr "Benachrichtigen, wenn ein Beitrag einen neuen Kommentar erhalten hat."
 
-#: subscriptions.admin.inc:426
+#: subscriptions.admin.inc:427
 msgid "Any changes you make here will only apply to newly created subscriptions."
 msgstr "Allfällige Änderungen werden nur für neu erzeugte Abonnemente wirksam."
 
-#: subscriptions.admin.inc:430
+#: subscriptions.admin.inc:431
 msgid "Visibility of controls"
 msgstr "Sichtbarkeit der Einstellelemente"
 
-#: subscriptions.admin.inc:437
+#: subscriptions.admin.inc:438
 msgid "The control(s) mentioned below appear(s) as one or more columns<br /> a) in the %Subscribe subform of node pages and<br /> b) on the sibling subtabs of this %Overview page.<br /> After you have set your %Preferences right above, you may want to hide the corresponding column(s), if you never change those values anyway."
 msgstr "Das/die untenstehenden Kontrollelemente beziehen sich auf eine oder mehrere Spalten, die an folgenden Orten vorkommen:<br /> a) im %Subscribe Teilformular auf Inhaltsseiten und <br /> b) auf den anderen Subtabs neben dieser %Overview-Seite.<br /> Nach dem Einstellen der %Preferences im vorhergehenden Abschnitt, können hier die betreffenden Spalten entfernt werden, wenn sie nicht benötigt werden."
 
-#: subscriptions.admin.inc:439
+#: subscriptions.admin.inc:440
 msgid "Visible"
 msgstr "Sichtbar"
 
-#: subscriptions.admin.inc:439
+#: subscriptions.admin.inc:440
 msgid "Hidden"
 msgstr "Versteckt"
 
-#: subscriptions.admin.inc:441
+#: subscriptions.admin.inc:442
 msgid "Permanently hidden, except for the %preferences"
 msgstr "Permanent versteckt, ausgenommen die %preferences"
 
-#: subscriptions.admin.inc:442
+#: subscriptions.admin.inc:443
 msgid "Completely inaccessible to the user"
 msgstr "Für die Benutzer unzugänglich"
 
-#: subscriptions.admin.inc:453
+#: subscriptions.admin.inc:454
 msgid "Beyond defining the %Visible/%Hidden defaults for your users, you can"
 msgstr "Über das Einstellen der %Visible/%Hidden Standard-Werte für die Benutzer hinaus, können hier folgende zwei Optionen gewählt werden:"
 
-#: subscriptions.admin.inc:458
+#: subscriptions.admin.inc:459
 msgid "permanently hide the columns (and the corresponding visibility controls), so that the users cannot make them visible anymore (they can still change their %Preferences though), or"
 msgstr "Die betreffenden Spalten (und die entsprechenden Elemente zum Kontrollieren der Sichtbarkeit) permanent entfernen, so dass die Benutzer sie nicht mehr sichtbar machen können; sie können allerdings weiterhin ihre %Preferences ändern."
 
-#: subscriptions.admin.inc:462
+#: subscriptions.admin.inc:463
 msgid "you can even hide the %Preferences, so that what you've set right above is cast in stone."
 msgstr "Die Spalten und auch die %Preferences entfernen, so dass die Benutzer nichts ändern können."
 
 #: subscriptions.admin.inc:491;568
 #: subscriptions_blog_ui.module:142
-#: subscriptions_content.module:888;971
+#: subscriptions_content.module:889;972
 #: subscriptions_taxonomy.module:300
 #: subscriptions_ui.module:217
 msgid "Save"
@@ -504,7 +504,7 @@ msgstr "Wert des CCK-Feldes %fieldname, wie für den !content_type definiert (ei
 msgid "thread"
 msgstr "Diskussion"
 
-#: subscriptions_content.module:64;937
+#: subscriptions_content.module:64;938
 msgid "content type"
 msgstr "Inhaltstyp"
 
@@ -758,20 +758,20 @@ msgstr "Ausschalten, damit keine Änderungs-Benachrichtigungen verschickt werden
 msgid "image on website"
 msgstr "Bild auf Website"
 
-#: subscriptions_content.module:892
+#: subscriptions_content.module:893
 msgid "There are no subscribed pages."
 msgstr "Keine abonnierten Seiten."
 
-#: subscriptions_content.module:937
+#: subscriptions_content.module:938
 msgid "This !content_type is blocked."
 msgstr "Dieser !content_type ist gesperrt."
 
-#: subscriptions_content.module:975
+#: subscriptions_content.module:976
 #: subscriptions_taxonomy.module:201
 msgid "There are no available !subs_types."
 msgstr "Es gibt keine verfügbaren !subs_types."
 
-#: subscriptions_content.module:975
+#: subscriptions_content.module:976
 msgid "content types"
 msgstr "Inhaltstypen"
 
@@ -791,49 +791,65 @@ msgstr "Benachrichtigung für @name (@to)"
 msgid "error mailing notification for @name at @to"
 msgstr "Fehler beim Versenden der Benachrichtigung an @name (@to)"
 
-#: subscriptions_mail.module:238
+#: subscriptions_mail.module:240
 msgid "Your installation returns %url as the base URL of the site. This is probably not what you want, and it can usually be fixed by setting the %variable variable in your %file file."
 msgstr "Diese Installation gibt als Basis-URL %url zurück. Das ist wahrscheinlich nicht das Gewünschte, und es kann üblicherweise durch Setzen der %variable Variablen in der %file Datei korrigiert werden."
 
-#: subscriptions_mail.module:243
+#: subscriptions_mail.module:245
 msgid "Mail settings"
 msgstr "E-Mail-Einstellungen"
 
-#: subscriptions_mail.module:248
+#: subscriptions_mail.module:250
 msgid "E-mail address"
 msgstr "E-Mail-Adresse"
 
-#: subscriptions_mail.module:250
+#: subscriptions_mail.module:252
 msgid "A valid e-mail address to be used as the \"From\" address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
 msgstr "Eine gültige E-Mail-Adresse als Absenderadresse für das Versenden der !module-Benachrichtigungen. Die Absenderadresse sollte in derselben Domain liegen wie die Website, um die Gefahr zu verringern, dass die Benachrichtungungen als Spam markiert werden."
 
-#: subscriptions_mail.module:250
+#: subscriptions_mail.module:252
 msgid "Clear this field to use the default site e-mail address."
 msgstr "Zum Zurücksetzen Feld löschen."
 
-#: subscriptions_mail.module:254
+#: subscriptions_mail.module:256
 msgid "Maximum number of notifications to send per cron job"
 msgstr "Maximale Anzahl Benachrichtigungen pro cron Job."
 
-#: subscriptions_mail.module:256
+#: subscriptions_mail.module:258
 msgid "!module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
 msgstr "!module versucht, einen guten Teil der im cron-Job zur Verfügung stehenden Zeit zu nutzen. Falls es zu viel Zeit verbraucht, oder falls die Anzahl Benachrichtigungen aus anderen Gründen beschränkt werden muss, kann das hier eingestellt werden. Der Standardwert ist 0 und bedeutet keine Begrenzung."
 
-#: subscriptions_mail.module:260
+#: subscriptions_mail.module:262
 msgid "Display watchdog entries for successful mailings"
 msgstr "Wächter-Einträge für erfolgreiche Versände anzeigen."
 
-#: subscriptions_mail.module:262
+#: subscriptions_mail.module:264
 msgid "Logs successful mailings to the watchdog log.  Default is ON, but with many subscribers this will generate a huge number of log entries."
 msgstr "Erfolgreichen Versand der Benachrichtigungen im Wächterprotokoll eintragen. Standard ist EIN, aber mit vielen Abonnenten erzeugt das sehr viele Einträge."
 
-#: subscriptions_mail.module:266
+#: subscriptions_mail.module:268
 msgid "Display summary watchdog entries per cron job"
 msgstr "Wächter-Einträge mit Cron-Statistik anzeigen."
 
-#: subscriptions_mail.module:268
+#: subscriptions_mail.module:270
 msgid "Logs the mailing counts, time spent, and size of the remaining queue to the watchdog log.  This is valuable information for estimating the load on the cron job and on your mail server.  Default is ON."
 msgstr "Zeichnet im Wächterprotokoll die Anzahl versandte Benachrichtigungen, die dafür verbrauchte Zeit und die Anzahl der Warteschlange-Einträge auf, welche nicht bearbeitet werden konnte. Diese wertvolle Information erlaubt ein Abschätzen der Last im Cron-Job und im Mail-Server. Standard ist EIN."
+
+#: subscriptions_mail.module:278
+msgid "Legacy template"
+msgstr "Alte Maske"
+
+#: subscriptions_mail.module:284
+msgid "You have Subscriptions 5.x-1.x-dev template variables defined in your database.<br />As long as these are in place, the template values below will be ignored!"
+msgstr "In der Datenbank ist eine Maske von Subscriptions 5.x-1.x-dev definiert.<br />Solange diese vorhanden ist, werden die untenstehenden Masken(teile) nicht verwendet!"
+
+#: subscriptions_mail.module:288
+msgid "Remove legacy template"
+msgstr "Alte Maske entfernen"
+
+#: subscriptions_mail.module:300
+msgid "(if the sender is visible)"
+msgstr "(falls der Sender sichtbar ist)"
 
 #: subscriptions_mail.module:209;217
 msgid "subscriptions"
@@ -955,19 +971,19 @@ msgstr "'von Autor' Optionen anzeigen"
 msgid "If you don't want your users to subscribe 'by author', then turn this off.  Default is ON."
 msgstr "Deaktivieren, wenn die Site keine Autor-spezifischen Abonnemente anbieten soll. Standard ist EIN."
 
-#: subscriptions.install:250
+#: subscriptions.install:253
 msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
 msgstr "Die alte \"!subscriptions_holding\" Tabelle wurde umbenannt in \"!subscriptions_holding_old\". Um allenfalls wieder zu einer alten !subscriptions_module-Version vor 5.x-2.0 zurückzukehren, muss das Umbenennen rückgängig gemacht werden."
 
-#: subscriptions.install:320
+#: subscriptions.install:323
 msgid "If the !subscriptions_module module upgrade succeeded, then the \"!subscriptions\" table has been upgraded, and the old version was saved as \"!subscriptions_old.\" To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table."
 msgstr "Wenn das !subscriptions_module-Modul erfolgreich erneuert wurde, dann wurde die \"!subscriptions\" Tabelle ebenfalls erneuert, und die alte Version wurde als \"!subscriptions_old\" gesichert. Um allenfalls auf eine !subscriptions_module-Version vor 5.x-2.0 zurückzukehren, muss die alte Tabelle wieder installiert werden."
 
-#: subscriptions.install:330
+#: subscriptions.install:333
 msgid "There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!"
 msgstr "Es gibt bereits eine !subscriptions_old-Tabelle &mdash; die !subscriptions-Tabelle wurde nicht erneuert!"
 
-#: subscriptions.install:543
+#: subscriptions.install:547
 msgid "Your email template variables were updated."
 msgstr "Die E-Mail-Vorlagen wurden konvertiert."
 
