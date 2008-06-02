@@ -493,6 +493,10 @@ function _subscriptions_get_setting($name, $account) {
     while ($s = db_fetch_array($result)) {
       $defaults[$s['uid']] = $s;
     }
+    if (empty($defaults[$uid])) {
+      drupal_set_message(t('Database error: user !uid not found in {subscriptions_user} table!', array('!uid' => $uid)), 'error', FALSE);
+      $uid = -DRUPAL_AUTHENTICATED_RID;
+    }
     $defaults[$uid]['uses_defaults'] = FALSE;
     foreach ($defaults[$uid] as $key => $value) {
       if ($value < 0) {  // not set, use site dft
