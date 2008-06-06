@@ -297,7 +297,8 @@ function subscriptions_queue($event) {
           SELECT u.uid, u.name, u.mail, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, su.last_sent, '%s', '%s', '%d'
           FROM {subscriptions} s
           INNER JOIN {subscriptions_user} su ON s.recipient_uid = su.uid
-          INNER JOIN {users} u USING(uid) $join
+          INNER JOIN {users} u ON su.uid = u.uid
+          $join
           WHERE
             s.module = '%s' AND
             s.field = '%s' AND
