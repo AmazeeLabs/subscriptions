@@ -29,7 +29,7 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
       if ($arg0['module'] == 'node') {
         $node = $arg0['node'];
         $params['node']['tid'] = array(
-          'join' => 'INNER JOIN {term_node} t ON s.value = t.tid',
+          'join' => 'INNER JOIN {term_node} t ON s.value = CAST(t.tid AS CHAR)',
           'where' => 't.nid = %d',
           'args' => array($node->nid),
         );
@@ -211,7 +211,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
   $sql = db_rewrite_sql("
     SELECT s.value, s.send_interval, s.author_uid, s.send_comments, s.send_updates, t.tid, t.vid, t.name
     FROM {term_data} t
-    INNER JOIN {subscriptions} s ON t.tid = s.value
+    INNER JOIN {subscriptions} s ON CAST(t.tid AS CHAR) = s.value
     WHERE s.module = 'node' AND s.field = 'tid' AND s.recipient_uid = %d
     ORDER BY s.author_uid", 't', 'tid');
   $result = db_query($sql, $uid);
