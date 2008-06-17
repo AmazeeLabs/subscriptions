@@ -49,15 +49,10 @@ function subscriptions_content_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
       break;
     case 'fields': // Parameter is module
       if ($arg0 == 'node' || $arg0 == 'comment') {
-        $tr = 't';
         return array(
           'nid' => array(
             'mailvars_function' => '_subscriptions_content_node_mailvars',
             '!subs_type' => t('thread'),
-          ),
-          'tid' => array(
-            'mailvars_function' => '_subscriptions_content_node_mailvars',
-            '!subs_type' => $tr('category'),
           ),
           'type' => array(
             'mailvars_function' => '_subscriptions_content_node_mailvars',
@@ -548,7 +543,6 @@ function subscriptions_content_form_mail_edit_form_alter(&$form, &$form_state) {
  */
 function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
   global $user;
-  $tr = 't';
 
   if (isset($form['type']) && $form['type']['#value'] .'_node_form' == $form_id) {
     if (isset($form['options'])) {
