@@ -140,10 +140,7 @@ function subscriptions_menu() {
   );
 
   // Unsubscribe links
-  //if (arg(0) == 's' && arg(1) == 'del' && arg(7) == md5(drupal_get_private_key() . arg(2) . arg(3) . arg(4) . arg(5) . arg(6))) {
-  //  $items['s/del'] = array(
-  //          ^^^^^   Can't make it that short anymore, can we?
-  $items['subscriptions/rem/%/%/%/%/%/%'] = array(
+  $items['subscriptions/rem/%'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('subscriptions_delete_form', 2, 3, 4, 5, 6),
     'type' => MENU_CALLBACK,
@@ -350,7 +347,7 @@ function subscriptions_write_subscription($module, $field, $value, $author_uid, 
 /**
  * Returns Delete form based on the given parameters.
  */
-function subscriptions_delete_form($module, $field, $value, $author_uid, $recipient_uid) {
+function subscriptions_delete_form(&$form_state, $module, $field, $value, $author_uid, $recipient_uid) {
   $form['data'] = array('#type' => 'value', '#value' => array($module, $field, $value, $author_uid, $recipient_uid));
   return confirm_form($form, t('Are you sure you want to unsubscribe?'), '<front>', NULL, t('Unsubscribe'));
 }
