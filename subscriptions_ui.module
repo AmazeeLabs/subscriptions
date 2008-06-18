@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Provides a user interface for Subscriptions.
+ */
+
+/**
  * Implementation of hook_nodeapi().
  *
  * Inject the node subform into node pages (depending on the Display Settings).
@@ -300,7 +305,7 @@ function subscriptions_ui_node_form_submit($form, &$form_state) {
 function subscriptions_ui_form_subscriptions_settings_form_alter(&$form, &$form_state) {
   global $user;
   $tr = 't';
-    
+
   $form['display_settings'] = array(
       '#type' => 'fieldset',
       '#title' => t('Display settings'),

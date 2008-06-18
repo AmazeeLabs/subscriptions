@@ -91,7 +91,7 @@ function subscriptions_menu() {
     'title' => 'Overview',
     'weight' => -10,
   );
-  
+
   foreach (subscriptions_types() as $stype => $data) {
     $items['subscriptions/add/'. $stype] = array(
       'title' => 'Add subscription',
@@ -120,7 +120,7 @@ function subscriptions_menu() {
       'access arguments' => array(1, $data['access']),
       'weight' => (isset($data['weight']) ? $data['weight'] : 0),
     );
-    
+
     if ($stype == 'node') {
       continue;  // not in site settings
     }
@@ -134,7 +134,7 @@ function subscriptions_menu() {
       'weight' => (isset($data['weight']) ? $data['weight'] : 0),
     );
   }
-  
+
   $items['subscriptions/add/node'] = array(
     'title' => 'Add subscription',
     'page callback' => 'drupal_get_form',
@@ -153,7 +153,7 @@ function subscriptions_menu() {
     'access arguments' => array(2, 3, 4, 5, 6, 7),
   );
   return $items;
-  
+
   // potx fails to pick up these strings:
   t('Add subscription');
   t('Remove subscription');
@@ -251,11 +251,11 @@ function subscriptions_write($access_key, $module, $field, $value, $author_uid =
  */
 function subscriptions_queue($event) {
   global $user;
-  
+
   if (isset($event['node']->nid) && strpos('  '. variable_get('subscriptions_blocked_nodes', '') .' ', ' '. $event['node']->nid .' ')) {
     return;
   }
-  
+
   $event += array(
     'uid' => $user->uid,
     'load_args' => '',
@@ -383,7 +383,7 @@ function subscriptions_write_subscription($module, $field, $value, $author_uid, 
 function subscriptions_delete_form(&$form_state, $module, $field, $value, $author_uid, $recipient_uid) {
   $form['data'] = array('#type' => 'value', '#value' => array($module, $field, $value, $author_uid, $recipient_uid));
   // We might be called from subscriptions_del_form() and don't want to submit to subscriptions_del_form_submit():
-  $form['#submit'][] = 'subscriptions_delete_form_submit';   
+  $form['#submit'][] = 'subscriptions_delete_form_submit';
   return confirm_form($form, t('Are you sure you want to unsubscribe?'), '<front>', NULL, t('Unsubscribe'));
 }
 

@@ -136,7 +136,7 @@ function _subscriptions_taxonomy_types() {
 function subscriptions_taxonomy_form_subscriptions_settings_form_alter(&$form, &$form_state) {
   global $user;
   $tr = 't';
-      
+
   $form['taxonomy'] = array(
     '#type' => 'fieldset',
     '#title' => t('Taxonomy settings'),

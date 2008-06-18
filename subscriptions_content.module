@@ -165,7 +165,7 @@ function _subscriptions_content_types() {
     'weight' => -2,
   );
   return $types;
-  
+
   // help potx to pick up these strings:
   t('subscribe to content');
   t('subscribe to content types');
@@ -288,7 +288,7 @@ function subscriptions_content_comment($comment, $op) {
 }
 
 /**
- * Implementation of hook_form_alter()
+ * Implementation of hook_form_alter().
  *
  * Add the Content Settings part to admin/settings/subscriptions,
  *
@@ -349,7 +349,7 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
 }
 
 /**
- * Implementation of hook_form_alter()
+ * Implementation of hook_form_alter().
  *
  * Add additional fields to the node and digest Mail Editor forms.
  *
@@ -536,7 +536,7 @@ function subscriptions_content_form_mail_edit_form_alter(&$form, &$form_state) {
 }
 
 /**
- * Implementation of hook_form_alter()
+ * Implementation of hook_form_alter().
  *
  * Add the Send Subscriptions Notifications checkbox to the Publishing Options
  * fieldset on the node edit form.
@@ -563,11 +563,10 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
       );
     }
   }
-  
 }
 
 /**
- * Implementation of hook_form_alter()
+ * Implementation of hook_form_alter().
  *
  * Add submit handler to catch bulk content moderation submissions.
  *
@@ -582,7 +581,7 @@ function subscriptions_content_form_node_admin_nodes_alter(&$form, &$form_state)
 }
 
 /**
- * Implementation of hook_form_alter()
+ * Implementation of hook_form_alter().
  *
  * Add the Send Subscriptions Notifications checkbox to the Administration Options
  * fieldset on the comment edit form.
@@ -823,7 +822,9 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
 }
 
 /**
- * Provide mailkeys for mail_edit. Implementation of hook_mailkeys().
+ * Implementation of hook_mailkeys().
+ *
+ * Provide mailkeys for mail_edit.
  *
  * The basic format is subscriptions dash module dash field. If the possible
  * values can be enumerated, like node types, profile fields, etc. then we add

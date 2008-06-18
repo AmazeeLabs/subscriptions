@@ -32,7 +32,7 @@ function subscriptions_mail_cron() {
   $lost_seconds = timer_read('page')/1000;
   $available_seconds = $total_seconds - $lost_seconds;
   //TEST: watchdog('cron', "Subscriptions has $available_seconds of $total_seconds seconds available.");
-  
+
   while (($mails_allowed <= 0 || $single_count + count($mails) < $mails_allowed)
           && $total_seconds - timer_read('page')/1000 > $available_seconds*variable_get('subscriptions_cron_percent', 50)/100) {
     subscriptions_mail_mail_edit_variables($null = NULL);  // clear cache
@@ -199,7 +199,7 @@ function subscriptions_mail_cron() {
 }
 
 /**
- * Implementation of hook_mail.
+ * Implementation of hook_mail().
  */
 function subscriptions_mail($key, &$message, $params) {
   $message['subject'] = $params['context']['subject'];
@@ -212,7 +212,7 @@ function subscriptions_mail($key, &$message, $params) {
  */
 function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, $uid) {
   global $user;
-  
+
   $mail_success = drupal_mail('subscriptions', $mailkey, $to, user_preferred_language($user), array(
     'account' => $user,
     'object' => NULL,
@@ -257,7 +257,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
   if (empty($_POST) && (substr($url, 0, 8) == 'http:///' || substr($url, 0, 17) == 'http://localhost/')) {
     drupal_set_message(t('Your installation returns %url as the base URL of the site. This is probably not what you want, and it can usually be fixed by setting the %variable variable in your %file file.', array('%url' => $url, '%variable' => '$base_url', '%file' => 'settings.php')), 'error');
   }
-  
+
   $form['mail_settings'] = array(
       '#type' => 'fieldset',
       '#title' => t('Mail settings'),
@@ -321,7 +321,7 @@ function subscriptions_mail_form_mail_edit_form_alter(&$form, &$form_state) {
       $expl = $form['help']['#variables'][$key];
       if ($expl[strlen($expl)-1] == '.') {
         $add_dot = TRUE;
-        $expl = substr($expl, 0, strlen($expl) - 1);
+        $expl = drupal_substr($expl, 0, drupal_strlen($expl) - 1);
       }
       $expl .= ' '. t('(if the sender is visible)') . (!empty($add_dot) ? '.' : '');
       $form['help']['#variables'][$key] = $expl;

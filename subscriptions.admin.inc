@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Subscriptions module (load-on-demand admin functions).
+ */
+
+/**
  * Site Settings form at admin/settings/subscriptions.
  * Other submodules contribute additional parts to this form.
  */
@@ -9,7 +14,7 @@ function subscriptions_settings_form(&$form_state) {
   global $user;
   $form = array();
   $tr = 't';
-  
+
   $form['links'] = array(
     '#type' => 'fieldset',
     '#title' => t('Links'),
@@ -35,8 +40,8 @@ function subscriptions_settings_form(&$form_state) {
     '#value' => '<div>'. l(t('My subscriptions'), 'user/'. $user->uid .'/subscriptions') .'</div>',
     '#weight' => 10,
   );
-  
-  
+
+
   //$form['sub_settings'] = array(
   //    '#type' => 'fieldset',
   //    '#title' => t('General settings'),
@@ -113,7 +118,7 @@ function theme_subscriptions_form_table($element) {
     }
   }
   unset($columns[end(array_keys($columns))]['width']);  // let the last column grow
-  
+
   foreach (element_children($element['checkboxes']) as $key) {
     foreach (element_children($element['checkboxes'][$key]) as $key1) {
       $row = array();
@@ -286,7 +291,7 @@ function subscriptions_page_user_overview($account) {
   // give other modules a chance to add their count(s)
   $more_counts = module_invoke_all('count_user_subscriptions', $counts, $uid);
   $counts = array_merge($counts, $more_counts);
-  
+
   $tr = 't';
   $header = array(array('data' => $tr('Type'), 'width' => '20%'), t('Number'));
   $types = subscriptions_types();
@@ -306,7 +311,7 @@ function subscriptions_page_user_overview($account) {
   $output  = theme('table', $header, $rows);
   $output .= theme('item', array('#value' => '', '#description' => t('Note: The counts on this page may differ from the ones on the detail pages for various technical reasons.')));
   $output .= '<br />';
-  
+
   $output .= drupal_get_form('subscriptions_user_settings_form', $account);
   drupal_set_title($uid < 0 ? t('Subscriptions') : check_plain($account->name));
   return $output;
@@ -323,7 +328,7 @@ function subscriptions_page_user_overview($account) {
  */
 function subscriptions_user_settings_form(&$form_state, $account) {
   global $user;
-  
+
   $uid = (isset($account) ? $account->uid : -DRUPAL_AUTHENTICATED_RID);
   $tr = 't';
   $form['settings'] = array(
@@ -671,7 +676,7 @@ function subscriptions_add_form_submit($form, &$form_state) {
  */
 function subscriptions_del_form(&$form_state, $stype, $sid, $author_uid = NULL) {
   global $user;
-  
+
   if ($a = module_invoke_all('subscriptions', 'stype', $stype, $sid, (isset($author_uid) ? $author_uid : -1))) {
     list($module, $field, $value, $author_uid) = $a;
     return subscriptions_delete_form($form_state, $module, $field, $value, $author_uid, $user->uid);
