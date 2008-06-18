@@ -685,7 +685,7 @@ msgid "Note: For standard Subscriptions functionality you need to enable the fol
 msgstr ""
 
 #: subscriptions.install:134
-msgid "(requires !mail_edit and uses !HTML_to_text if available)"
+msgid "(requires !mail_edit for customizing the templates)"
 msgstr ""
 
 #: subscriptions.install:223
@@ -725,7 +725,7 @@ msgid "Subscriptions Mail"
 msgstr "שולח הודעות מנויים בדוא\"ל"
 
 #: subscriptions_mail.info:0
-msgid "Sends out mails with drupal_mail, relying on the separate mail_edit module."
+msgid "Sends out mails with drupal_mail, customizable with the separate mail_edit module."
 msgstr ""
 
 #: subscriptions_taxonomy.info:0

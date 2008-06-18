@@ -898,8 +898,8 @@ msgid "Note: For standard Subscriptions functionality you need to enable the fol
 msgstr "Nota: per le funzionalità di Iscrizione standard devi attivare i seguenti moduli:"
 
 #: (duplicate) subscriptions.install:137
-msgid "(requires !mail_edit and uses !HTML_to_text if available)"
-msgstr "(richiede !mail_edit e usa !HTML_to_text se disponibile)"
+msgid "(requires !mail_edit for customizing the templates)"
+msgstr "(richiede !mail_edit per adattare gli modelli)"
 
 #: (duplicate) subscriptions.install:238
 msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
@@ -938,8 +938,8 @@ msgid "Subscriptions Mail"
 msgstr "Iscrizioni e-mail"
 
 #: subscriptions_mail.info:0
-msgid "Sends out mails with drupal_mail, relying on the separate mail_edit module."
-msgstr "Invia le e-mail con drupal_mail, appoggiandosi al module separato mail_edit."
+msgid "Sends out mails with drupal_mail, customizable with the separate mail_edit module."
+msgstr "Invia le e-mail con drupal_mail, adattibile con il module separato mail_edit."
 
 #: subscriptions_taxonomy.info:0
 msgid "Taxonomy Subscriptions"

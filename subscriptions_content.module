@@ -165,8 +165,11 @@ function _subscriptions_content_types() {
     'weight' => -2,
   );
   return $types;
+  
+  // help potx to pick up these strings:
   t('subscribe to content');
   t('subscribe to content types');
+  t('Pages');
 }
 
 /**

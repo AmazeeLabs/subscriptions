@@ -27,7 +27,7 @@ msgid "My subscriptions"
 msgstr "Mes abonnements"
 
 #: subscriptions.admin.inc:70
-msgid "Show the installation reminder above again."
+msgid "Keep showing the installation reminder above."
 msgstr "Toujours afficher le rappel ci-dessus."
 
 #: subscriptions.admin.inc:72
@@ -294,12 +294,12 @@ msgid "Daily"
 msgstr "Tous les jours"
 
 #: subscriptions.install.inc:10
-msgid "Note: for standard Subscriptions functionality you need to enable the following modules:"
+msgid "Note: For standard Subscriptions functionality you need to enable the following modules:"
 msgstr "NB: pour un fonctionnement standard, les modules suivantes doivent être activées:"
 
 #: subscriptions.install.inc:12
-msgid "(requires !mail_edit and uses !HTML_to_text if available)"
-msgstr "(nécessite !mail_edit et se sert de !HTML_to_text si disponible)"
+msgid "(requires !mail_edit for customizing the templates)"
+msgstr "(nécessite !mail_edit pour adapter les masqes)"
 
 #: subscriptions_mail.templates.inc:16
 msgid "| --------------------------------------------------------------------\n"
@@ -906,8 +906,8 @@ msgid "Subscriptions Mail"
 msgstr "Abonnements Mail"
 
 #: subscriptions_mail.info:0
-msgid "Sends out mails with drupal_mail, relying on the separate mail_edit module."
-msgstr "Permet l'envoi de messages avec drupal_mail, et nécessite le module séparé mail_edit."
+msgid "Sends out mails with drupal_mail, customizable with the separate mail_edit module."
+msgstr "Permet l'envoi de messages avec drupal_mail, qui peuvent être adaptée avec le module séparé mail_edit."
 
 #: subscriptions_taxonomy.info:0
 msgid "Taxonomy Subscriptions"
