@@ -5,7 +5,7 @@
  * Site Settings form at admin/settings/subscriptions.
  * Other submodules contribute additional parts to this form.
  */
-function subscriptions_settings_form() {
+function subscriptions_settings_form(&$form_state) {
   global $user;
   $form = array();
   $tr = 't';
@@ -551,7 +551,7 @@ function subscriptions_user_settings_form_submit($form, &$form_state) {
  *
  * @see _subscriptions_menu()
  */
-function subscriptions_intervals() {
+function subscriptions_intervals(&$form_state) {
   $default = '';
   foreach (_subscriptions_send_intervals() as $interval => $text) {
     $default .= "$interval|$text\n";
@@ -601,7 +601,7 @@ function subscriptions_intervals_submit($form, &$form_state) {
  * @ingroup forms
  * @see _subscriptions_menu()
  */
-function subscriptions_add_form($stype, $sid, $author_uid = NULL) {
+function subscriptions_add_form(&$form_state, $stype, $sid, $author_uid = NULL) {
   global $user;
   $form['sid'] = array('#type' => 'value', '#value' => $sid);
   $form['uid'] = array('#type' => 'value', '#value' => $user->uid);
@@ -646,7 +646,9 @@ function subscriptions_add_form_submit($form, &$form_state) {
     drupal_set_message(t('Your subscription was activated.'));
     $form_state['redirect'] = '<front>';
   }
-  drupal_set_message(t('Your subscription could not be activated.'));
+  else {
+    drupal_set_message(t('Your subscription could not be activated.'));
+  }
 }
 
 /**
@@ -665,7 +667,7 @@ function subscriptions_add_form_submit($form, &$form_state) {
  * @ingroup forms
  * @see _subscriptions_menu()
  */
-function subscriptions_del_form($stype, $sid, $author_uid = NULL) {
+function subscriptions_del_form(&$form_state, $stype, $sid, $author_uid = NULL) {
   global $user;
   
   if ($a = module_invoke_all('subscriptions', 'stype', $stype, $sid, (isset($author_uid) ? $author_uid : -1))) {
