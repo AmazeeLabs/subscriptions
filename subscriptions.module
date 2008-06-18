@@ -153,6 +153,15 @@ function subscriptions_menu() {
     'access arguments' => array(2, 3, 4, 5, 6, 7),
   );
   return $items;
+  
+  // potx fails to pick up these strings:
+  t('Add subscription');
+  t('Remove subscription');
+  t('Enables site settings for user subscriptions.');
+  t('Site settings');
+  t('User defaults');
+  t('Overview');
+  t('Interval');
 }
 
 function _subscriptions_rem_access($a2, $a3, $a4, $a5, $a6, $md) {
@@ -521,7 +530,7 @@ function _subscriptions_get_setting($name, $account) {
       $defaults[$s['uid']] = $s;
     }
     if (empty($defaults[$uid])) {
-      drupal_set_message(t('Database error: user !uid not found in {subscriptions_user} table!', array('!uid' => $uid)), 'error', FALSE);
+      drupal_set_message(t('Database error: user !uid not found in !table table!', array('!uid' => $uid, '!table' => '{subscriptions_user}')), 'error', FALSE);
       $uid = -DRUPAL_AUTHENTICATED_RID;
     }
     $defaults[$uid]['uses_defaults'] = FALSE;
