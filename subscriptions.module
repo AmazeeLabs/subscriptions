@@ -29,6 +29,12 @@ function subscriptions_init() {
   if (arg(0) == 'subscriptions' || arg(2) == 'subscriptions') {
     include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.admin.inc';  // TODO: do we need this?
   }
+  if (arg(0) == 's' && arg(1) == 'del') {
+    $router_item = menu_get_item('subscriptions/rem/'. substr($_GET['q'], 6));
+    if (isset($router_item) && $router_item['access']) {
+      menu_set_item($_GET['q'], $router_item);
+    }
+  }
 }
 
 /**

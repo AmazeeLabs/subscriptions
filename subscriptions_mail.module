@@ -112,7 +112,7 @@ function subscriptions_mail_cron() {
             '!manage_url' => url($base .'subscriptions', array('absolute' => TRUE)),
             '!name' => $s['name'],
             '!subs_type' => $fields[$locale][$module][$field]['!subs_type'],
-            '!unsubscribe_url' => url("subscriptions/rem/$module/$ori_field/$ori_value/". $s['author_uid'] .'/'. $s['uid'] .'/'. md5(drupal_get_private_key() . $module . $ori_field . $ori_value . $s['author_uid'] . $s['uid']), array('absolute' => TRUE)),
+            '!unsubscribe_url' => url("s/del/$module/$ori_field/$ori_value/". $s['author_uid'] .'/'. $s['uid'] .'/'. md5(drupal_get_private_key() . $module . $ori_field . $ori_value . $s['author_uid'] . $s['uid']), array('absolute' => TRUE)),
           );
           $mailvars_function($mailvars, $object, $field, $s);
           $mailvars += module_invoke_all('subscriptions_get_mailvars', $object);
