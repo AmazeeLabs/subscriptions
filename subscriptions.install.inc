@@ -9,7 +9,7 @@ function _subscriptions_install_information() {
   $tr = $t;
   drupal_set_message($t('Note: For standard Subscriptions functionality you need to enable the following modules:')
                      .'<ul><li>'. $tr('Subscriptions UI') .'</li><li>'. $tr('Subscriptions Mail ') .
-                      $t('(requires !mail_edit)',
+                      $t('(requires !mail_edit for customizing the templates)',
                         array(
                          '!mail_edit' => l($tr('Mail Editor'), 'http://drupal.org/project/mail_edit', array('target' => '_blank')),
                         ))
