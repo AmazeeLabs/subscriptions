@@ -13,7 +13,7 @@ function _subscriptions_install_information() {
                         array(
                          '!mail_edit' => l($tr('Mail Editor'), 'http://drupal.org/project/mail_edit', array('target' => '_blank')),
                         ))
-                     .'</li><li>'. $tr('Content Subscriptions') .'</li><li>'. $tr('Taxonomy Subscriptions') .'</li></ul>');
+                     .'</li><li>'. $tr('Content Subscriptions') .'</li><li>'. $tr('Taxonomy Subscriptions') .'</li></ul>', 'warning');
                      
 }
 
