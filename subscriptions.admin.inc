@@ -500,7 +500,7 @@ function subscriptions_user_settings_form(&$form_state, $account) {
       '#value'       => t('Reset to site defaults'),
     );
   }
-  $form['settings']['#submit']['subscriptions_user_options_submit'] = array();
+  $form['settings']['#submit'][] = 'subscriptions_user_options_submit';
   return $form;
 }
 
