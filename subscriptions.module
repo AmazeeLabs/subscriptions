@@ -135,15 +135,6 @@ function subscriptions_menu() {
     );
   }
 
-  $items['subscriptions/add/node'] = array(
-    'title' => 'Add subscription',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('subscriptions_add_form', 'nid'),  // TODO: was 'node', now 'nid'  -- do we need this at all?
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('subscribe to content'),
-  );
-
   // Unsubscribe links
   $items['subscriptions/rem/%'] = array(
     'page callback' => 'drupal_get_form',
