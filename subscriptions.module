@@ -101,7 +101,6 @@ function subscriptions_menu() {
       'access arguments' => array($data['access']),
     );
     $items['subscriptions/del/'. $stype] = array(
-      'title' => 'Remove subscription',
       'type' => MENU_CALLBACK,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('subscriptions_del_form', $stype),
@@ -351,13 +350,37 @@ function subscriptions_write_subscription($module, $field, $value, $author_uid, 
 }
 
 /**
- * Returns Delete form based on the given parameters.
+ * Provide the form definition for deleting subscriptions via
+ * s/del/... (aka subscriptions/rem/...) link.
+ *
+ * Callback of _subscriptions_menu().
+ *
+ * @param $form_state
+ *   FAPI form state.
+ * @param $module
+ *   Module that controls the subscription.
+ * @param $field
+ *   Field that controls the subscription (subscription type).
+ * @param $value
+ *   Subscription parameter (depends on type).
+ * @param $author_uid
+ *   User ID for author-specific subscriptions or -1/NULL for all authors.
+ * @param $recipient_uid
+ *   User ID of the subscriber.
+ *
+ * @ingroup forms
+ * @see _subscriptions_menu()
  */
 function subscriptions_delete_form(&$form_state, $module, $field, $value, $author_uid, $recipient_uid) {
   $form['data'] = array('#type' => 'value', '#value' => array($module, $field, $value, $author_uid, $recipient_uid));
+  // We might be called from subscriptions_del_form() and don't want to submit to subscriptions_del_form_submit():
+  $form['#submit'][] = 'subscriptions_delete_form_submit';   
   return confirm_form($form, t('Are you sure you want to unsubscribe?'), '<front>', NULL, t('Unsubscribe'));
 }
 
+/**
+ * Delete Subscription form submit handler.
+ */
 function subscriptions_delete_form_submit($form, &$form_state) {
   db_query("DELETE FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d", $form_state['values']['data']);
   drupal_set_message(t('Your subscription was deactivated.'));

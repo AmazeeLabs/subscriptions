@@ -652,11 +652,13 @@ function subscriptions_add_form_submit($form, &$form_state) {
 }
 
 /**
- * Provide the form definition for removing subscriptions via
+ * Provide the form definition for deleting subscriptions via
  * subscriptions/del/... link.
  *
  * Callback of _subscriptions_menu() in subscriptions.module.
  *
+ * @param $form_state
+ *   FAPI form state.
  * @param $stype
  *   Subscription type.
  * @param $sid
@@ -672,17 +674,9 @@ function subscriptions_del_form(&$form_state, $stype, $sid, $author_uid = NULL) 
   
   if ($a = module_invoke_all('subscriptions', 'stype', $stype, $sid, (isset($author_uid) ? $author_uid : -1))) {
     list($module, $field, $value, $author_uid) = $a;
-    $form['data'] = array('#type' => 'value', '#value' => array($module, $field, $value, $author_uid, $user->uid));
-    return confirm_form($form, t('Are you sure you want to unsubscribe?'), '<front>', NULL, t('Unsubscribe'));
+    return subscriptions_delete_form($form_state, $module, $field, $value, $author_uid, $user->uid);
   }
   drupal_set_message(t('Your subscription could not be deactivated.'));
-}
-
-/**
- * Remove Subscription form submit handler.
- */
-function subscriptions_del_form_submit($form, &$form_state) {
-  subscriptions_delete_form_submit($form, &$form_state);
 }
 
 /**
