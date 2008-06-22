@@ -263,7 +263,7 @@ function subscriptions_page($account, $stype) {
   //drupal_add_link(array(
   //  'rel' => 'alternate',
   //  'type' => 'application/rss+xml',
-  //  'title' => t("!name Subscriptions", array('!name' => $user->name)),
+  //  'title' => t('!name Subscriptions', array('!name' => $user->name)),
   //  'href' => url('subscriptions/feed'),
   //));
   drupal_set_title(isset($account) ? check_plain($account->name) : t('Subscriptions'));
@@ -303,7 +303,7 @@ function subscriptions_page_user_overview($account) {
     $has_access = ($uid < 0 && user_access('administer site configuration')) || user_access($type['access'], $account);
     if ($has_access || user_access('administer user subscriptions')) {
       $rows[] = array(
-        ($has_access ? l($type['title'], ($uid < 0 ? "admin/settings/subscriptions/userdefaults/$stype" : "user/$account->uid/subscriptions/$stype")) : $type['title']),
+        ($has_access ? l($tr($type['title']), ($uid < 0 ? "admin/settings/subscriptions/userdefaults/$stype" : "user/$account->uid/subscriptions/$stype")) : $type['title']),
         isset($counts[$type['fields'][0]][$type['fields'][1]]) ? $counts[$type['fields'][0]][$type['fields'][1]] : 0,
       );
     }
