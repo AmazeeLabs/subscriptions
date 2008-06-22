@@ -710,7 +710,7 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
   if (!isset($intervals)) {
     $intervals = _subscriptions_send_intervals();
   }
-  if (($author_uid == $subscription['author_uid'])) {
+  if (isset($subscription['author_uid']) && ($author_uid == $subscription['author_uid'])) {
     $defaults['checkboxes'][$key][$author_uid] = 1;
   }
   $defaults['send_interval'][$key][$author_uid] = $subscription['send_interval'];
@@ -720,7 +720,7 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
   if ($subscription['send_updates']) {
     $defaults['send_updates'][$key][$author_uid] = 1;
   }
-  if ($subscription['author_uid'] > 0) {
+  if (isset($subscription['author_uid']) && $subscription['author_uid'] > 0) {
     $author_value = check_plain(db_result(db_query('SELECT name FROM {users} WHERE uid = %d', $subscription['author_uid'])));
   }
   elseif ($author_uid == 0) {
