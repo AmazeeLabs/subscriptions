@@ -200,6 +200,11 @@ Both then_text and else_text can contain newlines and variables.
 Example:
 This {{!has_new_comments==1?has:doesn't have any}} new comments.
 
+Note: All the URL variables are built by calling the url() core function.
+You may be able to influence the return value of url() by setting $base_url 
+in settings.php. In any case, if you don't get what you expect, it's not 
+an issue of Subscriptions.
+
 
 
 
