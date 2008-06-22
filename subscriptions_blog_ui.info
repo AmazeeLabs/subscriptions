@@ -2,4 +2,7 @@
 name = Blog Subscriptions UI
 description = Provides a separate blogs subscriptions page.
 package = "Subscriptions"
-dependencies = subscriptions subscriptions_content blog
+dependencies[] = subscriptions
+dependencies[] = subscriptions_content
+dependencies[] = blog
+core = 6.x
