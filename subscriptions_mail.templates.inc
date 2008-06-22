@@ -11,7 +11,7 @@ define('SUBSCRIPTIONS_DIGEST_MAILKEY', 'subscriptions-digest');
 
 function subscriptions_mail_template_raw($key) {
   switch ($key) {
-  
+
     case 'SEP':      return // SUBSCRIPTIONS_DEFAULT_SEPARATOR
 t('| --------------------------------------------------------------------
 ');
