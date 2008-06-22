@@ -1,5 +1,8 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+
+Subscriptions 6.x-1.x-BETA1 (2008-06-22):
+   - Various fixes.
    - Initial port to D6 (ALPHA quality).
    - Copied Subscriptions 5.x-2.1-dev (2008-05-18).
