@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #273960: Fix multi-language support.
    - #273537: Allow translating the entries in the 'Type' column of the Overview page.
 
 Subscriptions 6.x-1.x-BETA1 (2008-06-22):
