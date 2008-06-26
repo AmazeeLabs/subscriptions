@@ -189,7 +189,7 @@ function subscriptions_page_form_submit($form, &$form_state) {
     }
   }
   if (!empty($rid0)) {
-    drupal_goto('admin/settings/subscriptions/userdefaults/'. arg(4) .'/'. $rid0);
+    $form_state['redirect'] = 'admin/settings/subscriptions/userdefaults/'. arg(4) .'/'. $rid0;
   }
 }
 

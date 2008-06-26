@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - Don't use drupal_goto() in a form submit handler.
    - #273960: Fix multi-language support.
    - #273537: Allow translating the entries in the 'Type' column of the Overview page.
 
