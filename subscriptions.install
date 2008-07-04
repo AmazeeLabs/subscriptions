@@ -116,7 +116,9 @@ function subscriptions_uninstall() {
     db_drop_table($ret, 'subscriptions_sent');           // incarnation of 5.x-2.0
   }
 
-  db_query("DELETE FROM {mail_edit} WHERE mailkey LIKE 'subscriptions-%'");
+  if (db_table_exists('mail_edit')) {
+    db_query("DELETE FROM {mail_edit} WHERE mailkey LIKE 'subscriptions-%'");
+  }
 
   variable_del('subscriptions_blocked_content_types');
   variable_del('subscriptions_blocked_nodes');
