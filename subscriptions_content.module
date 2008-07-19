@@ -414,7 +414,7 @@ function subscriptions_content_form_mail_edit_form_alter(&$form, &$form_state) {
       '!title' => t('The title of the subscriptions item.'),
       '!teaser' => t('An excerpt of the subscriptions item.'),
       '!body' => t('The body of the subscriptions item.'),
-      '!full_node' => t('The full node as it appears on the website (requires the %HTML_to_text module to be installed, and must be specifically enabled !here).', array('%HTML_to_text' => $tr('HTML to text'), '!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node')))),
+      '!full_node' => t('The full node as it appears on the website (must be specifically enabled !here).', array('!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node')))),
       '!url' => t('The URL of the item.'),
       '!unsubscribe_url' => t('The user can unsubscribe by clicking this link.'),
     );
@@ -679,16 +679,10 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
  * Convert text with formatting into plain text.
  */
 function _subscriptions_content_format_text($text, $format = NULL) {
-  static $have_HTML_to_text;
-  if (!isset($have_HTML_to_text)) {
-    $have_HTML_to_text = (substr(VERSION, 0, 1) > 5 || module_exists('html_to_text'));
-  }
   if (isset($format)) {
     $text = check_markup($text, $format, FALSE);
   }
-  if ($have_HTML_to_text) {
-    $text = drupal_html_to_text($text);
-  }
+  $text = drupal_html_to_text($text);
   if (module_exists('img_assist')) {
     $text = preg_replace('/\[img_assist\|.*\]/', '['. t('image on website') .']', $text);
   }

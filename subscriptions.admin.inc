@@ -64,8 +64,7 @@ function subscriptions_settings_form(&$form_state) {
         !module_exists('subscriptions_ui') ||
         !module_exists('subscriptions_mail') ||
         !module_exists('subscriptions_content') ||
-        !module_exists('subscriptions_taxonomy') ||
-        !module_exists('html_to_text'))) {
+        !module_exists('subscriptions_taxonomy'))) {
     if (empty($_POST)) {
       include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.install.inc';
       _subscriptions_install_information();

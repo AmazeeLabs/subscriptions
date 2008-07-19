@@ -48,10 +48,6 @@ For standard Subscriptions functionality you need to enable the following module
 * Content Subscriptions
 * Taxonomy Subscriptions (e.g. forums!)
 
-If you have any HTML in your content, e.g. URLs, then the HTML_to_text module
-(http://drupal.org/project/html_to_text) will provide much better text rendering,
-if it's installed.
-
 
 
 

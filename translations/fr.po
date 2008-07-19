@@ -540,8 +540,8 @@ msgid "The body of the subscriptions item."
 msgstr "Le corps de l'élément d'abonnement"
 
 #: subscriptions_content.module:413
-msgid "The full node as it appears on the website (requires the %HTML_to_text module to be installed, and must be specifically enabled !here)."
-msgstr "Le noeud complet comme il apparaît sur le site (nécessite l'installation du module %HTML_to_text et son activation !here)"
+msgid "The full node as it appears on the website (must be specifically enabled !here)."
+msgstr "Le noeud complet comme il apparaît sur le site (nécessite son activation !here)"
 
 #: subscriptions_content.module:413
 #: subscriptions_ui.module:309

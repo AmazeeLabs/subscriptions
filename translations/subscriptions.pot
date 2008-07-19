@@ -543,7 +543,7 @@ msgid "The body of the subscriptions item."
 msgstr ""
 
 #: subscriptions_content.module:418
-msgid "The full node as it appears on the website (requires the %HTML_to_text module to be installed, and must be specifically enabled !here)."
+msgid "The full node as it appears on the website (must be specifically enabled !here)."
 msgstr ""
 
 #: subscriptions_content.module:418 subscriptions_ui.module:318

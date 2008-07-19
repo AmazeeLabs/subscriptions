@@ -638,8 +638,8 @@ msgid "The body of the subscriptions item."
 msgstr "Der Inhalt des Beitrages."
 
 #: subscriptions_content.module:418
-msgid "The full node as it appears on the website (requires the %HTML_to_text module to be installed, and must be specifically enabled !here)."
-msgstr "Der ganze Inhalt, so wie er auf der Website erscheint (benötigt das %HTML_to_text Modul und muss !here aktiviert werden)."
+msgid "The full node as it appears on the website (must be specifically enabled !here)."
+msgstr "Der ganze Inhalt, so wie er auf der Website erscheint (muss !here aktiviert werden)."
 
 #: subscriptions_content.module:418
 #: subscriptions_ui.module:318
