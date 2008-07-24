@@ -45,7 +45,7 @@ function subscriptions_mail_cron() {
       $saved_language = $language;
       session_save_session(FALSE);
       $user = $users[$s['uid']];
-      $language = language_initialize();
+      drupal_init_language();
       $locale = $language->language;
       if ($user->status && $user->access) {
         $cids = array();
@@ -165,7 +165,7 @@ function subscriptions_mail_cron() {
     session_save_session(FALSE);
     foreach ($mails as $uid => $user_mails) {
       $user = $users[$uid];
-      $language = language_initialize();      
+      drupal_init_language();
       $locale = $language->language;
       $s = $user_mails['send'];
       if ($templates = db_fetch_object(db_query("SELECT * FROM {mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_DIGEST_MAILKEY))) {
