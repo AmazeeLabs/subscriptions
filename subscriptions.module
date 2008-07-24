@@ -521,6 +521,8 @@ function _subscriptions_get_setting($name, $account) {
       $defaults[$s['uid']] = $s;
     }
     if (empty($defaults[$uid])) {
+      // Note: This must not happen! subscriptions_user() takes care of inserting/removing records as users are created/deleted.
+      // If this happens, then users were created without calling the proper hooks.
       drupal_set_message(t('Database error: user !uid not found in !table table!', array('!uid' => $uid, '!table' => '{subscriptions_user}')), 'error', FALSE);
       $uid = -DRUPAL_AUTHENTICATED_RID;
     }

@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #281600: Add explanatory code comment for error message about missing {subscriptions_user} records (no significant functional changes).
    - #284442: Fix call to undefined function language_initialize() for sites that have only one language.
    - #282840: drupal_html_to_text() is now part of core, no more need for the HTML_to_text module.
    - #278107: Check for the existence of the {mail_edit} table before attempting to remove entries in subscriptions_uninstall().
