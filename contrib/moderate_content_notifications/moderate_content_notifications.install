@@ -8,12 +8,12 @@ function moderate_content_notifications_install() {
       db_query("CREATE TABLE {moderate_content_notifications} (
         `mcnid` int(10) unsigned NOT NULL auto_increment,
         `uid` int(10) unsigned NOT NULL default '0',
-        `nid` int UNSIGNED NOT NULL ,
-        `cid` int UNSIGNED NOT NULL , 
+        `nid` int UNSIGNED NOT NULL,
+        `cid` int UNSIGNED NOT NULL, 
         `type` varchar(10) NOT NULL default '',
-        `time_added` int( 11 ) UNSIGNED NOT NULL DEFAULT '0',
+        `time_added` int(11) UNSIGNED NOT NULL DEFAULT '0',
         `data` text NOT NULL,
-        PRIMARY KEY  (`mcnid`),
+        PRIMARY KEY (`mcnid`),
         KEY `uid` (`uid`),
         KEY `nid` (`nid`),
         KEY `cid` (`cid`),
@@ -22,14 +22,14 @@ function moderate_content_notifications_install() {
     break;
     case 'pgsql':
       db_query("CREATE TABLE {moderate_content_notifications} (
-        `mcnid` serial,
-        `uid` int unsigned NOT NULL default '0',
-        `nid` int UNSIGNED NOT NULL ,
-        `cid` int UNSIGNED NOT NULL , 
-        `type` varchar(10) NOT NULL default '',
-        `time_added` int UNSIGNED NOT NULL DEFAULT '0',
-        `data` text NOT NULL,
-        PRIMARY KEY  (`mcnid`)
+        mcnid serial,
+        uid int_unsigned NOT NULL default '0',
+        nid int_unsigned NOT NULL,
+        cid int_unsigned NOT NULL,
+        type varchar(10) NOT NULL default '',
+        time_added int_unsigned NOT NULL DEFAULT '0',
+        data text NOT NULL,
+        PRIMARY KEY (mcnid)
         )");
       db_query("CREATE INDEX {moderate_content_notifications}_uid_idx ON {moderate_content_notifications} (uid)");
       db_query("CREATE INDEX {moderate_content_notifications}_nid_idx ON {moderate_content_notifications} (nid)");
