@@ -925,8 +925,12 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     $form['#submit'][] = 'subscriptions_page_form_submit';
   }
   else {
-    $form['header']['#value'] = t('There are no subscribed pages.');
-    unset($form['footer']);
+    $form = array(
+      array(
+        '#type' => 'item',
+        '#value' => t('There are no subscribed pages.'),
+      ),
+    );
   }
   return $form;
 }
