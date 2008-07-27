@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #287591: Don't display Subscribe UI for anonymous users.
    - #269617: Fix pgsql section of contributed moderate_content_notifications_install().
    - #281600: Add explanatory code comment for error message about missing {subscriptions_user} records (no significant functional changes).
    - #284442: Fix call to undefined function language_initialize() for sites that have only one language.

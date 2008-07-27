@@ -16,7 +16,7 @@
  */
 function subscriptions_ui_nodeapi(&$node, $op, $teaser) {
   global $user;
-  if ($user->uid && $op == 'view' && $node->nid && !$teaser && subscriptions_ui_can_subscribe()) {
+  if ($op == 'view' && $node->nid && !$teaser && subscriptions_ui_can_subscribe()) {
     $node->content['subscriptions-anchor'] = array('#value' => '<a id="subscriptions"></a>', '#weight' => 99);
     if (!variable_get('subscriptions_form_in_block', 0) &&
         (!variable_get('subscriptions_form_link_only', 0) && (!arg(2) || arg(2) == 'view') ||
@@ -60,7 +60,9 @@ function subscriptions_ui_block($op = 'list', $delta = 0) {
  * Returns TRUE on node/NID pages if the NID is not blocked.
  */
 function subscriptions_ui_can_subscribe() {
-  return (arg(0) == 'node' && is_numeric(arg(1)) && !subscriptions_node_is_blocked(arg(1)) && user_access('subscribe to content'));
+  global $user;
+  
+  return ($user->uid && arg(0) == 'node' && is_numeric(arg(1)) && !subscriptions_node_is_blocked(arg(1)) && user_access('subscribe to content'));
 }
 
 /**
