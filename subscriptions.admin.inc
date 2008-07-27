@@ -94,7 +94,8 @@ function theme_subscriptions_form_table($element) {
   $output = '';
   $rows = array();
   drupal_add_js(drupal_get_path('module', 'subscriptions') .'/subscriptions_tableselect.js', 'module', 'header', FALSE, TRUE, FALSE);
-  $columns['checkboxes']    = array('data' => '&nbsp;', 'width' => '20%', 'class' => 'subscriptions-table');
+  $columns['checkboxes']    = array('data' => '&nbsp;', 'width' => '1%', 'class' => 'subscriptions-table');
+  $columns['labels']        = array('data' => '&nbsp;', 'width' => '18%');
   if ($element['send_interval']['#access']) {
     $columns['send_interval'] = array('data' => t('Send interval'), 'width' => '20%');
   }
@@ -728,6 +729,11 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
   else {
     $author_value = '';
   }
+
+  $form['labels'][$key][$author_uid] = array(
+    '#type' => 'item',
+    '#value' => $title,
+  );
   $form['author'][$key][$author_uid] = array(
     '#value' => $author_value,
   );
@@ -739,7 +745,6 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
   foreach (array('checkboxes', 'send_comments', 'send_updates') as $index => $name) {
     $form[$name][$key][$author_uid] = array(
       '#type' => 'checkbox',
-      '#title' => $index ? '' : $title,
       '#default_value' => !empty($defaults[$name][$key][$author_uid]),
     );
   }
