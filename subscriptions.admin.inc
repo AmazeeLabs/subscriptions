@@ -369,7 +369,7 @@ function subscriptions_user_settings_form(&$form_state, $account) {
   }
   $form['settings']['autosub'] = array(
     '#type'          => 'fieldset',
-    '#title'         => $tr('Auto-subscribe'),
+    '#title'         => t('Auto-subscribe'),
     '#access'        => !isset($account) || user_access('subscribe to content', $account),
   );
   $form['settings']['autosub']['autosub_post'] = array(
