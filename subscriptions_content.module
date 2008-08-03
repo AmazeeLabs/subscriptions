@@ -217,7 +217,7 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
       //  }
       //} else
       if ($node->uid > 0 && !$arg) {
-        subscriptions_autosubscribe('node', 'nid', $node->nid, ($op == 'insert' ? 'on_post' : 'on_update'));
+        _subscriptions_content_autosubscribe($node->type, 'node', 'nid', $node->nid, ($op == 'insert' ? 'on_post' : 'on_update'));
       }
 
       if ($node->subscriptions_notify) {
@@ -270,6 +270,7 @@ function subscriptions_content_comment($comment, $op) {
 
   if (!isset($comment['nomail']) && ($op == 'insert' || $op == 'update' || $op == 'publish')) {
     if (!isset($comment['subscriptions_notify']) || $comment['subscriptions_notify']) {
+      $node = node_load($comment['nid']);
       $event = array(
         'module' => 'node',
         'load_function' => 'subscriptions_content_comment_load',
@@ -278,12 +279,12 @@ function subscriptions_content_comment($comment, $op) {
         'type' => 'comment',
         'action' => $op,
         'is_new' => ($op != 'update' || $is_unpublished && $comment['status'] == COMMENT_PUBLISHED),
-        'node' => node_load($comment['nid']),
+        'node' => $node,
         'comment' => (object)$comment,
       );
       subscriptions_queue($event);
     }
-    subscriptions_autosubscribe('node', 'nid', $comment['nid'], 'on_comment');
+    _subscriptions_content_autosubscribe($node->type, 'node', 'nid', $comment['nid'], 'on_comment');
   }
 }
 
@@ -621,6 +622,29 @@ function subscriptions_content_node_admin_nodes_submit($form, &$form_state) {
       }
     }
   }
+}
+
+/**
+ * Auto-subscribe, if the content type is not blocked.
+ *
+ * @param $content_type
+ *   Content type of the node to subscribe to.
+ * @param $module
+ *   Parameter for subscriptions_autosubscribe().
+ * @param $field
+ *   Parameter for subscriptions_autosubscribe().
+ * @param $value
+ *   Parameter for subscriptions_autosubscribe().
+ * @param $context
+ *   Parameter for subscriptions_autosubscribe().
+ */
+function _subscriptions_content_autosubscribe($content_type, $module, $field, $value, $context)
+{
+  $blockeds = variable_get('subscriptions_blocked_content_types', array());
+  if (in_array($content_type, $blockeds)) {
+    return;
+  }
+  subscriptions_content_autosubscribe($module, $field, $value, $context);
 }
 
 /**

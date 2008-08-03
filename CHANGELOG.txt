@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #289965: 'Blocked content types' must override 'Auto-subscribe'.
    - #288553: Fix untranslated 'Auto-subscribe'.
    - #280182: Split the checkboxes and their labels into two separate columns to avoid toggling the checkboxes when clicking a label link.
    - Fix display of empty Page form.
