@@ -644,7 +644,7 @@ function _subscriptions_content_autosubscribe($content_type, $module, $field, $v
   if (in_array($content_type, $blockeds)) {
     return;
   }
-  subscriptions_content_autosubscribe($module, $field, $value, $context);
+  subscriptions_autosubscribe($module, $field, $value, $context);
 }
 
 /**
