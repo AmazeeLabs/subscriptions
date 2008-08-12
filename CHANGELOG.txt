@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #292654: On-comment subscriptions by author must check the node author, not the comment author.
    - #290882: Fix prior patch for #289965.
    - #289965: 'Blocked content types' must override 'Auto-subscribe'.
    - #288553: Fix untranslated 'Auto-subscribe'.

@@ -277,7 +277,9 @@ function subscriptions_queue($event) {
       foreach ($module_query as $field => $query) {
         $join = empty($query['join']) ? '' : $query['join'];
         $where = empty($query['where']) ? array() : array($query['where']);
-        $args = array($event['load_function'], $event['load_args'], $event['is_new'], $module, $field, $event['uid']);
+        $args = array($event['load_function'], $event['load_args'], $event['is_new'], $module, $field);
+        // author-specific subscriptions trigger on comments, when the node author is subscribed to:
+        $args[] = ($module == 'node' && $event['type'] == 'comment' && isset($event['node']->uid) ? $event['node']->uid : $event['uid']);
         if (!empty($query['value'])) {
           $where[] = "s.value = '%s'";
           $args[] = $query['value'];
@@ -306,11 +308,12 @@ function subscriptions_queue($event) {
             s.field = '%s' AND
             s.author_uid IN (%d, -1) AND $conditions";
         $result = db_query($sql, $args);
+        $affected_rows = db_affected_rows();
         /*  for debugging:
         $sql = db_prefix_tables($sql);
         _db_query_callback($args, TRUE);
         $sql = preg_replace_callback(DB_QUERY_REGEXP, '_db_query_callback', $sql);
-        drupal_set_message("$sql<br />". db_affected_rows() .' row(s) inserted.');
+        drupal_set_message("$sql<br />". $affected_rows .' row(s) inserted.');
         /**/
       }
     }
