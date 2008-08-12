@@ -1042,7 +1042,7 @@ function subscriptions_content_type_form(&$form_state, $account, $form) {
   return $form;
 }
 
-/*
+/**
  * Implementation of hook_cron().
  *
  * Ensure that we're heavier than the taxonomy.module.
@@ -1059,7 +1059,7 @@ function subscriptions_content_cron() {
   }
 }
 
-/*
+/**
  * Implementation of hook_disable().
  *
  * Remove our queue items.
