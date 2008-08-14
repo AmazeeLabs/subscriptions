@@ -16,9 +16,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Subscriptions 5.x-2.x\n"
+"Project-Id-Version: Subscriptions 6.x-1.x\n"
 "POT-Creation-Date: 2008-08-01 17:22+0200\n"
-"PO-Revision-Date: 2008-08-01 17:25+0100\n"
+"PO-Revision-Date: 2008-08-14 17:25+0100\n"
 "Last-Translator: Hans Salvisberg <drupal-xlat@salvisberg.com>\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr "Cron von Hand ausführen!"
 
 #: subscriptions.admin.inc:40
 msgid "My subscriptions"
-msgstr "Meine Abonnemente"
+msgstr "Meine Abonnements"
 
 #: subscriptions.admin.inc:74
 msgid "Keep showing the installation reminder above."
@@ -68,15 +68,15 @@ msgstr "Abonnements-Einstellungen gespeichert."
 
 #: subscriptions.admin.inc:212
 msgid "Admin Information"
-msgstr "Administrator-Information"
+msgstr "Administrator-Informationen"
 
 #: subscriptions.admin.inc:220
 msgid "The selected subscriptions will be given to <b>newly created</b> users."
-msgstr "Die ausgewählten Abonnemente werden <b>neu erzeugten</b> Benutzern hinzugefügt:"
+msgstr "Die ausgewählten Abonnements werden <b>neu erzeugten</b> Benutzern hinzugefügt:"
 
 #: subscriptions.admin.inc:232
 msgid "If a user has one or more roles assigned at creation time, then she will receive the additional subscriptions defined for these roles."
-msgstr "Wenn ein Benutzerkonto beim Erzeugen eine oder mehrere Rollen zugewiesen bekommt, dann erhält es automatisch auch die Abonnemente, die für diese Rollen definiert wurden."
+msgstr "Wenn ein Benutzerkonto beim Erzeugen eine oder mehrere Rollen zugewiesen bekommt, dann erhält es automatisch auch die für diese Rollen definierten Abonnements."
 
 #: subscriptions.admin.inc:237
 msgid "Role(s)"
@@ -84,7 +84,7 @@ msgstr "Rolle(n)"
 
 #: subscriptions.admin.inc:240
 msgid "Select the role to load or role(s) to save."
-msgstr "Rolle zum Laden bzw. eine oder mehrere Rollen zum Speichern."
+msgstr "Rolle zum Laden bzw. Rolle(n) zum Speichern auswählen."
 
 #: subscriptions.admin.inc:245
 msgid "Load"
@@ -92,12 +92,12 @@ msgstr "Laden"
 
 #: subscriptions.admin.inc:250
 msgid "Current subscriptions:"
-msgstr "Aktuelle Abonnemente:"
+msgstr "Aktuelle Abonnements:"
 
 #: subscriptions.admin.inc:257
 #: subscriptions_ui.module:219
 msgid "The master checkboxes on the left turn the given subscription on or off. Depending on the setup of the site, you may have additional options for active subscriptions."
-msgstr "Die Hauptankreuzfelder ganz links schalten ein Abonnement ein oder aus. Je nach Einstellung der Website kann es für eingeschaltete Abonnemente zusätzliche Optionen geben."
+msgstr "Die Hauptankreuzfelder ganz links schalten ein Abonnement ein oder aus. Je nach Einstellung der Website kann es für eingeschaltete Abonnements zusätzliche Optionen geben."
 
 #: subscriptions.admin.inc:269;316
 #: subscriptions_taxonomy.module:158
@@ -112,7 +112,7 @@ msgstr "Die Hauptankreuzfelder ganz links schalten ein Abonnement ein oder aus. 
 #: subscriptions_ui.info:0
 #: contrib/moderate_content_notifications/moderate_content_notifications.info:0
 msgid "Subscriptions"
-msgstr "Abonnemente"
+msgstr "Abonnements"
 
 #: subscriptions.admin.inc:296
 msgid "Number"
@@ -124,7 +124,7 @@ msgstr "Anmerkung: Aus technischen Gründen können die Zahlen auf dieser Seite 
 
 #: subscriptions.admin.inc:351
 msgid "The subtabs here under %User_defaults mirror those found at !My_account_Subscriptions, except that the fieldsets here come up already expanded. Please go there now and familiarize yourself with what's there!"
-msgstr "Die Subtabs hier unter %User_defaults spiegeln diejenigen unter !My_account_Subscriptions wieder, ausser dass die aufklappbaren Teile hier bereits aufgeklappt dargestellt werden. Bitte folgen Sie dem Link und schauen Sie, welche Einstellmöglichkeiten es dort für Ihre Benutzer gibt."
+msgstr "Die Unterreiter hier unter %User_defaults spiegeln diejenigen unter !My_account_Subscriptions wieder, ausser dass die aufklappbaren Teile hier bereits aufgeklappt dargestellt werden. Bitte folgen Sie dem Link und schauen Sie, welche Einstellmöglichkeiten es dort für Ihre Benutzer gibt."
 
 #: subscriptions.admin.inc:361
 msgid "The default settings that you define here are used for those users that haven't (yet) saved their own settings."
@@ -136,7 +136,7 @@ msgstr "Automatisch abonnieren"
 
 #: subscriptions.admin.inc:377
 msgid "Auto-subscribe to new content"
-msgstr "Inhalte automatisch abonnieren"
+msgstr "Neue Inhalte automatisch abonnieren"
 
 #: subscriptions.admin.inc:379
 msgid "Automatically subscribes you to items that you create."
@@ -180,7 +180,7 @@ msgstr "Voreinstellungen"
 
 #: subscriptions.admin.inc:416
 msgid "The frequency of notifications; it may take longer, but notifications will not be sent more frequently than indicated."
-msgstr "Die Häufigkeit der Benachrichtigungen; es kann auch länger dauern, aber die Benachrichtigungen werden nicht häufiger versandt, als angegeben."
+msgstr "Die Häufigkeit der Benachrichtigungen; es kann auch länger dauern, aber die Benachrichtigungen werden nicht häufiger versandt als angegeben."
 
 #: subscriptions.admin.inc:419;479
 msgid "On updates"
@@ -188,7 +188,7 @@ msgstr "Änderungen"
 
 #: subscriptions.admin.inc:422
 msgid "Sends a notification when an item is updated."
-msgstr "Benachrichtigen, wenn ein Beitrag geändert wurde."
+msgstr "Benachrichtigen, wenn ein Beitrag geändert wird."
 
 #: subscriptions.admin.inc:425;479
 msgid "On comments"
@@ -196,19 +196,19 @@ msgstr "Kommentare"
 
 #: subscriptions.admin.inc:428
 msgid "Sends a notification when an item receives a comment or reply."
-msgstr "Benachrichtigen, wenn ein Beitrag einen neuen Kommentar erhalten hat."
+msgstr "Benachrichtigen, wenn ein Beitrag einen neuen Kommentar erhält."
 
 #: subscriptions.admin.inc:431
 msgid "Any changes you make here will only apply to newly created subscriptions."
-msgstr "Allfällige Änderungen werden nur für neu erzeugte Abonnemente wirksam."
+msgstr "Alle hier vorgenommenen Änderungen werden nur auf neu erstellte Abonnements angewendet."
 
 #: subscriptions.admin.inc:435
 msgid "Visibility of controls"
-msgstr "Sichtbarkeit der Einstellelemente"
+msgstr "Sichtbarkeit der Steuerelemente"
 
 #: subscriptions.admin.inc:442
 msgid "The control(s) mentioned below appear(s) as one or more columns<br /> a) in the %Subscribe subform of node pages and<br /> b) on the sibling subtabs of this %Overview page.<br /> After you have set your %Preferences right above, you may want to hide the corresponding column(s), if you never change those values anyway."
-msgstr "Das/die untenstehenden Kontrollelemente beziehen sich auf eine oder mehrere Spalten, die an folgenden Orten vorkommen:<br /> a) im %Subscribe Teilformular auf Inhaltsseiten und <br /> b) auf den anderen Subtabs neben dieser %Overview-Seite.<br /> Nach dem Einstellen der %Preferences im vorhergehenden Abschnitt, können hier die betreffenden Spalten entfernt werden, wenn sie nicht benötigt werden."
+msgstr "Das/die untenstehenden Steuerelemente beziehen sich auf eine oder mehrere Spalten, die an folgenden Orten vorkommen:<br /> a) im %Subscribe Teilformular auf Inhaltsseiten und <br /> b) auf den anderen Subtabs neben dieser %Overview-Seite.<br /> Nach dem Einstellen der %Preferences im vorhergehenden Abschnitt, können hier die betreffenden Spalten entfernt werden, wenn sie nicht benötigt werden."
 
 #: subscriptions.admin.inc:444
 msgid "Visible"
@@ -220,11 +220,11 @@ msgstr "Versteckt"
 
 #: subscriptions.admin.inc:446
 msgid "Permanently hidden, except for the %preferences"
-msgstr "Permanent versteckt, ausgenommen die %preferences"
+msgstr "Permanent versteckt, ausser für die %preferences"
 
 #: subscriptions.admin.inc:447
 msgid "Completely inaccessible to the user"
-msgstr "Für die Benutzer unzugänglich"
+msgstr "Für den Benutzer vollständig unzugänglich"
 
 #: subscriptions.admin.inc:458
 msgid "Beyond defining the %Visible/%Hidden defaults for your users, you can"
@@ -232,7 +232,7 @@ msgstr "Über das Einstellen der %Visible/%Hidden Standard-Werte für die Benutz
 
 #: subscriptions.admin.inc:463
 msgid "permanently hide the columns (and the corresponding visibility controls), so that the users cannot make them visible anymore (they can still change their %Preferences though), or"
-msgstr "Die betreffenden Spalten (und die entsprechenden Elemente zum Kontrollieren der Sichtbarkeit) permanent entfernen, so dass die Benutzer sie nicht mehr sichtbar machen können; sie können allerdings weiterhin ihre %Preferences ändern."
+msgstr "Die betreffenden Spalten (und die entsprechenden Steuerelemente für die Sichtbarkeit) permanent entfernen, so dass die Benutzer sie nicht mehr sichtbar machen können; sie können allerdings weiterhin ihre %Preferences ändern."
 
 #: subscriptions.admin.inc:467
 msgid "you can even hide the %Preferences, so that what you've set right above is cast in stone."
@@ -322,7 +322,7 @@ msgid ""
 "| !manage_url\n"
 msgstr ""
 "| Dies ist eine automatische Benachrichtigung. Bitte NICHT antworten!\n"
-"| Sie können Ihre Abonnemente unter folgender Adresse verwalten:\n"
+"| Sie können Ihre Abonnements unter folgender Adresse verwalten:\n"
 "| !manage_url\n"
 
 #: subscriptions_mail.templates.inc:29
@@ -400,8 +400,8 @@ msgid ""
 msgstr ""
 "| Guten Tag, !name\n"
 "|\n"
-"| Ihre Abonnemente auf !site\n"
-"| benachrichtigen Sie über Änderungen seit der letzten Benachrichtigung:\n"
+"| Ihre Abonnements auf !site\n"
+"| benachrichtigen Sie über Änderungen seit der letzten Zusammenfassung:\n"
 "|\n"
 "!bodies!SEPARATOR!FOOTER"
 
@@ -441,7 +441,7 @@ msgstr "Abonnement löschen"
 
 #: subscriptions.module:151
 msgid "Enables site settings for user subscriptions."
-msgstr "Erlaubt globale Einstellungen für Abonnemente."
+msgstr "Erlaubt globale Einstellungen für Benutzer-Abonnements."
 
 #: subscriptions.module:152
 msgid "Site settings"
@@ -461,7 +461,7 @@ msgstr "Zustellung"
 
 #: subscriptions.module:187
 msgid "administer user subscriptions"
-msgstr "Abonnemente verwalten"
+msgstr "Benutzer-Abonnements verwalten"
 
 #: subscriptions.module:188
 #: subscriptions_content.module:333
@@ -470,7 +470,7 @@ msgstr "Alle Inhaltstypen abonnieren"
 
 #: subscriptions.module:378
 msgid "Are you sure you want to unsubscribe?"
-msgstr "Abonnement wirklich löschen?"
+msgstr "Soll das Abonnement wirklich gelöscht werden?"
 
 #: subscriptions.module:378
 msgid "Unsubscribe"
@@ -498,11 +498,11 @@ msgstr "Bezeichnung des CCK-Feldes %fieldname, wie für den !content_type defini
 
 #: subscriptions_cck.module:29
 msgid "The value(s) of the CCK field %fieldname, as defined for your !content_type, comma-separated."
-msgstr "Wert des CCK-Feldes %fieldname, wie für den !content_type definiert (durch Komma getrennt)."
+msgstr "Wert des CCK-Feldes %fieldname, wie für den !content_type definiert, durch Komma getrennt."
 
 #: subscriptions_cck.module:30
 msgid "The value(s) of the CCK field %fieldname, as defined for your !content_type, newline-separated."
-msgstr "Wert des CCK-Feldes %fieldname, wie für den !content_type definiert (ein Wert pro Zeile)."
+msgstr "Wert des CCK-Feldes %fieldname, wie für den !content_type definiert, ein Wert pro Zeile."
 
 #: subscriptions_content.module:55
 msgid "thread"
@@ -542,11 +542,11 @@ msgstr "Abonnements-Benachrichtigungen versenden"
 
 #: subscriptions_content.module:255
 msgid "Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out \"new\" notifications, unless you suppress this here."
-msgstr "Für nicht-publizierte Kommentare werden keine Abonnements-Benachrichtigungen verschickt (ausser an Benutzer mit der %administer_comments Berechtigung), aber wenn der !Status auf %Published geändert wird, dann werden \"neu\"-Benachrichtigungen verschickt; dies kann hier unterdrückt werden."
+msgstr "Für unveröffentlichte Kommentare werden keine Abonnements-Benachrichtigungen verschickt (ausser an Benutzer mit der %administer_comments Berechtigung), aber wenn der !Status auf %Published geändert wird, dann werden \"neu\"-Benachrichtigungen verschickt, solange dies hier nicht unterdrückt wird."
 
 #: subscriptions_content.module:261
 msgid "Subscriptions notifications are not sent for unpublished comments, except to users who have the %administer_comments permission, and you can even suppress the latter here."
-msgstr "Für nicht-publizierte Kommentare werden keine Abonnements-Benachrichtigungen verschickt, ausser an Benutzer mit der %administer_comments Berechtigung, und auch dies kann hier unterdrückt werden."
+msgstr "Für unveröffentlichte Kommentare werden keine Abonnements-Benachrichtigungen verschickt, ausser an Benutzer mit der %administer_comments Berechtigung, und auch letzteres kann hier unterdrückt werden."
 
 #: subscriptions_content.module:265
 msgid "You can suppress sending subscriptions notifications here."
@@ -567,7 +567,7 @@ msgstr "Weggelassene Inhaltstypen"
 
 #: subscriptions_content.module:319
 msgid "Select content types which should be <strong>removed from subscription listings</strong>.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by content type will be unavailable for the selected types."
-msgstr "Inhaltstypen wählen, die auf Auswahllisten nicht angezeigt werden sollen.<br />Die betroffenen Inhalte können weiterhin über andere Arten von Abonnenten abonniert werden, aber Abonnieren über die gewählten Inhaltstypen ist nicht mehr möglich."
+msgstr "Inhaltstypen wählen, die auf Auswahllisten nicht angezeigt werden sollen.<br />Die betroffenen Inhalte können weiterhin über andere Arten von Abonnenments abonniert werden, aber Abonnieren nach Inhaltstyp ist für die ausgewählten Inhaltstypen nicht mehr möglich."
 
 #: subscriptions_content.module:324
 msgid "Blocked content types"
@@ -575,7 +575,7 @@ msgstr "Gesperrte Inhaltstypen"
 
 #: subscriptions_content.module:327
 msgid "Select content types which should be <strong>completely unavailable for subscribing</strong>, i.e. content of the selected types will never trigger notifications for regular users."
-msgstr "Inhaltstypen wählen von Inhalten, die auf keine Art und Weise abonniert werden können sollen, d.h. Inhalte dieser Typen lösen für normale Benutzer keine Benachrichtigungen aus."
+msgstr "Inhaltstypen wählen von Inhalten, die auf keine Art und Weise abonniert werden können sollen, d.h. Inhalte dieser Typen lösen für normale Benutzer niemals Benachrichtigungen aus."
 
 #: subscriptions_content.module:332
 msgid "Note"
@@ -583,7 +583,7 @@ msgstr "Anmerkung"
 
 #: subscriptions_content.module:333
 msgid "The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types will be marked with a !symbol symbol (and appear in !red_ON red !red_OFF in the case of blocked types)."
-msgstr "Die %permission Berechtigung erlaubt normalen Zugang zu weggelassenen und gesperrten Inhaltstypen. Dies ist eine administrative Funktion, und die betroffenen Inhaltstypen werden durch ein !symbol Zeichen markiert; gesperrte Inhaltstypen werden zudem !red_ON rot !red_OFF geschrieben."
+msgstr "Die %permission Berechtigung erlaubt normalen Zugang zu weggelassenen und gesperrten Inhaltstypen. Dies ist eine administrative Funktion, und die betroffenen Inhaltstypen werden durch ein !symbol Zeichen markiert; gesperrte Inhaltstypen erscheinen zudem !red_ON rot !red_OFF."
 
 #: subscriptions_content.module:337
 msgid "Blocked nodes"
@@ -591,7 +591,7 @@ msgstr "Gesperrte Nodes"
 
 #: subscriptions_content.module:341
 msgid "Enter the IDs of nodes that should be <strong>completely unavailable for subscribing</strong>, separated by spaces."
-msgstr "IDs von Nodes eingeben, welche nicht abbonnierbar sein sollen, durch Leerzeichen getrennt."
+msgstr "IDs von Nodes eingeben, die <strong>überhaupt nicht abbonnierbar</strong> sein sollen, durch Leerzeichen getrennt."
 
 #: subscriptions_content.module:345
 msgid "Generate the %full_node variable"
@@ -599,7 +599,7 @@ msgstr "%full_node Variable erzeugen"
 
 #: subscriptions_content.module:347
 msgid "Generating this variable causes considerable overhead even if it's not used, and <strong>it may even cause errors</strong>, depending on the !content_type! Default is OFF."
-msgstr "Das Erzeugen dieser Variablen braucht bedeutenden Aufwand, und es kann je nach !content_type <strong>zu Fehlermeldungen führen!</strong> auch wenn sie nicht verwendet wird. Standard ist AUS."
+msgstr "Das Erzeugen dieser Variablen braucht bedeutenden Aufwand, selbst wenn sie nicht verwendet wird, und es kann je nach !content_type sogar <strong>zu Fehlermeldungen führen!</strong> Standard ist AUS."
 
 #: subscriptions_content.module:371
 msgid "The name of the site."
@@ -607,7 +607,7 @@ msgstr "Der Name der Website."
 
 #: subscriptions_content.module:372
 msgid "The URL where the user can manage her subscriptions."
-msgstr "Die URL, wo der Benutzer seine Abonnemente verwalten kann."
+msgstr "Die URL, unter der die Benutzer ihre Abonnements verwalten können."
 
 #: subscriptions_content.module:378
 msgid "The digested items (separated by a separator), as defined below:"
@@ -623,7 +623,7 @@ msgstr "Der Text einer (Teil-)Benachrichtigung."
 
 #: subscriptions_content.module:412
 msgid "The type of the subscription, like 'thread' or 'category'."
-msgstr "Die Art des Abonnementes, z.B. 'thread' oder 'category'."
+msgstr "Die Art des Abonnements, z.B. 'thread' oder 'category'."
 
 #: subscriptions_content.module:413
 msgid "The type of the node, like 'forum' or 'story'."
@@ -656,15 +656,15 @@ msgstr "Die URL des Beitrages."
 
 #: subscriptions_content.module:419
 msgid "The user can unsubscribe by clicking this link."
-msgstr "Der Benutzer kann das Abonnement durch Clicken dieses Links löschen."
+msgstr "Der Benutzer kann das Abonnement durch Anklicken dieses Links löschen."
 
 #: subscriptions_content.module:429;476
 msgid "The comments state: 1 = comments are available in !comments, 0 = no comments."
-msgstr "Der Kommentar-Status: 1 = es hat Kommentare in !comments, 0 = sonst."
+msgstr "Der Kommentar-Status: 1 = Kommentare sind verfügbar in !comments, 0 = sonst."
 
 #: subscriptions_content.module:430
 msgid "One or more comments if available, otherwise empty.<br />The rendering of the comments is defined by the following template:"
-msgstr "Ein oder mehrere Kommentare, falls vorhanden, sonst leer.<br />Die Darstellung der Kommentare wird durch die folgende Maske definiert."
+msgstr "Ein oder mehrere Kommentare, falls vorhanden, sonst leer.<br />Die Darstellung der Kommentare wird durch die folgende Vorlage definiert."
 
 #: subscriptions_content.module:436
 msgid "Digest item comment"
@@ -704,7 +704,7 @@ msgstr "Die Art der Benachrichtigung: 1 = weder neu noch geändert, 0 = sonst."
 
 #: subscriptions_content.module:475
 msgid "The publication state: 1 = published, 0 = unpublished.<br />(Unpublished nodes are sent to users with the %administer_nodes permission only.)"
-msgstr "Der Publikationsstatus: 1 = publiziert, 0 = nicht publiziert.<br />(Benachrichtigungen zu nicht publizierten Kommentaren werden nur an Benutzer versandt, welche das %administer_comments-Recht haben.)"
+msgstr "Der Veröffentlichungs-Status: 1 = veröffentlicht, 0 = nicht veröffentlicht.<br />(Benachrichtigungen zu unveröffentlichten Beiträgen werden nur an Benutzer mit der %administer_comments Berechtigung versandt.)"
 
 #: subscriptions_content.module:483
 msgid "Comment body"
@@ -720,15 +720,15 @@ msgstr "Trennung zwischen den Kommentaren"
 
 #: subscriptions_content.module:498
 msgid "The separator between comments (if needed)."
-msgstr "Text, der zwischen die Kommentare eingeschoben wird, falls es mehrere hat."
+msgstr "Der Text, der zwischen die Kommentare eingeschoben wird, falls es mehrere hat."
 
 #: subscriptions_content.module:503
 msgid "One or more comments if available, otherwise empty.<br />The rendering of the comments is defined by the following templates:"
-msgstr "Ein oder mehrere Kommentare, falls vorhanden, sonst leer.<br />Die Darstellung der Kommentare wird durch die folgenden Masken definiert."
+msgstr "Ein oder mehrere Kommentare, falls vorhanden, sonst leer.<br />Die Darstellung der Kommentare wird durch die folgenden Vorlagen definiert."
 
 #: subscriptions_content.module:508
 msgid "One or more comments if available, otherwise empty.<br />The rendering of the comments is defined by the <a href=\"subscriptions-node-nid#edit-comment-body\">comment templates</a>."
-msgstr "Ein oder mehrere Kommentare, falls vorhanden, sonst leer.<br />Die Darstellung der Kommentare wird durch die Masken <a href=\"subscriptions-node-nid#edit-comment-body\">hier</a> definiert."
+msgstr "Ein oder mehrere Kommentare, falls vorhanden, sonst leer.<br />Die Darstellung der Kommentare wird durch die Vorlagen <a href=\"subscriptions-node-nid#edit-comment-body\">hier</a> definiert."
 
 #: subscriptions_content.module:525
 msgid "The name of the comment author."
@@ -736,7 +736,7 @@ msgstr "Der Name des Kommentar-Autors."
 
 #: subscriptions_content.module:526
 msgid "The title of the comment."
-msgstr "Der Kommentartitel."
+msgstr "Der Titel des Kommentars."
 
 #: subscriptions_content.module:527
 msgid "The body text of the comment."
@@ -748,11 +748,11 @@ msgstr "Die direkte URL des Kommentars."
 
 #: subscriptions_content.module:529
 msgid "The type of comment notification: 1 = new comment, 0 = updated comment."
-msgstr "Die Art der Benachrichtigung: 1 = neuer Kommentar, 0 = geänderter Kommentar."
+msgstr "Die Art der Kommentar-Benachrichtigung: 1 = neuer Kommentar, 0 = geänderter Kommentar."
 
 #: subscriptions_content.module:530
 msgid "The comment publication state: 1 = published, 0 = unpublished.<br />(Unpublished comments are sent to users with the %administer_comments permission only.)"
-msgstr "Der Publikationsstatus: 1 = publiziert, 0 = nicht publiziert.<br />(Benachrichtigungen zu nicht publizierten Kommentaren werden nur an Benutzer versandt, welche das %administer_comments-Recht haben.)"
+msgstr "Der Veröffentlichungs-Status des Kommentars: 1 = veröffentlicht, 0 = nicht veröffentlicht.<br />(Benachrichtigungen zu unveröffentlichten Kommentaren werden nur an Benutzer mit der %administer_comments Berechtigung versandt.)"
 
 #: subscriptions_content.module:556
 msgid "You may want to turn this OFF if you only change %Promoted_to_front_page or %Sticky_at_top_of_lists, otherwise Subscriptions will send out \"update\" notifications.<br />Subscriptions does not send notifications for unpublished nodes (except to users who have the %administer_nodes permission), but when you set %Published to ON, Subscriptions will send out \"new\" notifications, unless you turn this off here."
@@ -768,7 +768,7 @@ msgstr "Keine abonnierten Seiten."
 
 #: subscriptions_content.module:977
 msgid "This !content_type is blocked."
-msgstr "Dieser !content_type ist gesperrt."
+msgstr "Der !content_type Inhaltstyp ist gesperrt."
 
 #: subscriptions_content.module:1015
 #: subscriptions_taxonomy.module:200
@@ -821,31 +821,31 @@ msgstr "!module versucht, einen guten Teil der im cron-Job zur Verfügung stehen
 
 #: subscriptions_mail.module:285
 msgid "Display watchdog entries for successful mailings"
-msgstr "Wächter-Einträge für erfolgreiche Versände anzeigen."
+msgstr "Wächter-Einträge bei erfolgreichem Versenden anzeigen"
 
 #: subscriptions_mail.module:287
 msgid "Logs successful mailings to the watchdog log.  Default is ON, but with many subscribers this will generate a huge number of log entries."
-msgstr "Erfolgreichen Versand der Benachrichtigungen im Wächterprotokoll eintragen. Standard ist EIN, aber mit vielen Abonnenten erzeugt das sehr viele Einträge."
+msgstr "Erfolgreiches Versenden der Benachrichtigungen im Wächterprotokoll eintragen. Standard ist EIN, aber mit vielen Abonnenten erzeugt das sehr viele Einträge."
 
 #: subscriptions_mail.module:291
 msgid "Display summary watchdog entries per cron job"
-msgstr "Wächter-Einträge mit Cron-Statistik anzeigen."
+msgstr "Zusammenfassende Wächter-Einträge pro Cron-Lauf anzeigen"
 
 #: subscriptions_mail.module:293
 msgid "Logs the mailing counts, time spent, and size of the remaining queue to the watchdog log.  This is valuable information for estimating the load on the cron job and on your mail server.  Default is ON."
-msgstr "Zeichnet im Wächterprotokoll die Anzahl versandte Benachrichtigungen, die dafür verbrauchte Zeit und die Anzahl der Warteschlange-Einträge auf, welche nicht bearbeitet werden konnte. Diese wertvolle Information erlaubt ein Abschätzen der Last im Cron-Job und im Mail-Server. Standard ist EIN."
+msgstr "Zeichnet im Wächterprotokoll die Anzahl versandter Benachrichtigungen, die dafür verbrauchte Zeit und die Anzahl der Warteschlange-Einträge auf, welche nicht bearbeitet werden konnten. Diese wertvollen Informationen erlauben ein Abschätzen der Last im Cron-Job und im Mail-Server. Standard ist EIN."
 
 #: subscriptions_mail.module:309
 msgid "Legacy template"
-msgstr "Alte Maske"
+msgstr "Alte Vorlage"
 
 #: subscriptions_mail.module:315
 msgid "You have Subscriptions 5.x-1.x-dev template variables defined in your database.<br />As long as these are in place, the template values below will be ignored!"
-msgstr "In der Datenbank ist eine Maske von Subscriptions 5.x-1.x-dev definiert.<br />Solange diese vorhanden ist, werden die untenstehenden Masken(teile) nicht verwendet!"
+msgstr "In der Datenbank ist eine Vorlage von Subscriptions 5.x-1.x-dev definiert.<br />Solange diese vorhanden ist, werden die untenstehenden Vorlagen(teile) ignoriert!"
 
 #: subscriptions_mail.module:319
 msgid "Remove legacy template"
-msgstr "Alte Maske entfernen"
+msgstr "Alte Vorlage entfernen"
 
 #: subscriptions_mail.module:331
 msgid "(if the sender is visible)"
@@ -853,7 +853,7 @@ msgstr "(falls der Sender sichtbar ist)"
 
 #: subscriptions_mail.module:234;242
 msgid "subscriptions"
-msgstr "Abonnemente"
+msgstr "Abonnements"
 
 #: subscriptions_mail.module:234
 msgid "notification for @name at @to"
@@ -885,7 +885,7 @@ msgstr "Eingeschränkte Kategoriegruppen"
 
 #: subscriptions_taxonomy.module:158
 msgid "Select vocabularies for which only the subscribed terms should be listed on the %Subscriptions | %Categories page.<br />This helps to reduce the size of the listing, especially for free-tagging vocabularies with large numbers of terms."
-msgstr "Für diese Kategoriegruppen werden auf der %Subscriptions | %Categories Seite <strong>nur die abonnierten Kategorien</strong> angezeigt. Das verringert die Länge der Listen, besonders bei „Free Tagging“ Kategoriegruppen mit vielen Begriffen."
+msgstr "Auswahl der Kategoriegruppen, für die auf der %Subscriptions | %Categories Seite <strong>nur die abonnierten Kategorien</strong> angezeigt werden sollen. Das verringert die Länge der Listen, besonders bei „Free Tagging“ Kategoriegruppen mit vielen Begriffen."
 
 #: subscriptions_taxonomy.module:163
 msgid "Omitted vocabularies"
@@ -893,7 +893,7 @@ msgstr "Weggelassene Kategoriegruppen"
 
 #: subscriptions_taxonomy.module:166
 msgid "Select vocabularies which should be <strong>omitted</strong> from subscription listings; this means the terms of those vocabularies will be unlisted, i.e. they will be removed from subscription listings.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by category will be unavailable for the terms in the selected vocabularies."
-msgstr "Die Kategorien in diesen Gruppen werden von den Abonnements-Listen ausgeschlossen; dies bedeutet, dass die Kategorien dieser Gruppen nicht angezeigt werden und damit zum Abonnieren nicht zur Verfügung stehen.<br />Die betroffenen Inhalte können weiterhin über andere Arten von Abonnenten abonniert werden, aber Abonnieren über die Kategorien in den gewählten Gruppen ist nicht mehr möglich."
+msgstr "Auswahl der Kategoriegruppen, die von den Abonnements-Listen <strong>weggelassen</strong> werden sollen; dies bedeutet, dass die Kategorien dieser Gruppen nicht angezeigt werden und damit zum Abonnieren nicht zur Verfügung stehen.<br />Die betroffenen Inhalte können weiterhin über andere Arten von Abonnements abonniert werden, aber Abonnieren über die Kategorien in den gewählten Gruppen ist nicht mehr möglich."
 
 #: subscriptions_taxonomy.module:200
 msgid "category groups"
@@ -933,11 +933,11 @@ msgstr "Position des Node-Formulars"
 
 #: subscriptions_ui.module:321
 msgid "Fieldset above node links (and comments)"
-msgstr "Rahmen oberhalb der Node-Links (und Kommentare)."
+msgstr "Bereich oberhalb der Node-Links (und Kommentare)."
 
 #: subscriptions_ui.module:322
 msgid "Fieldset in %block block (below the comments)"
-msgstr "Rahmen im %block Block (unterhalb der Kommentare)."
+msgstr "Bereich im %block Block (unterhalb der Kommentare)."
 
 #: subscriptions_ui.module:325
 msgid "How to display the subscriptions sub-form on node pages.  Default is the first option.<br />To use the block, <b>you must enable the block</b> !here; put it into the %content region and set the %block_title to !none."
@@ -949,11 +949,11 @@ msgstr "Sichtbarkeit des Node-Formulars"
 
 #: subscriptions_ui.module:331
 msgid "Always display the fieldset"
-msgstr "Rahmen immer anzeigen."
+msgstr "Bereich immer anzeigen."
 
 #: subscriptions_ui.module:332
 msgid "Display only a @subscribe link that makes the fieldset visible"
-msgstr "Nur einen @subscribe Link anzeigen, welcher den Rahmen sichtbar macht."
+msgstr "Nur einen @subscribe-Link anzeigen, welcher den Bereich sichtbar macht."
 
 #: subscriptions_ui.module:335
 msgid "What to display.  Default is the first option."
@@ -961,15 +961,15 @@ msgstr "Art der Anzeige. Standard ist die erste Option."
 
 #: subscriptions_ui.module:339
 msgid "Expand the node form fieldset"
-msgstr "Rahmen des Node-Formulars öffnen."
+msgstr "Bereich des Node-Formulars öffnen."
 
 #: subscriptions_ui.module:341
 msgid "Displays the fieldset with the node page subscriptions sub-form in expanded state.  Default is OFF."
-msgstr "Der Rahmen des Node-Unterformulars wird immer in geöffnetem Zustand dargestellt. Standard ist AUS."
+msgstr "Stellt den Bereich des Node-Unterformulars  auf Beitrags-Seiten in geöffnetem Zustand dar. Standard ist AUS."
 
 #: subscriptions_ui.module:344
 msgid "Note: Our <b>favorite display settings</b> are the exact opposites of the defaults, but we chose the defaults, because they work without enabling the Subscriptions block."
-msgstr "Hinweis: Unsere <b>bevorzugten Anzeige-Einstellungen</b> sind das Gegenteil der Standard-Einstellungen, aber wir haben sie so gewählt, dass sie ohne den Subscriptions-Block funktionieren."
+msgstr "Hinweis: Unsere <b>bevorzugten Anzeige-Einstellungen</b> sind das genaue Gegenteil der Standard-Einstellungen, aber wir haben diese so gewählt, weil sie ohne den Subscriptions-Block funktionieren."
 
 #: subscriptions_ui.module:348
 msgid "Show 'by author' subscriptions options"
@@ -977,7 +977,7 @@ msgstr "'von Autor' Optionen anzeigen"
 
 #: subscriptions_ui.module:350
 msgid "If you don't want your users to subscribe 'by author', then turn this off.  Default is ON."
-msgstr "Deaktivieren, wenn die Site keine Autor-spezifischen Abonnemente anbieten soll. Standard ist EIN."
+msgstr "Deaktivieren, wenn die Site keine Autor-spezifischen Abonnements anbieten soll. Standard ist EIN."
 
 #: (duplicate) subscriptions.install:196
 msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
@@ -985,15 +985,15 @@ msgstr "Die alte \"!subscriptions_holding\" Tabelle wurde umbenannt in \"!subscr
 
 #: (duplicate) subscriptions.install:249
 msgid "If the !subscriptions_module module upgrade succeeded, then the \"!subscriptions\" table has been upgraded, and the old version was saved as \"!subscriptions_old.\" To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table."
-msgstr "Wenn das !subscriptions_module-Modul erfolgreich erneuert wurde, dann wurde die \"!subscriptions\" Tabelle ebenfalls erneuert, und die alte Version wurde als \"!subscriptions_old\" gesichert. Um allenfalls auf eine !subscriptions_module-Version vor 5.x-2.0 zurückzukehren, muss die alte Tabelle wieder installiert werden."
+msgstr "Wenn das !subscriptions_module-Modul erfolgreich aktualisiert wurde, dann wurde die \"!subscriptions\" Tabelle ebenfalls aktualisiert, und die alte Version wurde als \"!subscriptions_old\" gesichert. Um allenfalls auf eine !subscriptions_module-Version vor 5.x-2.0 zurückzukehren, muss die alte Tabelle wieder reaktiviert werden."
 
 #: (duplicate) subscriptions.install:259
 msgid "There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!"
-msgstr "Es gibt bereits eine !subscriptions_old-Tabelle &mdash; die !subscriptions-Tabelle wurde nicht erneuert!"
+msgstr "Es gibt bereits eine !subscriptions_old-Tabelle &mdash; die !subscriptions-Tabelle wurde nicht aktualisiert!"
 
 #: (duplicate) subscriptions.install:424
 msgid "Your email template variables were updated."
-msgstr "Die E-Mail-Vorlagen wurden konvertiert."
+msgstr "Die E-Mail-Vorlage wurden konvertiert."
 
 #: subscriptions.info:0
 msgid "The basic Subscriptions framework."
@@ -1005,7 +1005,7 @@ msgstr "Weblog-Subscriptions-Benutzeroberfläche"
 
 #: subscriptions_blog_ui.info:0
 msgid "Provides a separate blogs subscriptions page."
-msgstr "Stellt eine Benutzeroberfläche für Weblog-Subscriptions zur Verfügung."
+msgstr "Stellt eine gesonderte Seite für Weblog-Subscriptions zur Verfügung."
 
 #: subscriptions_cck.info:0
 msgid "CCK Fields"
@@ -1021,11 +1021,11 @@ msgstr "Inhalts-Subscriptions"
 
 #: subscriptions_content.info:0
 msgid "Allows users to subscribe to nodes."
-msgstr "Erlaubt Benutzern, Änderungen an Knoten und Kategorien zu abonnieren."
+msgstr "Erlaubt das Abonnieren von Node-Seiten und Inhaltstypen."
 
 #: subscriptions_event.info:0
 msgid "Event Subscriptions"
-msgstr "Abonnemente für Veranstaltungen"
+msgstr "Abonnements für Veranstaltungen"
 
 #: subscriptions_event.info:0
 msgid "Provides event data."
@@ -1037,7 +1037,7 @@ msgstr "Subscriptions per E-Mail"
 
 #: subscriptions_mail.info:0
 msgid "Sends out mails with drupal_mail, customizable with the separate mail_edit module."
-msgstr "Versendet E-Mails mit drupal_mail, die mit dem separaten mail_edit-Modul angepasst werden können."
+msgstr "Versenden von Benachrichtigungen mit drupal_mail, die mit dem separaten mail_edit-Modul angepasst werden können."
 
 #: subscriptions_taxonomy.info:0
 msgid "Taxonomy Subscriptions"
@@ -1054,4 +1054,20 @@ msgstr "Subscriptions-Benutzeroberfläche"
 #: subscriptions_ui.info:0
 msgid "Provides a UI to Subscriptions."
 msgstr "Stellt eine Benutzeroberfläche für Subscriptions zur Verfügung."
+
+#: local/subscriptions_event.module:29
+msgid "The event start timestamp."
+msgstr "Beginn des Anlasses."
+
+#: local/subscriptions_event.module:30
+msgid "The event end timestamp."
+msgstr "Ende des Anlasses."
+
+#: local/subscriptions_event.info:0
+msgid "Event Subscriptions"
+msgstr "Event-Subscriptions"
+
+#: local/subscriptions_event.info:0
+msgid "Provides event data."
+msgstr "Stellt Event-Daten zur Verfügung."
 
