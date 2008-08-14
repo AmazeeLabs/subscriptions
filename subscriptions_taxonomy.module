@@ -233,13 +233,15 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
     );
     $subscriptions_vid = (isset($subscriptions[$vocab->vid]) ? $subscriptions[$vocab->vid] : NULL);
     $vids_to_restrict = variable_get('subscriptions_restricted_taxa', array());
+    $tree = NULL;
     if (!in_array($vocab->vid, $vids_to_restrict)) {
       // @ TODO create mechanism to allow users to
       //        subscribe to all terms under this vocabulary
       $tree = taxonomy_get_tree($vocab->vid);
     }
     else {
-      if ($tree = $subscriptions_terms_by_vid[$vocab->vid]) {
+      if (isset($subscriptions_terms_by_vid[$vocab->vid])) {
+        $tree = $subscriptions_terms_by_vid[$vocab->vid];
         $form[$vocab->vid][1] = array(
           '#type' => 'item',
           '#description' => '<div>'. t('This is a restricted category group; to subscribe to an unlisted category, go to a post in that category and subscribe from there.') .'</div>',
@@ -271,8 +273,9 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
           // TODO: support multi-parent hierarchies (currently, the child is not repeated)
           subscriptions_form_helper($form[$vocab->vid][0], $defaults, $author_uid, $term->tid, $title, $subscription);
           if (isset($forum_containers) && in_array($term->tid, $forum_containers)) {
-            $index = end(array_keys($form[$vocab->vid][0]['checkboxes']));
-            $form[$vocab->vid][0]['checkboxes'][$index][-1]['#disabled'] = TRUE;
+            $tids = array_keys($form[$vocab->vid][0]['checkboxes']);
+            $tid = end($tids);
+            $form[$vocab->vid][0]['checkboxes'][$tid][-1]['#disabled'] = TRUE;
           }
         }
       }
@@ -302,7 +305,35 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
   return $form;
 }
 
-/*
+/**
+ * Implementation of hook_taxonomy().
+ *
+ * Remove taxonomy subscriptions when the underlying terms or vocabularies are removed.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_taxonomy_taxonomy($op, $type, $array) {
+  if ($op != 'delete') {
+    return;
+  }
+  switch ($type) {
+    case 'term':
+      $tid = $array['tid'];
+      db_query("DELETE FROM {subscriptions_queue} WHERE module = 'node' AND field = 'tid' AND value = '%s'", $tid);
+      db_query("DELETE FROM {subscriptions} WHERE module = 'node' AND field = 'tid' AND value = '%s'", $tid);
+      break;
+    case 'vocabulary':
+      $vid = $array['vid'];
+      foreach (array('omitted', 'restricted') as $key) {
+        $array = variable_get('subscriptions_'. $key .'_taxa', array());
+        unset($array[$vid]);
+        variable_set('subscriptions_'. $key .'_taxa', $array);
+      }
+      break;
+  }
+}
+
+/**
  * Implementation of hook_disable().
  *
  * Remove our queue items.
