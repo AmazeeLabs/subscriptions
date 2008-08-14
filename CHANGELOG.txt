@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #283721: Add a List-Id header according to RFC 2919.
    - #291929: Use hook_taxonomy() and hook_node_type() to catch deletions and clean out orphaned subscriptions.
    - #292654: On-comment subscriptions by author must check the node author, not the comment author.
    - #290882: Fix prior patch for #289965.
