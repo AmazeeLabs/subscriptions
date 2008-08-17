@@ -417,12 +417,12 @@ msgid "The body of each item in the digest."
 msgstr "גוף כל פריט ביומן."
 
 #: subscriptions_content.module:303
-msgid "The type of the subscription, like 'thread' or 'category'."
-msgstr "סוג המנוי, כמו 'שרשור' או 'סווג'."
+msgid "The type of the subscription, like '!thread' or '!category'."
+msgstr "סוג המנוי, כמו '!thread' או '!category'."
 
 #: subscriptions_content.module:304
-msgid "The type of the node, like 'forum' or 'story'."
-msgstr "סוג פריט התוכן, כמו 'הודעת פורום' או 'כתבה'."
+msgid "The type of the node, like '!forum' or '!story'."
+msgstr "סוג פריט התוכן, כמו '!forum' או '!story'."
 
 #: subscriptions_content.module:305
 msgid "The title of the subscriptions item."

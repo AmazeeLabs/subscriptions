@@ -281,7 +281,7 @@ msgstr "Abonnement konnte nicht gelöscht werden."
 
 #: subscriptions.admin.inc:693
 msgid "As soon as possible"
-msgstr "Raschmöglichst"
+msgstr "Schnellstmöglich"
 
 #: subscriptions.admin.inc:694
 msgid "Every 15 minutes"
@@ -622,12 +622,12 @@ msgid "The body of each item in the digest."
 msgstr "Der Text einer (Teil-)Benachrichtigung."
 
 #: subscriptions_content.module:412
-msgid "The type of the subscription, like 'thread' or 'category'."
-msgstr "Die Art des Abonnements, z.B. 'thread' oder 'category'."
+msgid "The type of the subscription, like '!thread' or '!category'."
+msgstr "Die Art des Abonnements, z.B. '!thread' oder '!category'."
 
 #: subscriptions_content.module:413
-msgid "The type of the node, like 'forum' or 'story'."
-msgstr "Der Typ des Inhalts, z.B. 'forum' oder 'story'."
+msgid "The type of the node, like '!forum' or '!story'."
+msgstr "Der Typ des Inhalts, z.B. '!forum' oder '!story'."
 
 #: subscriptions_content.module:414
 msgid "The title of the subscriptions item."
@@ -643,7 +643,7 @@ msgstr "Der Inhalt des Beitrages."
 
 #: subscriptions_content.module:417
 msgid "The full node as it appears on the website (must be specifically enabled !here)."
-msgstr "Der ganze Inhalt, so wie er auf der Website erscheint (muss !here aktiviert werden)."
+msgstr "Der ganze Beitrag, so wie er auf der Website erscheint (muss !here aktiviert werden)."
 
 #: subscriptions_content.module:417
 #: subscriptions_ui.module:325
@@ -768,7 +768,7 @@ msgstr "Keine abonnierten Seiten."
 
 #: subscriptions_content.module:977
 msgid "This !content_type is blocked."
-msgstr "Der !content_type Inhaltstyp ist gesperrt."
+msgstr "Dieser !content_type ist gesperrt."
 
 #: subscriptions_content.module:1015
 #: subscriptions_taxonomy.module:200
@@ -1005,7 +1005,7 @@ msgstr "Weblog-Subscriptions-Benutzeroberfläche"
 
 #: subscriptions_blog_ui.info:0
 msgid "Provides a separate blogs subscriptions page."
-msgstr "Stellt eine gesonderte Seite für Weblog-Subscriptions zur Verfügung."
+msgstr "Stellt eine gesonderte Seite für Weblog-Abonnements zur Verfügung."
 
 #: subscriptions_cck.info:0
 msgid "CCK Fields"
@@ -1025,7 +1025,7 @@ msgstr "Erlaubt das Abonnieren von Node-Seiten und Inhaltstypen."
 
 #: subscriptions_event.info:0
 msgid "Event Subscriptions"
-msgstr "Abonnements für Veranstaltungen"
+msgstr "Subscriptions für Veranstaltungen"
 
 #: subscriptions_event.info:0
 msgid "Provides event data."

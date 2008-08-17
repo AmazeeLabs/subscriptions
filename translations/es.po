@@ -487,12 +487,12 @@ msgid "The body of each item in the digest."
 msgstr "El cuerpo de cada item en el resúmen."
 
 #: subscriptions_content.module:374
-msgid "The type of the subscription, like 'thread' or 'category'."
-msgstr "El tipo de suscripción, como ''"
+msgid "The type of the subscription, like '!thread' or '!category'."
+msgstr "El tipo de suscripción, como '!thread' o '!category'"
 
 #: subscriptions_content.module:375
-msgid "The type of the node, like 'forum' or 'story'."
-msgstr "El tipo de no, como 'foro' o 'relato'"
+msgid "The type of the node, like '!forum' or '!story'."
+msgstr "El tipo de no, como '!forum' o '!story'."
 
 #: subscriptions_content.module:376
 msgid "The title of the subscriptions item."

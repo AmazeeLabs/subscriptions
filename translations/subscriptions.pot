@@ -527,11 +527,11 @@ msgid "The body of each item in the digest."
 msgstr ""
 
 #: subscriptions_content.module:412
-msgid "The type of the subscription, like 'thread' or 'category'."
+msgid "The type of the subscription, like '!thread' or '!category'."
 msgstr ""
 
 #: subscriptions_content.module:413
-msgid "The type of the node, like 'forum' or 'story'."
+msgid "The type of the node, like '!forum' or '!story'."
 msgstr ""
 
 #: subscriptions_content.module:414

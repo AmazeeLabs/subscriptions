@@ -409,8 +409,8 @@ function subscriptions_content_form_mail_edit_form_alter(&$form, &$form_state) {
     }
 
     $form[$help_key]['#variables'] += array(
-      '!subs_type' => t("The type of the subscription, like 'thread' or 'category'."),
-      '!node_type' => t("The type of the node, like 'forum' or 'story'."),
+      '!subs_type' => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => t('category'))),
+      '!node_type' => t("The type of the node, like '!forum' or '!story'.", array('!forum' => 'forum', '!story' => 'story')),
       '!title' => t('The title of the subscriptions item.'),
       '!teaser' => t('An excerpt of the subscriptions item.'),
       '!body' => t('The body of the subscriptions item.'),
