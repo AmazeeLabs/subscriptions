@@ -829,18 +829,6 @@ msgstr ""
 msgid "(requires !mail_edit for customizing the templates)"
 msgstr ""
 
-#: subscriptions.install:238
-msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
-msgstr ""
-
-#: subscriptions.install:309
-msgid "If the !subscriptions_module module upgrade succeeded, then the \"!subscriptions\" table has been upgraded, and the old version was saved as \"!subscriptions_old.\" To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table."
-msgstr ""
-
-#: subscriptions.install:319
-msgid "There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!"
-msgstr "Ya existe una tabla !subscriptions_old &mdash; la tabla !subscriptions was no se actualizó!"
-
 #: subscriptions.info:0
 msgid "The basic Subscriptions framework."
 msgstr "La plataforma base de Suscripciones."

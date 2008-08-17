@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - Remove obsolete database table backup function when upgrading from 5.x-1.x.
    - #294381: Fine-tune the German translation, fix some replacable strings in all languages.
    - #294381: Update German translation.
    - #283721: Add a List-Id header according to RFC 2919.

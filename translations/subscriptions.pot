@@ -882,18 +882,6 @@ msgstr ""
 msgid "If you don't want your users to subscribe 'by author', then turn this off.  Default is ON."
 msgstr ""
 
-#: (duplicate) subscriptions.install:196 
-msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
-msgstr ""
-
-#: (duplicate) subscriptions.install:249 
-msgid "If the !subscriptions_module module upgrade succeeded, then the \"!subscriptions\" table has been upgraded, and the old version was saved as \"!subscriptions_old.\" To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table."
-msgstr ""
-
-#: (duplicate) subscriptions.install:259 
-msgid "There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!"
-msgstr ""
-
 #: (duplicate) subscriptions.install:424 
 msgid "Your email template variables were updated."
 msgstr ""

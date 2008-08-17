@@ -857,18 +857,6 @@ msgstr "Afficher les options d'abonnement 'Par Auteur'"
 msgid "If you don't want your users to subscribe 'by author', then turn this off.  Default is ON."
 msgstr "Si vous ne souhaitez pas que les utilisateurs puissent s'abonner 'par auteur', désactivez ceci. Activé par défaut."
 
-#: subscriptions.install:250
-msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
-msgstr "Le table obsolète \"!subscriptions_holding\" a été renommé \"!subscriptions_holding_old\". Pour passer à une version plus ancienne de !subscriptions_module (antérieur à 5.x-2.0), il faut d'abord renommer cette table."
-
-#: subscriptions.install:320
-msgid "If the !subscriptions_module module upgrade succeeded, then the \"!subscriptions\" table has been upgraded, and the old version was saved as \"!subscriptions_old.\" To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table."
-msgstr "Si la mise à jour du module !subscriptions_module a réussi, la table \"!subscriptions\" a été mise à jour, et la version précédente sauvegardé sous le nom \"!subscriptions_old.\" Pour passer à une version plus ancienne de !subscriptions_module (antérieur à 5.x-2.0), il faut d'abord réactiver cette table."
-
-#: subscriptions.install:330
-msgid "There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!"
-msgstr "Une table !subscriptions_old existe déja &mdash; La table !subscriptions n'as pas été mise à jour!"
-
 #: subscriptions.install:543
 msgid "Your email template variables were updated."
 msgstr "Votre masque de message email a été mise à jour."

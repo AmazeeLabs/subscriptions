@@ -979,18 +979,6 @@ msgstr "'von Autor' Optionen anzeigen"
 msgid "If you don't want your users to subscribe 'by author', then turn this off.  Default is ON."
 msgstr "Deaktivieren, wenn die Site keine Autor-spezifischen Abonnements anbieten soll. Standard ist EIN."
 
-#: (duplicate) subscriptions.install:196
-msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
-msgstr "Die alte \"!subscriptions_holding\" Tabelle wurde umbenannt in \"!subscriptions_holding_old\". Um allenfalls wieder zu einer alten !subscriptions_module-Version vor 5.x-2.0 zurückzukehren, muss das Umbenennen rückgängig gemacht werden."
-
-#: (duplicate) subscriptions.install:249
-msgid "If the !subscriptions_module module upgrade succeeded, then the \"!subscriptions\" table has been upgraded, and the old version was saved as \"!subscriptions_old.\" To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table."
-msgstr "Wenn das !subscriptions_module-Modul erfolgreich aktualisiert wurde, dann wurde die \"!subscriptions\" Tabelle ebenfalls aktualisiert, und die alte Version wurde als \"!subscriptions_old\" gesichert. Um allenfalls auf eine !subscriptions_module-Version vor 5.x-2.0 zurückzukehren, muss die alte Tabelle wieder reaktiviert werden."
-
-#: (duplicate) subscriptions.install:259
-msgid "There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!"
-msgstr "Es gibt bereits eine !subscriptions_old-Tabelle &mdash; die !subscriptions-Tabelle wurde nicht aktualisiert!"
-
 #: (duplicate) subscriptions.install:424
 msgid "Your email template variables were updated."
 msgstr "Die E-Mail-Vorlage wurden konvertiert."

@@ -901,18 +901,6 @@ msgstr "Nota: per le funzionalità di Iscrizione standard devi attivare i seguen
 msgid "(requires !mail_edit for customizing the templates)"
 msgstr "(richiede !mail_edit per adattare gli modelli)"
 
-#: (duplicate) subscriptions.install:238
-msgid "The obsolete \"!subscriptions_holding\" table has been renamed to \"!subscriptions_holding_old\". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back."
-msgstr "La tabella obsoleta \"!subscriptions_holding\" è stata rinominata \"!subscriptions_holding_old\". Se vuoi ripristinare una versione di !subscriptions_module precedente alla 5.x-2.0, devi rinominare questa tabella."
-
-#: (duplicate) subscriptions.install:309
-msgid "If the !subscriptions_module module upgrade succeeded, then the \"!subscriptions\" table has been upgraded, and the old version was saved as \"!subscriptions_old.\" To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table."
-msgstr "Se l'aggiornamento del modulo !subscriptions_module ha avuto successo, allora la tabella \"!subscriptions\" è stata aggiornata, e la vecchia versione salvata come \"!subscriptions_old\". Se vuoi ripristinare una versione di !subscriptions_module precedente alla 5.x-2.0, devi riattivare la vecchia tabella."
-
-#: (duplicate) subscriptions.install:319
-msgid "There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!"
-msgstr "La tabella !subscriptions_old esiste già &mdash; la tabella !subscriptions non è stata aggiornata!"
-
 #: subscriptions.info:0
 msgid "The basic Subscriptions framework."
 msgstr "I componenti base per le Iscrizioni."

@@ -190,78 +190,56 @@ function subscriptions_update_3() {
   $ret = array();
   $t = get_t();
 
-  if (db_table_exists('subscriptions_holding') && !db_table_exists('subscriptions_holding_old')) {
-    db_rename_table($ret, subscriptions_holding, subscriptions_holding_old);
-    if ($ret[count($ret)-1]['success']) {
-      drupal_set_message($t('The obsolete "!subscriptions_holding" table has been renamed to "!subscriptions_holding_old". To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would first need to rename this table back.',
-        array(
-          '!subscriptions_module' => 'Subscriptions',
-          '!subscriptions_holding' => db_prefix_tables('{subscriptions_holding}'),
-          '!subscriptions_holding_old' => db_prefix_tables('{subscriptions_holding_old}'),
-        )));
-    }
+  if (db_table_exists('subscriptions_holding')) {
+    db_drop_table($ret, 'subscriptions_holding');             // old left-over from 5.x-1.x
   }
 
   if (db_table_exists('subscriptions_sent')) {                // old left-over from first
     db_drop_table($ret, 'subscriptions_sent');                // incarnation of 5.x-2.0
   }
 
-  if (!db_table_exists('subscriptions_old')) {
-
-    db_rename_table($ret, subscriptions, subscriptions_old);
-
-    $schema['subscriptions'] = array(
-      'fields'          => array(
-        'sid'           => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'),
-        'module'        => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
-        'field'         => array('type' => 'varchar', 'length' => '32', 'not null' => FALSE),
-        'value'         => array('type' => 'varchar', 'length' => '237', 'not null' => FALSE),
-        'recipient_uid' => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
-        'send_interval' => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
-        'author_uid'    => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
-        'send_updates'  => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4'),
-        'send_comments' => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4')),
-      'primary key'     => array('sid'),
-      'indexes'         => array(
-        'module'        => array('module', 'field', 'value'),
-        'recipient_uid' => array('recipient_uid')),
-    );
-    db_create_table($ret, 'subscriptions', $schema['subscriptions']);
-
-
-    $ret[] = update_sql("INSERT INTO {subscriptions}
-        (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
-        SELECT 'node', 'nid', sid, uid, send_interval, -1, 0, 1
-          FROM {subscriptions_old}
-          WHERE stype = 'node'");
-    $ret[] = update_sql("INSERT INTO {subscriptions}
-        (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
-        SELECT 'node', 'tid', sid, uid, send_interval, -1, 0, 1
-          FROM {subscriptions_old}
-          WHERE stype = 'taxa'");
-    $ret[] = update_sql("INSERT INTO {subscriptions}
-        (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
-        SELECT 'node', 'type', SUBSTRING(stype FROM 5), uid, send_interval, -1, 0, 1
-          FROM {subscriptions_old}
-          WHERE stype LIKE 'type%'");
-    $ret[] = update_sql("UPDATE {subscriptions} SET send_interval = 1 WHERE send_interval < 1");
-
-    drupal_set_message($t('If the !subscriptions_module module upgrade succeeded, then the "!subscriptions" table has been upgraded, and the old version was saved as "!subscriptions_old." To downgrade to a !subscriptions_module version prior to 5.x-2.0, you would need to reactivate the old table.',
-      array(
-        '!subscriptions_module' => 'Subscriptions',
-        '!subscriptions' => db_prefix_tables('{subscriptions}'),
-        '!subscriptions_old' => db_prefix_tables('{subscriptions_old}'),
-      )));
+  if (db_table_exists('subscriptions_old')) {
+    db_drop_table($ret, 'subscriptions_old');
   }
-  else {
-    $ret[] = array(
-      'success' => FALSE,
-      'query' => $t('There already exists a !subscriptions_old table &mdash; the !subscriptions table was not upgraded!', array(
-        '!subscriptions' => db_prefix_tables('{subscriptions}'),
-        '!subscriptions_old' => db_prefix_tables('{subscriptions_old}'),
-      )),
-    );
-  }
+  db_rename_table($ret, subscriptions, subscriptions_old);
+
+  $schema['subscriptions'] = array(
+    'fields'          => array(
+      'sid'           => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE, 'disp-width' => '10'),
+      'module'        => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
+      'field'         => array('type' => 'varchar', 'length' => '32', 'not null' => FALSE),
+      'value'         => array('type' => 'varchar', 'length' => '237', 'not null' => FALSE),
+      'recipient_uid' => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+      'send_interval' => array('type' => 'int', 'not null' => FALSE, 'disp-width' => '11'),
+      'author_uid'    => array('type' => 'int', 'not null' => TRUE, 'disp-width' => '11'),
+      'send_updates'  => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4'),
+      'send_comments' => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 'disp-width' => '4')),
+    'primary key'     => array('sid'),
+    'indexes'         => array(
+      'module'        => array('module', 'field', 'value'),
+      'recipient_uid' => array('recipient_uid')),
+  );
+  db_create_table($ret, 'subscriptions', $schema['subscriptions']);
+
+
+  $ret[] = update_sql("INSERT INTO {subscriptions}
+      (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
+      SELECT 'node', 'nid', sid, uid, send_interval, -1, 0, 1
+        FROM {subscriptions_old}
+        WHERE stype = 'node'");
+  $ret[] = update_sql("INSERT INTO {subscriptions}
+      (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
+      SELECT 'node', 'tid', sid, uid, send_interval, -1, 0, 1
+        FROM {subscriptions_old}
+        WHERE stype = 'taxa'");
+  $ret[] = update_sql("INSERT INTO {subscriptions}
+      (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
+      SELECT 'node', 'type', SUBSTRING(stype FROM 5), uid, send_interval, -1, 0, 1
+        FROM {subscriptions_old}
+        WHERE stype LIKE 'type%'");
+  $ret[] = update_sql("UPDATE {subscriptions} SET send_interval = 1 WHERE send_interval < 1");
+
+  db_drop_table($ret, 'subscriptions_old');
 
 
   $schema['subscriptions_queue'] = array(
