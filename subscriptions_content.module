@@ -261,7 +261,7 @@ function subscriptions_content_comment($comment, $op) {
                                                           array('%administer_comments' => $tr('administer comments')));
       }
       else {
-        $form['subscriptions_notify']['#description'] = t('You can suppress sending subscriptions notifications here.');
+        $form['subscriptions_notify']['#description'] = t('You can suppress sending subscriptions notifications here; this option is not saved.');
       }
     }
     return (isset($form) ? $form : NULL);
@@ -553,7 +553,7 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
       $form['options']['subscriptions_notify'] = array(
         '#type' => 'checkbox',
         '#title' => t('Send subscriptions notifications'),
-        '#description' => t('You may want to turn this OFF if you only change %Promoted_to_front_page or %Sticky_at_top_of_lists, otherwise Subscriptions will send out "update" notifications.<br />Subscriptions does not send notifications for unpublished nodes (except to users who have the %administer_nodes permission), but when you set %Published to ON, Subscriptions will send out "new" notifications, unless you turn this off here.',
+        '#description' => t('You may want to turn this OFF when you only change %Promoted_to_front_page or %Sticky_at_top_of_lists, otherwise Subscriptions will send out "update" notifications; this option is not saved.<br />Subscriptions does not send notifications for unpublished nodes (except to users who have the %administer_nodes permission), but when you set %Published to ON, Subscriptions will send out "new" notifications, unless you turn this off here.',
                             array('%Promoted_to_front_page' => $tr('Promoted to front page'),
                                   '%Sticky_at_top_of_lists' => $tr('Sticky at top of lists'),
                                   '%administer_nodes' => $tr('administer nodes'),
