@@ -48,6 +48,9 @@ For standard Subscriptions functionality you need to enable the following module
 * Content Subscriptions
 * Taxonomy Subscriptions (e.g. forums!)
 
+SMTP Authentication (http://drupal.org/project/smtp) may be useful for sending
+out emails, if your provider imposes limits on what you can do with PHP mail.
+
 
 
 
