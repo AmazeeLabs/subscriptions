@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #296995: Change defaults to send comments and updates.
    - Remove obsolete database table backup function when upgrading from 5.x-1.x.
    - #294381: Fine-tune the German translation, fix some replacable strings in all languages.
    - #294381: Update German translation.

@@ -88,7 +88,7 @@ function subscriptions_schema() {
 function subscriptions_install() {
   $ret = drupal_install_schema('subscriptions');
 
-  db_query("INSERT INTO {subscriptions_user} (uid, digest, send_interval, send_updates, send_comments, send_interval_visible, send_updates_visible, send_comments_visible, autosub_on_post, autosub_on_update, autosub_on_comment, send_self) VALUES(". -DRUPAL_AUTHENTICATED_RID .", 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1)");
+  db_query("INSERT INTO {subscriptions_user} (uid, digest, send_interval, send_updates, send_comments, send_interval_visible, send_updates_visible, send_comments_visible, autosub_on_post, autosub_on_update, autosub_on_comment, send_self) VALUES(". -DRUPAL_AUTHENTICATED_RID .", 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1)");
   db_query("INSERT INTO {subscriptions_user} (uid) SELECT uid FROM {users} WHERE uid > 0");
   subscriptions_update_8();   // convert 1.x-dev template variables if found
 
