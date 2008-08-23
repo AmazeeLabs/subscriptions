@@ -124,7 +124,7 @@ msgstr "Anmerkung: Aus technischen Gründen können die Zahlen auf dieser Seite 
 
 #: subscriptions.admin.inc:351
 msgid "The subtabs here under %User_defaults mirror those found at !My_account_Subscriptions, except that the fieldsets here come up already expanded. Please go there now and familiarize yourself with what's there!"
-msgstr "Die Unterreiter hier unter %User_defaults spiegeln diejenigen unter !My_account_Subscriptions wieder, ausser dass die aufklappbaren Teile hier bereits aufgeklappt dargestellt werden. Bitte folgen Sie dem Verweis und schauen Sie, welche Einstellmöglichkeiten es dort für Ihre Benutzer gibt."
+msgstr "Die Unterreiter hier unter %User_defaults spiegeln diejenigen unter !My_account_Subscriptions wieder, nur dass die aufklappbaren Teile hier bereits aufgeklappt dargestellt werden. Bitte folgen Sie dem Verweis und schauen Sie, welche Einstellmöglichkeiten es dort für Ihre Benutzer gibt."
 
 #: subscriptions.admin.inc:361
 msgid "The default settings that you define here are used for those users that haven't (yet) saved their own settings."
@@ -220,7 +220,7 @@ msgstr "Versteckt"
 
 #: subscriptions.admin.inc:446
 msgid "Permanently hidden, except for the %preferences"
-msgstr "Permanent versteckt, ausser für die %preferences"
+msgstr "Permanent versteckt, bis auf die %preferences"
 
 #: subscriptions.admin.inc:447
 msgid "Completely inaccessible to the user"
@@ -542,11 +542,11 @@ msgstr "Abonnements-Benachrichtigungen versenden"
 
 #: subscriptions_content.module:255
 msgid "Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out \"new\" notifications, unless you suppress this here."
-msgstr "Für unveröffentlichte Kommentare werden keine Abonnements-Benachrichtigungen verschickt (ausser an Benutzer mit der %administer_comments Berechtigung), aber wenn der !Status auf %Published geändert wird, dann werden \"neu\"-Benachrichtigungen verschickt, solange dies hier nicht unterdrückt wird."
+msgstr "Für unveröffentlichte Kommentare werden keine Abonnements-Benachrichtigungen verschickt (gilt nicht für Benutzer mit der %administer_comments Berechtigung), aber wenn der !Status auf %Published geändert wird, dann werden \"neu\"-Benachrichtigungen verschickt, solange dies hier nicht unterdrückt wird."
 
 #: subscriptions_content.module:261
 msgid "Subscriptions notifications are not sent for unpublished comments, except to users who have the %administer_comments permission, and you can even suppress the latter here."
-msgstr "Für unveröffentlichte Kommentare werden keine Abonnements-Benachrichtigungen verschickt, ausser an Benutzer mit der %administer_comments Berechtigung, und auch letzteres kann hier unterdrückt werden."
+msgstr "Für unveröffentlichte Kommentare werden keine Abonnements-Benachrichtigungen verschickt (gilt nicht für Benutzer mit der %administer_comments Berechtigung), und auch letzteres kann hier unterdrückt werden."
 
 #: subscriptions_content.module:265
 msgid "You can suppress sending subscriptions notifications here; this option is not saved."
@@ -756,7 +756,7 @@ msgstr "Der Veröffentlichungs-Status des Kommentars: 1 = veröffentlicht, 0 = n
 
 #: subscriptions_content.module:556
 msgid "You may want to turn this OFF when you only change %Promoted_to_front_page or %Sticky_at_top_of_lists, otherwise Subscriptions will send out \"update\" notifications; this option is not saved.<br />Subscriptions does not send notifications for unpublished nodes (except to users who have the %administer_nodes permission), but when you set %Published to ON, Subscriptions will send out \"new\" notifications, unless you turn this off here."
-msgstr "Ausschalten, damit keine Änderungs-Benachrichtigungen verschickt werden, insbesondere beim Ändern von %Promoted_to_front_page und %Sticky_at_top_of_lists; diese Option wird nicht gespeichert.<br />Es werden keine Benachrichtigungen für nicht-publizierte Inhalte verschickt (ausser an Benutzer, welche das %administer_nodes-Recht haben); dafür werden beim Aktivieren von %Published Benachrichtigungen verschickt, falls diese Box aktiviert bleibt."
+msgstr "Ausschalten, damit keine Änderungs-Benachrichtigungen verschickt werden, insbesondere beim Ändern von %Promoted_to_front_page und %Sticky_at_top_of_lists; diese Option wird nicht gespeichert.<br />Es werden keine Benachrichtigungen für nicht-publizierte Inhalte verschickt (gilt nicht für Benutzer, welche das %administer_nodes-Recht haben); dafür werden beim Aktivieren von %Published Benachrichtigungen verschickt, falls diese Box aktiviert bleibt."
 
 #: subscriptions_content.module:687
 msgid "image on website"
