@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Subscriptions_cck module installation.
+ */
+
+/**
  * Implementation of hook_install().
  */
 function subscriptions_cck_install() {

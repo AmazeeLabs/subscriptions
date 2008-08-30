@@ -471,7 +471,7 @@ function _subscriptions_content_autosubscribe($content_type, $module, $field, $v
  * @param $node
  *   Node object used to fill $mailvars.
  * @param $field
- *   Intervall used for filling variable !term_name.
+ *   Internal use for filling variable !term_name.
  * @param $s
  *   Subscription object.
  */
@@ -862,7 +862,7 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         $tokens += $options['tokens'];
       }
       if ($mailkey != 'digest') {
-        $tokens = module_invoke_all('subscriptions_tokens_list', $mailkey, array('tokens' => $tokens));
+        $tokens += module_invoke_all('subscriptions_tokens_list', $mailkey, array('tokens' => $tokens));
       }
       $tokens += array(
         '!full_node'           => t('The full node as it appears on the website (must be specifically enabled !here).', array('!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node')))),

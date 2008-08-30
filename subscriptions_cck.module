@@ -1,5 +1,5 @@
 <?php
-//$Id$
+// $Id$
 
 /**
  * @file
@@ -8,32 +8,26 @@
  */
 
 /**
- * Implementation of hook_form_alter().
- * Add the !cck_... variable explanation to the Mail Editor forms.
+ * Implementation of hook_subscriptions_tokens_list().
+ *
+ * Provide replacable tokens for mail_edit.
  *
  * @ingroup hooks
  */
-function subscriptions_cck_form_alter($form_id, &$form) {
-  if ($form_id == 'mail_edit_form' && substr($form['mailkey']['#value'], 0, 13) == 'subscriptions') {
-    if (!isset($form['addon_help'])) {
-      $form['addon_help'] = array(
-        '#variables' => array(),
-        '#theme' => 'mail_edit_variables',
-        '#weight' => 35.5,
-      );
-    }
-    $tr = 't';
-    $variables = array('%fieldname' => '<fieldname>', '!content_type', $tr('content type'));
-    $form['addon_help']['#variables'] += array(
-      '!ccklabel_&lt;fieldname&gt;' => t('The label for the CCK field %fieldname, as defined for your !content_type.', $variables),
-      '!cckvalue1_&lt;fieldname&gt;' => t('The value(s) of the CCK field %fieldname, as defined for your !content_type, comma-separated.', $variables),
-      '!cckvalue2_&lt;fieldname&gt;' => t('The value(s) of the CCK field %fieldname, as defined for your !content_type, newline-separated.', $variables),
-    );
-  }
+function subscriptions_cck_subscriptions_tokens_list($mailkey, $options = array()) {
+  $tr = 't';
+  $variables = array('%fieldname' => '<fieldname>', '!content_type', $tr('content type'));
+  $tokens = array (
+    '!ccklabel_&lt;fieldname&gt;' => t('The label for the CCK field %fieldname, as defined for your !content_type.', $variables),
+    '!cckvalue1_&lt;fieldname&gt;' => t('The value(s) of the CCK field %fieldname, as defined for your !content_type, comma-separated.', $variables),
+    '!cckvalue2_&lt;fieldname&gt;' => t('The value(s) of the CCK field %fieldname, as defined for your !content_type, newline-separated.', $variables),
+  );
+  return $tokens;
 }
 
 /**
- * Implementation of hook_subscriptions_add_mailvars().
+ * Implementation of hook_subscriptions_get_mailvars().
+ *
  * Add the !cck... variables.
  *
  * @ingroup hooks
