@@ -81,7 +81,7 @@ function subscriptions_mail_cron() {
           if (!isset($fields[$langcode][$module])) {
             $fields[$langcode][$module] = module_invoke_all('subscriptions', 'fields', $module);
           }
-          if ($module == 'node' && $field == 'nid' && (!empty($object->_is_updated) || !empty($object->_is_new)) && user_access('subscribe to content types', $user)) {
+          if ($module == 'node' && $field == 'nid' && (!empty($object->_subscriptions_is_updated) || !empty($object->_subscriptions_is_new)) && user_access('subscribe to content types', $user)) {
             $unlisteds = variable_get('subscriptions_unlisted_content_types', array());
             if (isset($object->type) && !in_array($object->type, $unlisteds)) {
               $field = 'type';
@@ -119,7 +119,7 @@ function subscriptions_mail_cron() {
           );
           $mailvars_function($mailvars, $object, $field, $s);
           $mailvars += module_invoke_all('subscriptions_get_mailvars', $object);
-          if ($digest && !empty($object->_comments) && module_exists('subscriptions_content')) {
+          if ($digest && !empty($object->_subscriptions_comments) && module_exists('subscriptions_content')) {
             $digest_comment_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+comment', $langcode, 'body', 'DITEMCMT');
             $mailvars['!comments'] = _subscriptions_content_format_comments($object, $digest_comment_template, '');
           }

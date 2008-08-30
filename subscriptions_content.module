@@ -127,7 +127,7 @@ function _subscriptions_content_node_options($account, $node) {
  */
 function _subscriptions_content_access($load_function, $load_args, $node) {
   ///global $user;  /// keep this for remote debugging
-  if (($load_function == 'subscriptions_content_node_load' || ($load_function == 'subscriptions_content_comment_load' && $node->_comments)) &&
+  if (($load_function == 'subscriptions_content_node_load' || ($load_function == 'subscriptions_content_comment_load' && $node->_subscriptions_comments)) &&
     ($node->status || user_access('administer nodes')) && node_access('view', $node)) {
     // We vote 'yes'. Other modules might vote 'no' and then that wins.
     ///watchdog('subs debug', "_sca returns TRUE for node $node->nid, user $user->uid.");  ///
@@ -485,11 +485,11 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   $mailvars['!teaser'] = _subscriptions_content_format_text($node->teaser, $node->format);
   $mailvars['!body'] = _subscriptions_content_format_text($node->body, $node->format);
   $mailvars['!full_node'] = (variable_get('subscriptions_generate_full_node', 0) ? _subscriptions_content_format_text(node_view($node, FALSE, TRUE, FALSE)) : '!full_node');
-  $mailvars['!is_new'] = (integer) !empty($node->_is_new);
-  $mailvars['!is_updated'] = (integer) !empty($node->_is_updated);
-  $mailvars['!is_old'] = (integer)(empty($node->_is_new) && empty($node->_is_updated));
+  $mailvars['!is_new'] = (integer) !empty($node->_subscriptions_is_new);
+  $mailvars['!is_updated'] = (integer) !empty($node->_subscriptions_is_updated);
+  $mailvars['!is_old'] = (integer)(empty($node->_subscriptions_is_new) && empty($node->_subscriptions_is_updated));
   $mailvars['!is_published'] = $node->status;
-  $mailvars['!has_new_comments'] = (integer)!empty($node->_comments);
+  $mailvars['!has_new_comments'] = (integer)!empty($node->_subscriptions_comments);
   if ($field == 'tid') {
     $mailvars['!term_name'] = db_result(db_query('SELECT name FROM {term_data} WHERE tid = %d', $s['value']));
   }
@@ -529,13 +529,13 @@ function _subscriptions_content_format_text($text, $format = NULL) {
  */
 function _subscriptions_content_format_comments($node, $comment_template, $separator) {
   $comments = array();
-  foreach ($node->_comments as $comment) {
+  foreach ($node->_subscriptions_comments as $comment) {
     $mailvars = array(
       '!comment_name' => ($comment->uid == 0 ? variable_get('anonymous', '!comment_name') : $comment->name),
       '!comment_title' => trim($comment->subject),
       '!comment_text' => _subscriptions_content_format_text($comment->comment, $comment->format),
       '!comment_url' => url('node/'. $comment->nid, array('fragment' => 'comment-'. $comment->cid, 'absolute' => TRUE)),
-      '!comment_is_new' => (integer)$comment->_is_new,
+      '!comment_is_new' => (integer)$comment->_subscriptions_is_new,
       '!comment_is_published' => (integer)($comment->status == COMMENT_PUBLISHED),
     );
     $template = module_invoke('subscriptions_mail', 'template_preprocess', $comment_template, $mailvars);
@@ -568,10 +568,10 @@ function subscriptions_content_node_load($nid, $sqid, $is_new) {
     return;
   }
   if ($is_new) {
-    $node->_is_new = TRUE;
+    $node->_subscriptions_is_new = TRUE;
   }
   else {
-    $node->_is_updated = TRUE;
+    $node->_subscriptions_is_updated = TRUE;
   }
   return $node;
 }
@@ -600,7 +600,7 @@ function subscriptions_content_comment_load($cid, $sqid) {
     $sqid = NULL;
   }
   $node = _subscriptions_content_load($nid, $sqid);
-  if (empty($node->_comments)) {
+  if (empty($node->_subscriptions_comments)) {
     return;
   }
   return $node;
@@ -630,16 +630,16 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
         $limit_sqids = 'AND q.sqid < '. (integer) $cutoff_sqid;
       }
     }
-    $sql = "SELECT q.sqid AS _sqid, q.is_new AS _is_new, c.* FROM {comments} c INNER JOIN {subscriptions_queue} q ON c.cid = q.load_args AND q.uid = %d AND q.load_function = '%s' WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
+    $sql = "SELECT q.sqid AS _subscriptions_sqid, q.is_new AS _subscriptions_is_new, c.* FROM {comments} c INNER JOIN {subscriptions_queue} q ON c.cid = q.load_args AND q.uid = %d AND q.load_function = '%s' WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
     $sql = db_rewrite_sql($sql, 'c', 'cid');
     $result = db_query($sql, $user->uid, 'subscriptions_content_comment_load', $nid);
     $sqids = $placeholders = array();
     while ($comment = db_fetch_object($result)) {
       comment_invoke_comment($comment, 'view');
-      if ($comment && user_access('access comments') && !isset($node->_comments[$comment->cid])) {
-        $node->_comments[$comment->cid] = $comment;
+      if ($comment && user_access('access comments') && !isset($node->_subscriptions_comments[$comment->cid])) {
+        $node->_subscriptions_comments[$comment->cid] = $comment;
       }
-      $sqids[] = $comment->_sqid;
+      $sqids[] = $comment->_subscriptions_sqid;
       $placeholders[] = '%d';
     }
     if ($sqids) {
