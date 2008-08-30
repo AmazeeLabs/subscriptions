@@ -104,13 +104,13 @@ function theme_subscriptions_form_table($element) {
   drupal_add_js(drupal_get_path('module', 'subscriptions') .'/subscriptions_tableselect.js', 'module', 'header', FALSE, TRUE, FALSE);
   $columns['checkboxes']    = array('data' => '&nbsp;', 'width' => '1%', 'class' => 'subscriptions-table');
   $columns['labels']        = array('data' => '&nbsp;', 'width' => '18%');
-  if ($element['send_interval']['#access']) {
+  if (isset($element['send_interval']) && $element['send_interval']['#access']) {
     $columns['send_interval'] = array('data' => t('Send interval'), 'width' => '20%');
   }
-  if ($element['send_updates']['#access']) {
+  if (isset($element['send_updates']) && $element['send_updates']['#access']) {
     $columns['send_updates']  = array('data' => t('On&nbsp;updates'), 'width' => '10%');
   }
-  if ($element['send_comments']['#access'] && module_exists('comment')) {
+  if (isset($element['send_comments']) && $element['send_comments']['#access'] && module_exists('comment')) {
     $columns['send_comments'] = array('data' => t('On&nbsp;comments'), 'width' => '10%');
   }
 
@@ -125,7 +125,8 @@ function theme_subscriptions_form_table($element) {
       }
     }
   }
-  unset($columns[end(array_keys($columns))]['width']);  // let the last column grow
+  $column_keys = array_keys($columns);
+  unset($columns[end($column_keys)]['width']);  // let the last column grow
 
   foreach (element_children($element['checkboxes']) as $key) {
     foreach (element_children($element['checkboxes'][$key]) as $key1) {
@@ -171,11 +172,11 @@ function subscriptions_page_form_submit($form, &$form_state) {
           foreach ($bundle as $author_uid => $set_to_enabled) {
             if ($set_to_enabled && (
                 !isset($defaults['checkboxes'][$value][$author_uid]) ||
-                $element_values['send_interval'][$value][$author_uid] != $defaults['send_interval'][$value][$author_uid] ||
-                $element_values['send_updates'][$value][$author_uid] != $defaults['send_updates'][$value][$author_uid] ||
-                $element_values['send_comments'][$value][$author_uid] != $defaults['send_comments'][$value][$author_uid])) {
-              $send_updates = ($element_values['send_updates'][$value][$author_uid] ? 1 : 0);
-              $send_comments = ($element_values['send_comments'][$value][$author_uid] ? 1 : 0);
+                empty($element_values['send_interval'][$value][$author_uid]) != empty($defaults['send_interval'][$value][$author_uid]) ||
+                empty($element_values['send_updates'][$value][$author_uid]) != empty($defaults['send_updates'][$value][$author_uid]) ||
+                empty($element_values['send_comments'][$value][$author_uid]) != empty($defaults['send_comments'][$value][$author_uid]))) {
+              $send_updates = (empty($element_values['send_updates'][$value][$author_uid]) ? 0 : 1);
+              $send_comments = (empty($element_values['send_comments'][$value][$author_uid]) ? 0 : 1);
               foreach ($form_state['values']['roles'] as $uid) {
                 subscriptions_write($access_key, $module, $field, $value, $author_uid, -$uid, $element_values['send_interval'][$value][$author_uid], $send_updates, $send_comments);
               }
