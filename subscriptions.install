@@ -90,7 +90,7 @@ function subscriptions_install() {
 
   db_query("INSERT INTO {subscriptions_user} (uid, digest, send_interval, send_updates, send_comments, send_interval_visible, send_updates_visible, send_comments_visible, autosub_on_post, autosub_on_update, autosub_on_comment, send_self) VALUES(". -DRUPAL_AUTHENTICATED_RID .", 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1)");
   db_query("INSERT INTO {subscriptions_user} (uid) SELECT uid FROM {users} WHERE uid > 0");
-  subscriptions_update_8();   // convert 1.x-dev template variables if found
+  subscriptions_update_9();   // remove 5.x-1.x-dev template variables if found
 
   include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.install.inc';
   _subscriptions_install_information();
@@ -376,31 +376,17 @@ function subscriptions_update_7() {
 }
 
 /**
- * Database update function 8: Convert 5.x-1.x-dev email templates.
- * (also called by subscriptions_install()!)
+ * Database update function 8: Empty.
  */
 function subscriptions_update_8() {
+}
+
+/**
+ * Database update function 9: Remove 5.x-1.x-dev email templates.
+ */
+function subscriptions_update_9() {
   $ret = array();
-  foreach (array('subject', 'body') as $field) {
-    $template = variable_get("subscriptions_email_$field", '');
-    if (!empty($template)) {
-      $template = strtr($template, array(
-        '@name' => '!name',
-        '@type' => '!node_type',
-        '@site' => '!site',
-        '@title' => '!title',
-        '@teaser' => '!teaser',
-      ));
-      variable_set("subscriptions_email_$field", $template);
-      $updated = TRUE;
-    }
-  }
-  if (!empty($updated)) {
-    $t = get_t();
-    $ret[] = array(
-      'success' => TRUE,
-      'query' => $t('Your email template variables were updated.'),
-    );
-  }
+  variable_del('subscriptions_email_body');
+  variable_del('subscriptions_email_subject');
   return $ret;
 }

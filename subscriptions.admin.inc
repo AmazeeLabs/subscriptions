@@ -26,11 +26,19 @@ function subscriptions_settings_form(&$form_state) {
     '#value' => '<div>'. l($tr('Permissions'), 'admin/user/permissions', array('fragment' => 'module-subscriptions')) .'</div>',
     '#weight' => -20,
     );
-  if (module_exists('subscriptions_mail') && module_exists('mail_edit')) {
-    $form['links'][] = array(
-      '#value' => '<div>'. l($tr('Mail templates'), 'admin/build/mail_edit') .'</div>',
-      '#weight' => -10,
-    );
+  if (module_exists('subscriptions_mail')) {
+    if (module_exists('mail_edit')) {
+      $form['links'][] = array(
+        '#value' => '<div>'. l($tr('Mail templates'), 'admin/build/mail-edit') .'</div>',
+        '#weight' => -10,
+      );
+    }
+    else {
+      $form['links'][] = array(
+        '#value' => '<div>'. l('Mail Editor', 'http://drupal.org/project/mail_edit') .'</div>',
+        '#weight' => -10,
+      );
+    }
   }
   $form['links'][] = array(
     '#value' => '<div>'. l(t('Run cron manually!'), 'admin/reports/status/run-cron') .'</div>',

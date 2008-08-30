@@ -52,10 +52,12 @@ function subscriptions_content_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
         return array(
           'nid' => array(
             'mailvars_function' => '_subscriptions_content_node_mailvars',
+            'mailkey' => 'subscriptions_content_node-nid',
             '!subs_type' => t('thread'),
           ),
           'type' => array(
             'mailvars_function' => '_subscriptions_content_node_mailvars',
+            'mailkey' => 'subscriptions_content_node-type',
             '!subs_type' => t('content type'),
           ),
         );
@@ -351,193 +353,6 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
 /**
  * Implementation of hook_form_alter().
  *
- * Add additional fields to the node and digest Mail Editor forms.
- *
- * @ingroup hooks
- * @ingroup form
- */
-function subscriptions_content_form_mail_edit_form_alter(&$form, &$form_state) {
-  $tr = 't';
-
-  if (substr($form['mailkey']['#value'], 0, 13) == 'subscriptions') {
-    include_once drupal_get_path('module', 'subscriptions_mail') .'/subscriptions_mail.templates.inc';
-
-    $mailkey = $form['mailkey']['#value'];
-    $mkey = substr($mailkey, 13);
-    $form['subscriptions']['#tree'] = TRUE;
-
-    $help_key = 'help';
-    $form[$help_key]['#variables'] += array(
-      '!site' => t('The name of the site.'),
-      '!manage_url' => t('The URL where the user can manage her subscriptions.'),
-      //'!name' => t('The name of the user.'), // default templates need !name, custom templates should use !recipient_name
-    );
-
-    if ($mailkey == SUBSCRIPTIONS_DIGEST_MAILKEY) {
-      $form[$help_key]['#variables'] += array(
-        '!bodies' => t('The digested items (separated by a separator), as defined below:'));
-      $form['subject']['#title'] = 'Digest subject';
-      $form['body']['#title'] = 'Digest body';
-      $form['digest_item']['#default_value'] = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_DIGEST_MAILKEY .'-item'));
-      $form['digest_item_comment']['#default_value'] = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_DIGEST_MAILKEY .'-item-comment'));
-      foreach (array(
-        'subject'             => subscriptions_mail_template('DSUBJ'),
-        'body'                => subscriptions_mail_template('DBODY'),
-        'digest_item'         => subscriptions_mail_template('DITEM'),
-        'digest_item_comment' => subscriptions_mail_template('DITEMCMT')
-      ) as $key => $value) {
-        if (empty($form[$key]['#default_value'])) {
-          $form[$key]['#default_value'] = $value;
-        }
-      }
-      foreach (array('!sender_name', '!sender_page', '!sender_contact_page', '!sender_has_contact_page') as $key) {
-        unset($form['help']['#variables'][$key]);
-      }
-      $form['digest_item'] += array(
-        '#type' => 'textarea',
-        '#title' => t('Digest item body'),
-        '#description' => t('The body of each item in the digest.'),
-        '#weight' => 33,
-        '#rows' => 5,
-      );
-      $form['item_help'] = array(
-        '#variables' => array(),
-        '#theme' => 'mail_edit_variables',
-        '#weight' => 35,
-      );
-      $help_key = 'item_help';
-    }
-
-    $form[$help_key]['#variables'] += array(
-      '!subs_type' => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => t('category'))),
-      '!node_type' => t("The type of the node, like '!forum' or '!story'.", array('!forum' => 'forum', '!story' => 'story')),
-      '!title' => t('The title of the subscriptions item.'),
-      '!teaser' => t('An excerpt of the subscriptions item.'),
-      '!body' => t('The body of the subscriptions item.'),
-      '!full_node' => t('The full node as it appears on the website (must be specifically enabled !here).', array('!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node')))),
-      '!url' => t('The URL of the item.'),
-      '!unsubscribe_url' => t('The user can unsubscribe by clicking this link.'),
-    );
-
-    if (isset($form['addon_help'])) {
-      $form[$help_key]['#variables'] += $form['addon_help']['#variables'];
-      unset($form['addon_help']);
-    }
-
-    if ($mailkey == SUBSCRIPTIONS_DIGEST_MAILKEY) {
-      $form[$help_key]['#variables'] += array(
-        '!has_new_comments' => t('The comments state: 1 = comments are available in !comments, 0 = no comments.'),
-        '!comments' => t('One or more comments if available, otherwise empty.<br />The rendering of the comments is defined by the following template:'),
-      );
-      $comment = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_DIGEST_MAILKEY .'-comment'));
-      $comment = ($comment ? $comment : subscriptions_mail_template('DITEMCMT'));
-      $form['digest_item_comment'] += array(
-        '#type' => 'textarea',
-        '#title' => t('Digest item comment'),
-        '#default_value' => $comment,
-        '#description' => t('The comments inside a digest item body.'),
-        '#weight' => 36,
-        '#rows' => 2,
-      );
-      $form['comment_help'] = array(
-        '#weight' => 37,
-      );
-      $separator = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_DIGEST_MAILKEY .'-separator'));
-      $separator = ($separator ? $separator : subscriptions_mail_template('SEP'));
-      $form['digest_separator'] = array(
-        '#type' => 'textarea',
-        '#title' => t('Digest item separator'),
-        '#default_value' => $separator,
-        '#description' => t('The separator between digest items (if needed).'),
-        '#weight' => 38,
-        '#rows' => 2,
-      );
-      $form['#submit'][] = 'subscriptions_content_mail_edit_submit';
-    }
-    else { // ! $mailkey == SUBSCRIPTIONS_DIGEST_MAILKEY
-      switch ($mkey) {
-        case '-node-type-forum':
-          $form['help']['#variables'] += array(
-            '!term_name' => t('The name of the forum.'),
-          );
-          break;
-        case '-node-tid':
-          $form['help']['#variables'] += array(
-            '!term_name' => t('The name of the term.'),
-          );
-          break;
-      }
-      $tr = 't';
-      $form['help']['#variables'] += array(
-        '!is_new' => t('The type of notification: 1 = new item, 0 = otherwise.'),
-        '!is_updated' => t('The type of notification: 1 = updated (possibly new and already updated) item, 0 = otherwise.'),
-        '!is_old' => t('The type of notification: 1 = neither new nor updated item, 0 = otherwise.'),
-        '!is_published' => t('The publication state: 1 = published, 0 = unpublished.<br />(Unpublished nodes are sent to users with the %administer_nodes permission only.)', array('%administer_nodes' => $tr('administer nodes'))),
-        '!has_new_comments' => t('The comments state: 1 = comments are available in !comments, 0 = no comments.')
-      );
-      if ($mkey == '-node-nid') {
-        $comment_body = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_COMMENT_MAILKEY .'-item'));
-        $comment_body = ($comment_body ? $comment_body : subscriptions_mail_template('CITEM'));
-        $form['comment_body'] = array(
-          '#type' => 'textarea',
-          '#title' => t('Comment body'),
-          '#default_value' => $comment_body,
-          '#description' => t('The body of each comment.'),
-          '#weight' => 33,
-          '#rows' => 3,
-        );
-        $form['comment_help'] = array(
-          '#weight' => 35,
-        );
-        $separator = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_COMMENT_MAILKEY .'-separator'));
-        $separator = ($separator ? $separator : subscriptions_mail_template('SEP'));
-        $form['comment_separator'] = array(
-          '#type' => 'textarea',
-          '#title' => t('Comment separator'),
-          '#default_value' => $separator,
-          '#description' => t('The separator between comments (if needed).'),
-          '#weight' => 37,
-          '#rows' => 2,
-        );
-        $form['help']['#variables'] += array(
-          '!comments' => t('One or more comments if available, otherwise empty.<br />The rendering of the comments is defined by the following templates:'),
-        );
-      }
-      else {
-        $form['help']['#variables'] += array(
-          '!comments' => t('One or more comments if available, otherwise empty.<br />The rendering of the comments is defined by the <a href="subscriptions-node-nid#edit-comment-body">comment templates</a>.'),
-        );
-      }
-      if (empty($form['subject']['#default_value'])) {
-        $form['subject']['#default_value'] = subscriptions_mail_template('SUBJ');
-      }
-      if (empty($form['body']['#default_value'])) {
-        $form['body']['#default_value'] = subscriptions_mail_template('BODY');
-      }
-      $form['#submit'][] = 'subscriptions_content_mail_edit_submit';
-    }
-
-    if (isset($form['comment_help']['#weight'])) {
-      $tr = 't';
-      $form['comment_help'] += array(
-        '#theme' => 'mail_edit_variables',
-        '#variables' => array(
-          '!comment_name' => t('The name of the comment author.'),
-          '!comment_title' => t('The title of the comment.'),
-          '!comment_text' => t('The body text of the comment.'),
-          '!comment_url' => t('The direct URL of the comment.'),
-          '!comment_is_new' => t('The type of comment notification: 1 = new comment, 0 = updated comment.'),
-          '!comment_is_published' => t('The comment publication state: 1 = published, 0 = unpublished.<br />(Unpublished comments are sent to users with the %administer_comments permission only.)', array('%administer_comments' => $tr('administer comments'))),
-        ),
-      );
-    }
-  }
-
-}
-
-/**
- * Implementation of hook_form_alter().
- *
  * Add the Send Subscriptions Notifications checkbox to the Publishing Options
  * fieldset on the node edit form.
  *
@@ -661,6 +476,7 @@ function _subscriptions_content_autosubscribe($content_type, $module, $field, $v
  *   Subscription object.
  */
 function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
+  global $language;
   include_once drupal_get_path('module', 'subscriptions_mail') .'/subscriptions_mail.templates.inc';
 
   $mailvars['!url'] = url('node/'. $node->nid, array('absolute' => TRUE));
@@ -683,14 +499,9 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   else {
     unset($mailvars['!term_name']);
   }
-  if ($s['load_function'] == 'subscriptions_content_comment_load' || ($s['load_function'] == 'subscriptions_content_node_load' && isset($node->_comments))) {
-    static $comment_template, $separator;
-    if (!$comment_template) {
-      $comment_template = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_COMMENT_MAILKEY .'-item'));
-      $comment_template = ($comment_template ? $comment_template : subscriptions_mail_template('CITEM'));
-      $separator = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", SUBSCRIPTIONS_COMMENT_MAILKEY .'-separator'));
-      $separator = ($separator ? $separator : subscriptions_mail_template('SEP'));
-    }
+  if ($s['load_function'] == 'subscriptions_content_comment_load' || ($s['load_function'] == 'subscriptions_content_node_load' && isset($node->_subscriptions_comments))) {
+    $comment_template = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $language->language, 'body', 'CITEM');
+    $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $language->language, 'body', 'SEP');
     $mailvars['!comments'] = _subscriptions_content_format_comments($node, $comment_template, $separator);
   }
   else {
@@ -836,50 +647,6 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
     }
   }
   return (empty($node) ? NULL : $node);
-}
-
-/**
- * Implementation of hook_mailkeys().
- *
- * Provide mailkeys for mail_edit.
- *
- * The basic format is subscriptions dash module dash field. If the possible
- * values can be enumerated, like node types, profile fields, etc. then we add
- * that too with a dash.
- *
- * @ingroup hooks
- */
-function subscriptions_content_mailkeys() {
-  include_once drupal_get_path('module', 'subscriptions_mail') .'/subscriptions_mail.templates.inc';
-  $mailkeys = array(SUBSCRIPTIONS_DIGEST_MAILKEY, 'subscriptions-node-nid', 'subscriptions-node-tid');
-  foreach (array_keys(node_get_types()) as $type) {
-    $mailkeys[] = 'subscriptions-node-type-'. $type;
-  }
-  return $mailkeys;
-}
-
-/**
- * Custom submit handler for mail_edit_form().
- *
- * @ingroup form
- */
-function subscriptions_content_mail_edit_submit($form, &$form_state) {
-  include_once drupal_get_path('module', 'subscriptions_mail') .'/subscriptions_mail.templates.inc';
-
-  foreach (array(
-    'digest_item'         => SUBSCRIPTIONS_DIGEST_MAILKEY .'-item',
-    'digest_item_comment' => SUBSCRIPTIONS_DIGEST_MAILKEY .'-item-comment',
-    'digest_separator'    => SUBSCRIPTIONS_DIGEST_MAILKEY .'-separator',
-    'comment_body'        => SUBSCRIPTIONS_COMMENT_MAILKEY .'-item',
-    'comment_separator'   => SUBSCRIPTIONS_COMMENT_MAILKEY .'-separator',
-  ) as $key => $value) {
-    if (isset($form_state['values'][$key])) {
-      db_query("UPDATE {subscriptions_mail_edit} SET item_body = '%s' WHERE mailkey = '%s'", $form_state['values'][$key], $value);
-      if (!db_affected_rows()) {
-        db_query("INSERT INTO {subscriptions_mail_edit} (item_body, mailkey) VALUES ('%s', '%s')", $form_state['values'][$key], $value);
-      }
-    }
-  }
 }
 
 /**
@@ -1039,6 +806,170 @@ function subscriptions_content_type_form(&$form_state, $account, $form) {
     unset($form['footer']);
   }
   return $form;
+}
+
+/**
+ * Implementation of hook_mailkeys().
+ *
+ * Provide mailkeys for mail_edit.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_content_mailkeys() {
+  $mailkeys['node-nid'] = t('Notifications for %Pages subscriptions', array('%Pages' => t('Pages')));
+  foreach (array_keys(node_get_types()) as $type) {
+    $mailkeys['node-type-'. $type] = t('Notifications for %type !content_type subscriptions', array('%type' => $type, '!content_type' => t('content type')));
+  }
+  return $mailkeys;
+}
+
+/**
+ * Implementation of hook_mail_edit_tokens_list().
+ *
+ * Provide replacable tokens for mail_edit.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array()) {
+  $tr = 't';
+  $tokens = array();
+  switch ($mailkey) {
+    case 'comments':
+      $tokens += array(
+        '!comment_name'         => t('The name of the comment author.'),
+        '!comment_title'        => t('The title of the comment.'),
+        '!comment_text'         => t('The body text of the comment.'),
+        '!comment_url'          => t('The direct URL of the comment.'),
+        '!comment_is_new'       => t('The type of comment notification: 1 = new comment, 0 = updated comment.'),
+        '!comment_is_published' => t('The comment publication state: 1 = published, 0 = unpublished.<br />(Unpublished comments are sent to users with the %administer_comments permission only.)', array('%administer_comments' => $tr('administer comments'))),
+      );
+      return $tokens;
+      
+    default:
+      $tokens += array(
+        '!unsubscribe_url'     => t('The user can unsubscribe by clicking this link.'),
+        '!sender_name'         => t('Name of the sender (if the sender is visible).'),
+        '!sender_page'         => t('The user page of the sender (if the sender is visible).'),
+        '!sender_has_contact_page' => t("The sender's contact setting: 1 = contact form enabled, 0 = disabled."),
+        '!sender_contact_page' => t('The contact page of the sender.'),
+        '!subs_type'           => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => t('category'))),
+        '!node_type'           => t("The type of the node, like '!forum' or '!story'.", array('!forum' => 'forum', '!story' => 'story')),
+        '!title'               => t('The title of the subscriptions item.'),
+        '!teaser'              => t('An excerpt of the subscriptions item.'),
+        '!body'                => t('The body of the subscriptions item.'),
+      );
+      if (isset($options['tokens'])) {
+        $tokens += $options['tokens'];
+      }
+      if ($mailkey != 'digest') {
+        $tokens = module_invoke_all('subscriptions_tokens_list', $mailkey, array('tokens' => $tokens));
+      }
+      $tokens += array(
+        '!full_node'           => t('The full node as it appears on the website (must be specifically enabled !here).', array('!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node')))),
+        '!url'                 => t('The URL of the item.'),
+        '!is_new'              => t('The type of notification: 1 = new item, 0 = otherwise.'),
+        '!is_updated'          => t('The type of notification: 1 = updated (possibly new and already updated) item, 0 = otherwise.'),
+        '!is_old'              => t('The type of notification: 1 = neither new nor updated item, 0 = otherwise.'),
+        '!is_published'        => t('The publication state: 1 = published, 0 = unpublished.<br />(Unpublished nodes are sent to users with the %administer_nodes permission only.)', array('%administer_nodes' => $tr('administer nodes'))),
+        '!has_new_comments'    => t('The comments state: 1 = comments are available in !comments, 0 = no comments.'),
+        '!comments'            => t('One or more comments if available, otherwise empty.') .'<br />',
+      );
+      if ($mailkey == 'node-nid' || $mailkey == 'digest') {
+        $tokens['!comments'] = $tokens['!comments'] . t('The rendering of the comments is defined by the template below.');
+      }
+      else {
+        $tokens['!comments'] = $tokens['!comments'] . t('The rendering of the comments is defined by the !link.', array(
+                                                          '!link' => '<a href="../subscriptions_content_node-nid/'. check_plain(arg(4)) .'#edit-comment-body">'. t('comment templates') .'</a>'));
+      }
+  }
+  return $tokens;
+}
+
+/**
+ * Implementation of hook_mail_edit_text().
+ *
+ * Provide default template strings for mail_edit.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_content_mail_edit_text($mailkey, $language) {
+  if (!($return = module_invoke('subscriptions_mail', 'subscriptions_mail_text', $mailkey, $language))) {
+    $return = module_invoke_all('subscriptions_mail_text', $mailkey, $language);
+  }
+  return $return;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ *
+ * Add the comment parts to the subscriptions_content_node-nid mail_edit page.
+ *
+ * @ingroup hooks
+ * @ingroup form
+ */
+function subscriptions_content_form_mail_edit_trans_alter(&$form, &$form_state) {
+  $mailkey = 'subscriptions_content_node-nid';
+  if ($form['id']['#value'] == $mailkey) {
+    $tr = 't';
+    $langcode = $form['language']['#value'];
+    $comment_body = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $langcode, 'body', 'CITEM');
+    $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $langcode, 'subject', 'SEP');
+
+    $form['mail']['comment_body'] = array(
+      '#title'      => t('Comment body'),
+      '#type'       => 'textarea',
+      '#default_value'  => $comment_body,
+      '#rows' => 7,
+      '#description' => t('The body of each comment.'),
+    );
+    $placeholders = subscriptions_content_mail_edit_tokens_list('comments');
+    // Display the user documentation of placeholders supported by this module mailkey
+    $doc = "<dl>\n";
+    foreach ($placeholders as $name => $description) {
+      $doc .= '<dt>'. $name .'</dt>';
+      $doc .= '<dd>'. $description .'</dd>';
+    }
+    $doc .= "</dl>\n";
+    $form['mail']['comment_token_help'] = array(
+      '#title' => t('Replacement patterns'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['mail']['comment_token_help']['help'] = array(
+      '#value' => $doc,
+    );
+    $form['mail']['comment_separator'] = array(
+      '#title'      => t('Comment separator'),
+      '#type'       => 'textarea',
+      '#default_value' => $separator,
+      '#rows' => 2,
+      '#description' => t('The separator between comments (if needed).'),
+    );
+    
+    $form['op']['#submit'][] = 'subscriptions_content_form_mail_edit_trans_save';
+    if (isset($form['delete'])) {
+      $form['delete']['#submit'][] = 'subscriptions_content_form_mail_edit_trans_delete';
+    }
+  } 
+}
+
+/**
+ * Save handler for enhanced mail_edit page.
+ */
+function subscriptions_content_form_mail_edit_trans_save($form, &$form_state) {
+  $form_state['values']['description'] = '';
+  $form_state['values']['subject'] = $form_state['values']['comment_separator'];
+  $form_state['values']['body'] = $form_state['values']['comment_body'];
+  $form_state['values']['id'] .= '+comment';
+  mail_edit_trans_save($form, &$form_state);
+}
+
+/**
+ * Delete handler for enhanced mail_edit page.
+ */
+function subscriptions_content_form_mail_edit_trans_delete($form, &$form_state) {
+  db_query("DELETE FROM {mail_edit} WHERE id = '%s' AND language = '%s'", $form_state['values']['id'] .'+comment', $form_state['values']['language']);
 }
 
 /**
