@@ -17,7 +17,6 @@
 function subscriptions_ui_nodeapi(&$node, $op, $teaser) {
   global $user;
   if ($op == 'view' && $node->nid && !$teaser && subscriptions_ui_can_subscribe()) {
-    $node->content['subscriptions-anchor'] = array('#value' => '<a id="subscriptions"></a>', '#weight' => 99);
     if (!variable_get('subscriptions_form_in_block', 0) &&
         (!variable_get('subscriptions_form_link_only', 0) && (!arg(2) || arg(2) == 'view') ||
           variable_get('subscriptions_form_link_only', 0) && arg(2) == 'subscribe' )) {
@@ -78,7 +77,7 @@ function subscriptions_ui_link($type, $node = NULL, $teaser = NULL) {
         return array('subscriptions-subscribe' => array(
           'href' => $_GET['q'] .'/subscribe',
           'title' => t('Subscribe'),
-          'fragment' => 'subscriptions',
+          'fragment' => 'subscribe',
           'attributes' => array('title' => t('Receive notifications about changes and/or comments to this page (and possibly similar pages).')),
         ));
       }
@@ -193,6 +192,7 @@ function subscriptions_ui_node_form(&$form_state, $node, $account = NULL) {
     '#collapsible' => TRUE,
     '#collapsed' => !variable_get('subscriptions_form_expanded', 0),
     '#theme' => 'subscriptions_ui_table',
+    '#prefix' => '<a id="subscribe" />',
   );
   $form['wrapper']['subscriptions'] = array(
     '#type' => 'checkboxes',
