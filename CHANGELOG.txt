@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - Two missing pieces for mail_edit 6.x-1.x.
    - Avoid potential naming conflicts.
    - Clean up: eliminate notices.
    - Implement support for mail_edit 6.x-1.x.

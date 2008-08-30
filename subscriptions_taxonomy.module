@@ -51,6 +51,7 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
         return array(
           'tid' => array(
             'mailvars_function' => '_subscriptions_content_node_mailvars',
+            'mailkey' => 'subscriptions_taxonomy_node-tid',
             '!subs_type' => $tr('category'),
           ),
         );
@@ -303,6 +304,50 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
     $form['#submit'][] = 'subscriptions_page_form_submit';
   }
   return $form;
+}
+
+/**
+ * Implementation of hook_mailkeys().
+ *
+ * Provide mailkeys for mail_edit.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_taxonomy_mailkeys() {
+  return array('node-tid' => t('Notifications for %Categories subscriptions', array('%Categories' => t('Categories'))));
+}
+
+/**
+ * Implementation of hook_mail_edit_tokens_list().
+ *
+ * Provide replacable tokens for mail_edit.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_taxonomy_mail_edit_tokens_list($mailkey, $options = array()) {
+  $tokens = array();
+  switch ($mailkey) {
+    case 'node-tid':
+      $tokens['!term_name']= t('The name of the term/category/tag/forum/etc.');
+      break;
+  }
+  if (isset($options['tokens'])) {
+    $tokens += $options['tokens'];
+  }
+  $tokens = subscriptions_content_mail_edit_tokens_list($mailkey, array('tokens' => $tokens));
+  return $tokens;
+}
+
+/**
+ * Implementation of hook_mail_edit_text().
+ *
+ * Provide default template strings for mail_edit.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_taxonomy_mail_edit_text($mailkey, $language) {
+  $return = subscriptions_content_mail_edit_text($mailkey, $language);
+  return $return;
 }
 
 /**

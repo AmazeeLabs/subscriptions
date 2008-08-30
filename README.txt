@@ -43,10 +43,13 @@ Modules
 -------
 
 For standard Subscriptions functionality you need to enable the following modules:
-* Subscriptions UI
-* Subscriptions Mail (requires Mail Editor, http://drupal.org/project/mail_edit)
-* Content Subscriptions
-* Taxonomy Subscriptions (e.g. forums!)
+ * Subscriptions UI
+ * Subscriptions Mail
+ * Content Subscriptions
+ * Taxonomy Subscriptions (e.g. forums!)
+
+Mail Editor (http://drupal.org/project/mail_edit) allows you to customize the
+notification messages sent by Subscriptions Mail.
 
 SMTP Authentication (http://drupal.org/project/smtp) may be useful for sending
 out emails, if your provider imposes limits on what you can do with PHP mail.
@@ -79,6 +82,9 @@ Permissions
 -----------
 
 Don't forget to set the permissions!
+
+Subscriptions does not support anonymous users -- there's no use in
+giving them any subscribe permissions.
 
 
 
