@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #303298: Remove call-time pass-by-reference.
 
 Subscriptions 6.x-1.x-BETA2 (2008-08-30):
    - Add subscriptions_cck.module for D6.

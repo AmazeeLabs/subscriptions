@@ -962,7 +962,7 @@ function subscriptions_content_form_mail_edit_trans_save($form, &$form_state) {
   $form_state['values']['subject'] = $form_state['values']['comment_separator'];
   $form_state['values']['body'] = $form_state['values']['comment_body'];
   $form_state['values']['id'] .= '+comment';
-  mail_edit_trans_save($form, &$form_state);
+  mail_edit_trans_save($form, $form_state);
 }
 
 /**

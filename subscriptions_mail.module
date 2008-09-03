@@ -460,11 +460,11 @@ function subscriptions_mail_form_mail_edit_trans_save($form, &$form_state) {
   $form_state['values']['subject'] = $form_state['values']['digest_item_separator'];
   $form_state['values']['body'] = $form_state['values']['digest_item'];
   $form_state['values']['id'] = $id .'+item';
-  mail_edit_trans_save($form, &$form_state);
+  mail_edit_trans_save($form, $form_state);
   $form_state['values']['subject'] = '';
   $form_state['values']['body'] = $form_state['values']['digest_item_comment'];
   $form_state['values']['id'] = $id .'+comment';
-  mail_edit_trans_save($form, &$form_state);
+  mail_edit_trans_save($form, $form_state);
 }
 
 /**
