@@ -218,7 +218,7 @@ function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, 
   ), $from, TRUE);
 
   $watchdog_params = array('@name' => $name, '@to' => "<$to>");
-  if (!empty($mail_success->result)) {
+  if (!empty($mail_success['result'])) {
     if (variable_get('subscriptions_watchgood', 1)) {
       watchdog('subscriptions', 'notification for @name at @to', $watchdog_params);
     }
