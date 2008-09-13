@@ -83,12 +83,16 @@ function subscriptions_content_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
 function _subscriptions_content_node_options($account, $node) {
   // Default node, field are the first three indexes, but they can be overridden in params
   // Thread
-  $options['nid'][] = array(
-    'name' => t('Subscribe to this page'),
-    'params' => array('module' => 'node', 'field' => 'nid', 'value' => $node->nid),
-    'link' => 'node/'. $node->nid,
-  );
-  $options['nid']['weight'] = -4;
+  $options = array();
+  $statics = variable_get('subscriptions_static_content_types', array());
+  if (!in_array($node->type, $statics)) {
+    $options['nid'][] = array(
+      'name' => t('Subscribe to this page'),
+      'params' => array('module' => 'node', 'field' => 'nid', 'value' => $node->nid),
+      'link' => 'node/'. $node->nid,
+    );
+    $options['nid']['weight'] = -4;
+  }
   $unlisteds = variable_get('subscriptions_unlisted_content_types', array());
   if (user_access('subscribe to content types', $account)) {
     $unlisted_tag = '';
@@ -342,6 +346,30 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
     '#default_value' => variable_get('subscriptions_blocked_nodes', ''),
     '#description'   => t('Enter the IDs of nodes that should be <strong>completely unavailable for subscribing</strong>, separated by spaces.'),
   );
+
+  $statics = variable_get('subscriptions_static_content_types', array());
+  $avoid_empty_subscribe_links = variable_get('subscriptions_avoid_empty_subscribe_links', 0);
+  $form['content']['static_content'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Static content'),
+    '#collapsible' => TRUE,
+    '#collapsed' => (empty($statics) || (count($statics) == 1 && isset($statics[0]))) && !$avoid_empty_subscribe_links,
+  );
+  $form['content']['static_content']['subscriptions_static_content_types'] = array(
+    '#type'          => 'select',
+    '#title'         => t('Static content types'),
+    '#default_value' => $statics,
+    '#options'       => $select,
+    '#description'   => t('Select content types which do not change nor receive comments and thus should not have the %option option.', array('%option' => t('Subscribe to this page'))),
+    '#multiple'      => TRUE,
+  );
+  $form['content']['static_content']['subscriptions_avoid_empty_subscribe_links'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Avoid empty %Subscribe links', array('%Subscribe' => t('Subscribe'))),
+    '#default_value' => $avoid_empty_subscribe_links,
+    '#description'   => t('Nodes of %Static_content_types may end up with no %Subscribe options at all. Turn this option on to avoid displaying %Subscribe links in this case. The default is OFF, because this option causes processing overhead for each node view operation.', array('%Static_content_types' => t('Static content types'), '%Subscribe' => t('Subscribe'))),
+  );
+
   $form['content']['subscriptions_generate_full_node'] = array(
     '#type'          => 'checkbox',
     '#title'         => t('Generate the %full_node variable', array('%full_node' => '!full_node')),
@@ -848,11 +876,11 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
     default:
       $tokens += array(
         '!unsubscribe_url'     => t('The user can unsubscribe by clicking this link.'),
-        '!sender_name'         => t('Name of the sender (if the sender is visible).'),
+        '!sender_name'         => t('The name of the sender (if the sender is visible).'),
         '!sender_page'         => t('The user page of the sender (if the sender is visible).'),
         '!sender_has_contact_page' => t("The sender's contact setting: 1 = contact form enabled, 0 = disabled."),
         '!sender_contact_page' => t('The contact page of the sender.'),
-        '!subs_type'           => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => t('category'))),
+        '!subs_type'           => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => $tr('category'))),
         '!node_type'           => t("The type of the node, like '!forum' or '!story'.", array('!forum' => 'forum', '!story' => 'story')),
         '!title'               => t('The title of the subscriptions item.'),
         '!teaser'              => t('An excerpt of the subscriptions item.'),
@@ -931,7 +959,7 @@ function subscriptions_content_form_mail_edit_trans_alter(&$form, &$form_state) 
     }
     $doc .= "</dl>\n";
     $form['mail']['comment_token_help'] = array(
-      '#title' => t('Replacement patterns'),
+      '#title' => $tr('Replacement patterns'),
       '#type' => 'fieldset',
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,

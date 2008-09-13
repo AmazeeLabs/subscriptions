@@ -120,6 +120,7 @@ function subscriptions_uninstall() {
     db_query("DELETE FROM {mail_edit} WHERE mailkey LIKE 'subscriptions-%'");
   }
 
+  variable_del('subscriptions_avoid_empty_subscribe_links');
   variable_del('subscriptions_blocked_content_types');
   variable_del('subscriptions_blocked_nodes');
   variable_del('subscriptions_cron_percent');
@@ -134,6 +135,7 @@ function subscriptions_uninstall() {
   variable_del('subscriptions_send_intervals');
   variable_del('subscriptions_show_by_author_options');
   variable_del('subscriptions_site_mail');
+  variable_del('subscriptions_static_content_types');
   variable_del('subscriptions_unlisted_content_types');
   variable_del('subscriptions_watchgood');
   variable_del('subscriptions_watchstats');
