@@ -41,6 +41,8 @@ function subscriptions_ui_block($op = 'list', $delta = 0) {
   switch ($op) {
     case 'list':
       $blocks[0]['info'] = t('Subscriptions interface');
+      $blocks[0]['cache'] = BLOCK_CACHE_PER_PAGE;
+      $blocks[0]['region'] = 'content';
       return $blocks;
     case 'view':
       if (subscriptions_ui_can_subscribe() && variable_get('subscriptions_form_in_block', 0) &&
