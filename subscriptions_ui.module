@@ -100,7 +100,7 @@ function subscriptions_ui_link($type, $node = NULL, $teaser = NULL) {
         }
       }
       if (empty($subscriptions_ui_block_visible)) {
-        drupal_set_message(t('Enable the !module block <!link_tag_begin>here<!link_tag_end>!', array('!module' => 'Subscriptions', '!link_tag_begin' => 'a href="/admin/build/block"', '!link_tag_end' => '/a')), 'error');
+        drupal_set_message(t('Enable the !module block <!link_tag_begin>here<!link_tag_end>!', array('!module' => 'Subscriptions', '!link_tag_begin' => 'a href="'. url('admin/build/block') .'"', '!link_tag_end' => '/a')), 'error');
       }
     }
   }

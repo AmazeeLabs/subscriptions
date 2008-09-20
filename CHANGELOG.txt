@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #308801: Fix enable-subscriptions-block-warning link.
    - #299259: Add option to hide "Subscribe to this page", update .pot and de.po files.
    - #302961: Fix bogus "error mailing notification" in watchdog log.
    - #303298: Remove call-time pass-by-reference.
