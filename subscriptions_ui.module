@@ -196,7 +196,7 @@ function subscriptions_ui_node_form(&$form_state, $node, $account = NULL) {
     '#collapsible' => TRUE,
     '#collapsed' => !variable_get('subscriptions_form_expanded', 0),
     '#theme' => 'subscriptions_ui_table',
-    '#prefix' => '<a id="subscribe" />',
+    '#attributes' => array('id' => 'subscribe'),
   );
   $form['wrapper']['subscriptions'] = array(
     '#type' => 'checkboxes',
