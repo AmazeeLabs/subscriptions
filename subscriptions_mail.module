@@ -248,7 +248,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
 
   // check the $base_url (#199039, #226335)
   $url = url('', array('absolute' => TRUE));
-  if (empty($_POST) && (substr($url, 0, 8) == 'http:///' || substr($url, 0, 17) == 'http://localhost/')) {
+  if (empty($_POST) && (substr($url, 0, 8) == 'http:///' || substr($url, 0, 17) == 'http://localhost/' || $url == 'http://')) {
     drupal_set_message(t('Your installation returns %url as the base URL of the site. This is probably not what you want, and it can usually be fixed by setting the %variable variable in your %file file.', array('%url' => $url, '%variable' => '$base_url', '%file' => 'settings.php')), 'error');
   }
 
@@ -403,7 +403,7 @@ function subscriptions_mail_form_mail_edit_trans_alter(&$form, &$form_state) {
       }
       $doc .= "</dl>\n";
       $form['mail']['digest_item_help'] = array(
-        '#title' => t('Replacement patterns'),
+        '#title' => $tr('Replacement patterns'),
         '#type' => 'fieldset',
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
