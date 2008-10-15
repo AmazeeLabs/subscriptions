@@ -889,11 +889,13 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
       if (isset($options['tokens'])) {
         $tokens += $options['tokens'];
       }
+
+      $tokens += module_invoke_all('subscriptions_tokens_list', $mailkey, array('tokens' => $tokens));
+
       if ($mailkey != 'digest') {
-        $tokens += module_invoke_all('subscriptions_tokens_list', $mailkey, array('tokens' => $tokens));
+        $tokens['!full_node']  =  t('The full node as it appears on the website (must be specifically enabled !here).', array('!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node'))));
       }
       $tokens += array(
-        '!full_node'           => t('The full node as it appears on the website (must be specifically enabled !here).', array('!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node')))),
         '!url'                 => t('The URL of the item.'),
         '!is_new'              => t('The type of notification: 1 = new item, 0 = otherwise.'),
         '!is_updated'          => t('The type of notification: 1 = updated (possibly new and already updated) item, 0 = otherwise.'),

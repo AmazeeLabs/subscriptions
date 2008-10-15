@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #318236: Explanation of CCK variables missing from digest page in mail_edit.
    - #311343: Warn about bad 'http://' site url.
    - #315304: Avoid using empty anchor tag.
    - Add missing hook_block('list') information.

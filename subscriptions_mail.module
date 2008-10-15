@@ -323,6 +323,8 @@ function subscriptions_mail_mail_edit_tokens_list($mailkey, $options = array()) 
 function subscriptions_mail_subscriptions_tokens_list($mailkey, $options = array()) {
   $tokens = array();
   switch ($mailkey) {
+    case 'digest':
+      break;
     default:
       $tokens += array(
         '!site'           => t('The name of the site.'),
