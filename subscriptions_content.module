@@ -529,7 +529,7 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   }
   if ($s['load_function'] == 'subscriptions_content_comment_load' || ($s['load_function'] == 'subscriptions_content_node_load' && isset($node->_subscriptions_comments))) {
     $comment_template = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $language->language, 'body', 'CITEM');
-    $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $language->language, 'body', 'SEP');
+    $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $language->language, 'subject', 'SEP');
     $mailvars['!comments'] = _subscriptions_content_format_comments($node, $comment_template, $separator);
   }
   else {
