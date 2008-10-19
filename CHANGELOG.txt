@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #322131: Fix user default subscriptions forms.
    - #318150: Get by without hook_nodeapi('prepare') for inserting nodes programmatically.
  
 Subscriptions 6.x-1.x-BETA3 (2008-10-14):

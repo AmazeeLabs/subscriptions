@@ -152,12 +152,12 @@ function theme_subscriptions_form_table($element) {
  */
 function subscriptions_page_form_submit($form, &$form_state) {
   global $user;
-  if (isset($form_state['values']['roles'])) {
-    $rid0 = current($form_state['values']['roles']);
+  if (isset($form_state['values']['header']['role']['roles'])) {
+    $rid0 = current($form_state['values']['header']['role']['roles']);
   }
   if ($form_state['values']['op'] == $form_state['values']['submit']) {
     if (empty($rid0)) {
-      $form_state['values']['roles'][] = -$form_state['values']['uid'];  // will be negated again below
+      $form_state['values']['header']['role']['roles'][] = -$form_state['values']['uid'];  // will be negated again below
     }
     $module = $form_state['values']['module'];
     $field = $form_state['values']['field'];
@@ -172,19 +172,19 @@ function subscriptions_page_form_submit($form, &$form_state) {
           foreach ($bundle as $author_uid => $set_to_enabled) {
             if ($set_to_enabled && (
                 !isset($defaults['checkboxes'][$value][$author_uid]) ||
-                empty($element_values['send_interval'][$value][$author_uid]) != empty($defaults['send_interval'][$value][$author_uid]) ||
+                $element_values['send_interval'][$value][$author_uid] != $defaults['send_interval'][$value][$author_uid] ||
                 empty($element_values['send_updates'][$value][$author_uid]) != empty($defaults['send_updates'][$value][$author_uid]) ||
                 empty($element_values['send_comments'][$value][$author_uid]) != empty($defaults['send_comments'][$value][$author_uid]))) {
               $send_updates = (empty($element_values['send_updates'][$value][$author_uid]) ? 0 : 1);
               $send_comments = (empty($element_values['send_comments'][$value][$author_uid]) ? 0 : 1);
-              foreach ($form_state['values']['roles'] as $uid) {
+              foreach ($form_state['values']['header']['role']['roles'] as $uid) {
                 subscriptions_write($access_key, $module, $field, $value, $author_uid, -$uid, $element_values['send_interval'][$value][$author_uid], $send_updates, $send_comments);
               }
               $changed = TRUE;
             }
             elseif (!$set_to_enabled && isset($defaults['checkboxes'][$value][$author_uid])) {
               // It was enabled but now it is not. Delete.
-              foreach ($form_state['values']['roles'] as $uid) {
+              foreach ($form_state['values']['header']['role']['roles'] as $uid) {
                 db_query("DELETE FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d", $module, $field, $value, $author_uid, -$uid);
               }
               $changed = TRUE;
