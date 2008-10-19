@@ -225,7 +225,7 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
         _subscriptions_content_autosubscribe($node->type, 'node', 'nid', $node->nid, ($op == 'insert' ? 'on_post' : 'on_update'));
       }
 
-      if ($node->subscriptions_notify) {
+      if (!isset($node->subscriptions_notify) || $node->subscriptions_notify) {
         subscriptions_queue($event);
       }
       break;
@@ -402,7 +402,7 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
                                   '%administer_nodes' => $tr('administer nodes'),
                                   '%Published' => $tr('Published'))),
         '#weight' => 5,
-        '#default_value' => TRUE,
+        '#default_value' => (isset($form['#node']->subscriptions_notify) ? $form['#node']->subscriptions_notify : TRUE),
       );
     }
   }
