@@ -735,6 +735,7 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       '#value' => $defaults,
     );
     subscriptions_form_column_filter($form[0], $uid);
+    $form['#tree'] = TRUE;
     $form['uid'] = array('#type' => 'value', '#value' => $uid);
     $form['access_key'] = array('#type' => 'value', '#value' => 'node');
     $form['module'] = array('#type' => 'value', '#value' => 'node');
@@ -822,6 +823,7 @@ function subscriptions_content_type_form(&$form_state, $account, $form) {
       '#value' => $defaults,
     );
     subscriptions_form_column_filter($form[0], $uid);
+    $form['#tree'] = TRUE;
     $form['uid'] = array('#type' => 'value', '#value' => $uid);
     $form['access_key'] = array('#type' => 'value', '#value' => 'type');
     $form['module'] = array('#type' => 'value', '#value' => 'node');

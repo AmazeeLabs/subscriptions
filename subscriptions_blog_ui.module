@@ -136,6 +136,7 @@ function subscriptions_blog_ui_blog_form(&$form_state, $blogs, $account, $form) 
   );
   subscriptions_form_column_filter($form[0], $uid);
 
+  $form['#tree'] = TRUE;
   $form['uid'] = array('#type' => 'value', '#value' => $uid);
   $form['access_key'] = array('#type' => 'value', '#value' => 'blog');
   $form['module'] = array('#type' => 'value', '#value' => 'node');
