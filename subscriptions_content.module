@@ -695,7 +695,9 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
   $sql = db_rewrite_sql("
     SELECT s.value, s.send_interval, s.author_uid, s.send_comments, s.send_updates, n.title, n.status
     FROM {node} n
-    INNER JOIN {subscriptions} s ON CAST(n.nid AS CHAR) = s.value
+    INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+                                  ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : '')
+                                       ." = s.value
     WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d
     ORDER BY s.author_uid");
   $result = db_query($sql, $uid);

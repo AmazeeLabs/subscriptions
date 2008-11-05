@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #328341: Make pgsql CAST()s conditional on the database engine.
    - #322131: Really fix user default subscriptions forms.
    - #322131: Fix user default subscriptions forms.
    - #318150: Get by without hook_nodeapi('prepare') for inserting nodes programmatically.
