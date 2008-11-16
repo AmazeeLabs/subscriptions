@@ -390,7 +390,7 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
 function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
   global $user;
 
-  if (isset($form['type']) && $form['type']['#value'] .'_node_form' == $form_id) {
+  if (isset($form['type']['#value']) && $form['type']['#value'] .'_node_form' == $form_id) {
     if (isset($form['options'])) {
       $tr = 't';
       $form['options']['subscriptions_notify'] = array(
