@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #336952: Warn about IP as site address.
    - #333818: Fix E_NOTICE.
    - #328341: Make pgsql CAST()s conditional on the database engine.
    - #322131: Really fix user default subscriptions forms.
