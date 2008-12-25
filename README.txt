@@ -23,6 +23,7 @@ Initial Translations:
 - Italian:  peterpoe
 - Spanish:  develCuy
 - French:   matkeane
+- Japanese: PineRay
 
 Contributed Modules:
 - moderate_content_notifications:  written and maintained by beginner.
@@ -204,6 +205,13 @@ Both then_text and else_text can contain newlines and variables.
 
 Example:
 This {{!has_new_comments==1?has:doesn't have any}} new comments.
+
+Undefined variables are replaced by themselves, i.e. they remain as !varname.
+Example:
+{{!sender_name==!sender_name?Sender is undefined:Sender: !sender_name}}
+
+Variables can be defined and empty. Example:
+{{!sender_name==?Sender is empty:Sender is either undefined or non-empty}}
 
 Note: All the URL variables are built by calling the url() core function.
 You may be able to influence the return value of url() by setting $base_url 
