@@ -40,16 +40,21 @@ function subscriptions_mail_cron() {
   while (($mails_allowed <= 0 || $single_count + count($mails) < $mails_allowed)
           && $total_seconds - timer_read('page')/1000 > $available_seconds*variable_get('subscriptions_cron_percent', 50)/100) {
     $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE last_sent + send_interval < %d ORDER BY sqid', time(), 0, 1);
-    if ($s = db_fetch_array($result)) {
-      if (!isset($users[$s['uid']])) {
-        $users[$s['uid']] = user_load(array('uid' => $s['uid']));
-      }
-      $saved_user = $user;
-      $saved_language = $language;
-      session_save_session(FALSE);
-      $user = $users[$s['uid']];
-      drupal_init_language();
-      $langcode = $language->language;
+    if (!($s = db_fetch_array($result))) {
+      break;  // No more subscriptions, terminate loop.
+    }
+    
+    if (!isset($users[$s['uid']])) {
+      $users[$s['uid']] = user_load(array('uid' => $s['uid']));
+    }
+    $saved_user = $user;
+    $saved_language = $language;
+    session_save_session(FALSE);
+    $user = $users[$s['uid']];
+    drupal_init_language();
+    $langcode = $language->language;
+
+    do {  // once and repeat while adding to a digest
       if ($user->status && $user->access) {
         $cids = array();
         $load_function = $s['load_function'];
@@ -141,16 +146,22 @@ function subscriptions_mail_cron() {
           }
         }
       }
-      $user = $saved_user;
-      $language = $saved_language;
-      session_save_session(TRUE);
       db_query("DELETE FROM {subscriptions_queue} WHERE load_function = '%s' AND load_args = '%s' AND uid = %d", $s['load_function'], $s['load_args'], $s['uid']);
-    }
-    else {
-      // No more subscriptions, terminate loop.
-      break;
-    }
+
+      if ($digest) {
+        // TODO: Get the next queue item for this user and finish off this user's digest
+        // before moving on to the next user. All messages in one digest together count
+        // as one mail, and if the number of mails is limited (per cron run), we must
+        // not let this cause a split up of the digest.
+        // Issue: We must know which notifications to send according to their send_interval.
+      }
+    } while ( FALSE );  // TODO: while adding to a digest
+
+    $user = $saved_user;
+    $language = $saved_language;
+    session_save_session(TRUE);
   }
+
   if ($mails) {
     session_save_session(FALSE);
     foreach ($mails as $uid => $user_mails) {
