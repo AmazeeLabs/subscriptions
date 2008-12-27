@@ -2,6 +2,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
  
+Subscriptions 6.x-1.x-BETA5 (2008-12-27):
+   - #351606: Fix deprecated call-time pass-by-reference.
+
 Subscriptions 6.x-1.x-BETA4 (2008-12-27):
    - #339076: Decode entities in CCK field values.
    - #305235: Make 'Subscribe' links compatible with Pathauto.
