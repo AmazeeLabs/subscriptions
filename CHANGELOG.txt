@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #351753: Add any missing {subscriptions_user} records without complaint to support multi-site installations.
    - Remove pre-D6 {subscriptions_mail_edit} table from database schema.
    - Clean up database schema to keep schema module happy.
    - #305235: Revert previous patch because it didn't work.
