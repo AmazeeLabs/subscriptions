@@ -24,6 +24,7 @@ Initial Translations:
 - Spanish:  develCuy
 - French:   matkeane
 - Japanese: PineRay
+- Danish:   wulff / Anders Lund
 
 Contributed Modules:
 - moderate_content_notifications:  written and maintained by beginner.
