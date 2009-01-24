@@ -445,6 +445,9 @@ function subscriptions_types($field = NULL, $type = NULL) {
   if (!isset($types)) {
     $types = module_invoke_all('subscriptions', 'types');
     foreach ($types as $stype => $data) {
+      if (!_subscriptions_validate_hook_result($stype, $data)) {
+        continue;
+      }
       foreach ($data as $name => $value) {
         $list[$name][$stype] = $value;
       }
@@ -459,6 +462,34 @@ function subscriptions_types($field = NULL, $type = NULL) {
   else {
     return $types;
   }
+}
+
+/**
+ * Check return values of hook_subscriptions().
+ */
+function _subscriptions_validate_hook_result($stype, $data)
+{
+  if (isset($stype)) {
+    if (!is_numeric($stype) && is_array($data) && isset($data['title']) && isset($data['access']) && isset($data['page']) && isset($data['fields']) && is_array($data['fields'])) {
+      return TRUE;
+    }
+  }
+
+  static $already_reported = FALSE;
+  if (!$already_reported) {
+    $already_reported = TRUE;
+    foreach (module_implements('subscriptions') as $module) {
+      $hook = $module .'_subscriptions';
+      $types = $hook('types');
+      foreach($types as $stype => $data) {
+        if (!_subscriptions_validate_hook_result($stype, $data)) {
+          $modules[$module] = $module;
+        }
+      }
+    }
+    drupal_set_message(t('The following modules return invalid data from %hook: !modules   Either they are buggy Subscriptions add-ons, or they are unrelated to Subscriptions and should not define %hook!', array('%hook' => 'hook_subscriptions()', '!modules' => '<ul><li>'. implode($modules, '</li><li>') .'</li></ul>')), 'error', FALSE);
+  }
+  return FALSE;
 }
 
 /**

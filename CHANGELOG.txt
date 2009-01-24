@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #362533: Analyze and report faulty returns from hook_subscriptions().
    - Move Danish translation to the correct directory (it's based on the D5 version even though it was uploaded to HEAD/D6, but it's better than nothing).
    - #351753: Add any missing {subscriptions_user} records without complaint to support multi-site installations.
    - Remove pre-D6 {subscriptions_mail_edit} table from database schema.
