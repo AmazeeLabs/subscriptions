@@ -18,13 +18,14 @@ Doxygen documentation by develCuy, sponsored by www.transit.york.ac.uk.
 http://api.drupal-contrib.org/api/subscriptions provides on-line developer documentation.
 
 Initial Translations:
-- German:   salvis
-- Hebrew:   yhager
-- Italian:  peterpoe
-- Spanish:  develCuy
-- French:   matkeane
-- Japanese: PineRay
-- Danish:   wulff / Anders Lund
+- German:               salvis
+- Hebrew:               yhager
+- Italian:              peterpoe
+- Spanish:              develCuy
+- French:               matkeane
+- Japanese:             PineRay
+- Danish:               wulff / Anders Lund
+- Brazilian Portuguese: Márcio Moreira
 
 Contributed Modules:
 - moderate_content_notifications:  written and maintained by beginner.
