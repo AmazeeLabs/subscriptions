@@ -658,7 +658,13 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
         $limit_sqids = 'AND q.sqid < '. (integer) $cutoff_sqid;
       }
     }
-    $sql = "SELECT q.sqid AS _subscriptions_sqid, q.is_new AS _subscriptions_is_new, c.* FROM {comments} c INNER JOIN {subscriptions_queue} q ON c.cid = q.load_args AND q.uid = %d AND q.load_function = '%s' WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
+    $sql = "
+      SELECT q.sqid AS _subscriptions_sqid, q.is_new AS _subscriptions_is_new, c.* 
+      FROM {comments} c 
+        INNER JOIN {subscriptions_queue} q ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+                                            ."c.cid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : '')
+                                                 ." = q.load_args AND q.uid = %d AND q.load_function = '%s' 
+      WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
     $sql = db_rewrite_sql($sql, 'c', 'cid');
     $result = db_query($sql, $user->uid, 'subscriptions_content_comment_load', $nid);
     $sqids = $placeholders = array();
