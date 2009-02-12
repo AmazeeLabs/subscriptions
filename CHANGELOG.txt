@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #373128: Fix notice (Trying to get property of non-object).
    - #371701: Add another pgsql CAST().
    - #365682: Commit Brazilian Portuguese translation.
    - #362533: Analyze and report faulty returns from hook_subscriptions().
