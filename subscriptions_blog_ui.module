@@ -73,15 +73,15 @@ function subscriptions_blog_ui_page_blog($account, $form) {
 
   // possibly additional blog subscription entries (no blog nodes)
   if (isset($account)) {
-	  $result = db_query("
-	    SELECT s.author_uid, u.name
-	    FROM {subscriptions} s
-	    INNER JOIN {users} u ON s.author_uid = u.uid
-	    WHERE s.module = 'node' AND s.field = 'type' AND s.value = 'blog' AND s.recipient_uid = %d
-	    ORDER BY u.name", $account->uid);
-	  while ($usr = db_fetch_array($result)) {
-	    $blogs[$usr['author_uid']]['uid'] = $usr['author_uid'];
-	    $blogs[$usr['author_uid']]['name'] = $usr['name'];
+    $result = db_query("
+      SELECT s.author_uid, u.name
+      FROM {subscriptions} s
+      INNER JOIN {users} u ON s.author_uid = u.uid
+      WHERE s.module = 'node' AND s.field = 'type' AND s.value = 'blog' AND s.recipient_uid = %d
+      ORDER BY u.name", $account->uid);
+    while ($usr = db_fetch_array($result)) {
+      $blogs[$usr['author_uid']]['uid'] = $usr['author_uid'];
+      $blogs[$usr['author_uid']]['name'] = $usr['name'];
     }
   }
 
