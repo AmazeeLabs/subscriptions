@@ -486,7 +486,7 @@ msgid "Note"
 msgstr ""
 
 #: subscriptions_content.module:339
-msgid "The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types will be marked with a !symbol symbol (and appear in !red_ON red !red_OFF in the case of blocked types)."
+msgid "The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types and links will be marked with a '!symbol' symbol (and appear !red_ON like this !red_OFF in the case of blocked types)."
 msgstr ""
 
 #: subscriptions_content.module:343

@@ -336,7 +336,7 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
   $form['content']['subscriptions_blocked_content_types_note'] = array(
     '#type'          => 'item',
     '#title'         => t('Note'),
-    '#value'         => t('The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types will be marked with a !symbol symbol (and appear in !red_ON red !red_OFF in the case of blocked types).', array('%permission' => t('subscribe to all content types'), '!symbol' => SUBSCRIPTIONS_UNAVAILABLE, '!red_ON' => '<span class="error">', '!red_OFF' => '</span>')),
+    '#value'         => t("The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types and links will be marked with a '!symbol' symbol (and appear !red_ON like this !red_OFF in the case of blocked types).", array('%permission' => t('subscribe to all content types'), '!symbol' => SUBSCRIPTIONS_UNAVAILABLE, '!red_ON' => '<span class="error">', '!red_OFF' => '</span>')),
   );
   $form['content']['subscriptions_blocked_nodes'] = array(
     '#type'          => 'textfield',

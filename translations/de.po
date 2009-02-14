@@ -572,8 +572,8 @@ msgid "Note"
 msgstr "Anmerkung"
 
 #: subscriptions_content.module:339
-msgid "The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types will be marked with a !symbol symbol (and appear in !red_ON red !red_OFF in the case of blocked types)."
-msgstr "Die %permission Berechtigung erlaubt normalen Zugang zu weggelassenen und gesperrten Inhaltstypen. Dies ist eine administrative Funktion, und die betroffenen Inhaltstypen werden durch ein !symbol Zeichen markiert; gesperrte Inhaltstypen erscheinen zudem !red_ON rot !red_OFF."
+msgid "The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types and links will be marked with a '!symbol' symbol (and appear !red_ON like this !red_OFF in the case of blocked types)."
+msgstr "Die %permission Berechtigung erlaubt normalen Zugang zu weggelassenen und gesperrten Inhaltstypen. Dies ist eine administrative Funktion, und die betroffenen Inhaltstypen und Links werden durch ein '!symbol' Zeichen markiert; gesperrte Inhaltstypen erscheinen zudem !red_ON so. !red_OFF"
 
 #: subscriptions_content.module:343
 msgid "Blocked nodes"
