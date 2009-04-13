@@ -102,7 +102,7 @@ function theme_subscriptions_form_table($element) {
   $output = '';
   $rows = array();
   drupal_add_js(drupal_get_path('module', 'subscriptions') .'/subscriptions_tableselect.js', 'module', 'header', FALSE, TRUE, FALSE);
-  $columns['checkboxes']    = array('data' => '&nbsp;', 'width' => '1%', 'class' => 'subscriptions-table');
+  $columns['checkboxes']    = array('data' => '', 'width' => '1%', 'class' => 'subscriptions-table select-all');
   $columns['labels']        = array('data' => '&nbsp;', 'width' => '18%');
   if (isset($element['send_interval']) && $element['send_interval']['#access']) {
     $columns['send_interval'] = array('data' => t('Send interval'), 'width' => '20%');
@@ -130,6 +130,9 @@ function theme_subscriptions_form_table($element) {
 
   foreach (element_children($element['checkboxes']) as $key) {
     foreach (element_children($element['checkboxes'][$key]) as $key1) {
+      if (empty($element['checkboxes'][$key][$key1]['#disabled'])) {
+        $element['checkboxes'][$key][$key1]['#attributes']['class'] = 'select-row';
+      }
       $row = array();
       foreach (array_keys($columns) as $colkey) {
         $row[] = drupal_render($element[$colkey][$key][$key1]);
