@@ -699,17 +699,40 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
   $uid = $account->uid;
   $subscriptions = array();
   $sql = db_rewrite_sql("
-    SELECT s.value, s.send_interval, s.author_uid, s.send_comments, s.send_updates, n.title, n.status
+    SELECT n.nid, n.uid, s.send_interval, s.author_uid, s.send_comments, s.send_updates, n.title, n.status, n.changed, n.comment AS comment_count, ncs.last_comment_timestamp,
+      IF(s.send_comments + s.send_updates = 0, n.created, IF(s.send_comments + s.send_updates = 2, IF(n.changed > ncs.last_comment_timestamp, n.changed, ncs.last_comment_timestamp), IF(s.send_comments = 1, ncs.last_comment_timestamp, n.changed))) AS latest_activity
     FROM {node} n
     INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
                                   ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : '')
                                        ." = s.value
+    LEFT JOIN {node_comment_statistics} ncs ON n.nid = ncs.nid
     WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d
-    ORDER BY s.author_uid");
+    ORDER BY latest_activity DESC");
   $result = db_query($sql, $uid);
   while ($s = db_fetch_array($result)) {
-    $subscriptions[$s['value']][$s['author_uid']] = $s;
+    $subscriptions[$s['nid']][$s['author_uid']] = $s;
   }
+
+  // check whether we've commented:
+  $nids = array_keys($subscriptions);
+  $placeholders = db_placeholders($nids);
+  $result = db_query("
+    SELECT nid FROM {comments}
+      WHERE
+        nid IN (
+          SELECT ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+               ."value". ($GLOBALS['db_type'] == 'pgsql' ? ' AS INTEGER)' : '')
+                    ." FROM {subscriptions} WHERE module = 'node' AND field = 'nid' AND recipient_uid = %d
+        )
+        AND uid = %d GROUP BY nid", $uid, $uid);
+  while ($c = db_fetch_array($result)) {
+    if (isset($subscriptions[$c['nid']])) {
+      foreach ($subscriptions[$c['nid']] as $author_uid => $subscription) {
+        $subscriptions[$c['nid']][$author_uid]['commented'] = TRUE;
+      }
+    }
+  }
+
   $form[0] = array(
     '#type' => 'item',
     '#title' => '',
@@ -723,7 +746,7 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       if ($title != $subscription['title']) {
         $title .= '...';
       }
-      $title = l($title, 'node/'. $subscription['value']);
+      $title = l($title, 'node/'. $subscription['nid']);
       if (!$subscription['status']) {
         if (user_access('administer nodes')) {
           $title = SUBSCRIPTIONS_UNAVAILABLE .'&nbsp;'. $title;
@@ -732,9 +755,15 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
           continue;
         }
       }
-      subscriptions_form_helper($form[0], $defaults, $author_uid, $subscription['value'], $title, $subscription);
+      $subscription['extra_info'] = t('@latest_activity, @authored, @commented', array(
+        '@latest_activity' => format_interval(time() - $subscription['latest_activity']),
+        '@authored' => ($subscription['uid'] == $uid ? t('yes') : t('no')),
+        '@commented' => (!empty($subscription['commented']) ? t('yes') : t('no')),
+      ));
+      subscriptions_form_helper($form[0], $defaults, $author_uid, $subscription['nid'], $title, $subscription);
     }
   }
+  $form[0]['extra_info']['#title'] = t('Latest activity, authored, commented');
   unset($form[0]['author']);
 
   if (count(element_children($form[0]))) {
@@ -759,6 +788,10 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       ),
     );
   }
+  $form['note'] = array(
+    '#type' => 'item',
+    '#description' => '<div>'. t('Note: Deactivated subscriptions will be removed from the list.') .'</div>',
+  );
   return $form;
 }
 

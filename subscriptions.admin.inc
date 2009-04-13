@@ -125,19 +125,24 @@ function theme_subscriptions_form_table($element) {
       }
     }
   }
+  if (isset($element['extra_info'])) {
+    $columns['extra_info']['data'] = $element['extra_info']['#title'];
+  }
   $column_keys = array_keys($columns);
   unset($columns[end($column_keys)]['width']);  // let the last column grow
 
-  foreach (element_children($element['checkboxes']) as $key) {
-    foreach (element_children($element['checkboxes'][$key]) as $key1) {
-      if (empty($element['checkboxes'][$key][$key1]['#disabled'])) {
-        $element['checkboxes'][$key][$key1]['#attributes']['class'] = 'select-row';
+  if (isset($element['checkboxes'])) {
+    foreach (element_children($element['checkboxes']) as $key) {
+      foreach (element_children($element['checkboxes'][$key]) as $key1) {
+        if (empty($element['checkboxes'][$key][$key1]['#disabled'])) {
+          $element['checkboxes'][$key][$key1]['#attributes']['class'] = 'select-row';
+        }
+        $row = array();
+        foreach (array_keys($columns) as $colkey) {
+          $row[] = drupal_render($element[$colkey][$key][$key1]);
+        }
+        $rows[] = $row;
       }
-      $row = array();
-      foreach (array_keys($columns) as $colkey) {
-        $row[] = drupal_render($element[$colkey][$key][$key1]);
-      }
-      $rows[] = $row;
     }
   }
   if ($rows) {
@@ -757,10 +762,16 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
     '#options' => $intervals,
     '#default_value' => $defaults['send_interval'][$key][$author_uid],
   );
-  foreach (array('checkboxes', 'send_comments', 'send_updates') as $index => $name) {
-    $form[$name][$key][$author_uid] = array(
+  foreach (array('checkboxes', 'send_comments', 'send_updates') as $col_name) {
+    $form[$col_name][$key][$author_uid] = array(
       '#type' => 'checkbox',
-      '#default_value' => !empty($defaults[$name][$key][$author_uid]),
+      '#default_value' => !empty($defaults[$col_name][$key][$author_uid]),
+    );
+  }
+  if (isset($subscription['extra_info'])) {
+    $form['extra_info'][$key][$author_uid] = array(
+      '#type' => 'item',
+      '#value' => $subscription['extra_info'],
     );
   }
 }

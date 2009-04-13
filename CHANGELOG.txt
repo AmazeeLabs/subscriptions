@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #356964: Add "Latest activity, authored, commented" information on the page/thread subscriptions page.
    - #356964: Add select/unselect all checkbox on the subscriptions pages.
    - #373130: Avoid mentioning 'red' formatting because this is theme-dependent.
    - #372490: Add tag symbol to links that are visible only due to the 'subscribe to all content types' permission.
