@@ -102,8 +102,8 @@ function theme_subscriptions_form_table($element) {
   $output = '';
   $rows = array();
   drupal_add_js(drupal_get_path('module', 'subscriptions') .'/subscriptions_tableselect.js', 'module', 'header', FALSE, TRUE, FALSE);
-  $columns['checkboxes']    = array('data' => '', 'width' => '1%', 'class' => 'subscriptions-table select-all');
-  $columns['labels']        = array('data' => '&nbsp;', 'width' => '18%');
+  $columns['checkboxes']      = array('data' => '', 'width' => '1%', 'class' => 'subscriptions-table select-all');
+  $columns['labels']          = array('data' => t('Subscription'), 'width' => '18%');
   if (isset($element['send_interval']) && $element['send_interval']['#access']) {
     $columns['send_interval'] = array('data' => t('Send interval'), 'width' => '20%');
   }
@@ -274,7 +274,7 @@ function subscriptions_page($account, $stype) {
 
   $form['footer'] = array(
     '#type' => 'item',
-    '#description' => t('The master checkboxes on the left turn the given subscription on or off. Depending on the setup of the site, you may have additional options for active subscriptions.'),
+    '#description' => t('The master checkboxes on the left turn the given subscription on or off. Click and Shift-click to turn a range of subscriptions on or off.') .'<br />'. t('Depending on the setup of the site, you may have additional options for active subscriptions.'),
     '#weight' => 10,
     );
 

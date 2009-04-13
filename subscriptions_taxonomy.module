@@ -248,7 +248,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
         $tree = $subscriptions_terms_by_vid[$vocab->vid];
         $form[$vocab->vid][1] = array(
           '#type' => 'item',
-          '#description' => '<div>'. t('This is a restricted category group; to subscribe to an unlisted category, go to a post in that category and subscribe from there.') .'</div>',
+          '#description' => '<div>'. t('This is a restricted category group; inactive subscriptions will disappear. To subscribe to an unlisted category, go to a post in that category and subscribe from there.') .'</div>',
         );
       }
     }
@@ -262,7 +262,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
         if (is_array($term)) {
           $term = (object)$term;
         }
-        $title = str_repeat('--&nbsp;', $term->depth) . l($term->name, 'taxonomy/term/'. $term->tid);
+        $title = str_repeat('--&nbsp;', (empty($term->depth) ? 0 : $term->depth)) . l($term->name, 'taxonomy/term/'. $term->tid);
         if (!isset($subscriptions_vid[$term->tid][-1])) {
           // author-less item is missing -- add it here:
           $subscriptions_vid[$term->tid][-1] = array(

@@ -39,7 +39,7 @@ Drupal.subscriptions_tableSelect = function() {
 
   // Keep track of the table, which checkbox is checked and alias the settings.
   var table = this, checkboxes, lastChecked;
-  var strings = { 'selectAll': Drupal.t('Select all rows in this table'), 'selectNone': Drupal.t('Deselect all rows in this table') };
+  var strings = { 'selectAll': Drupal.t('Turn all subscriptions on.'), 'selectNone': Drupal.t('Turn all subscriptions off.') };
   var updateSelectAll = function(state) {
     $('th.select-all input:checkbox', table).each(function() {
       $(this).attr('title', state ? strings.selectNone : strings.selectAll);
