@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #427642: Add Hungarian translation.
    - Minor clean-up (mostly strings).
    - #356964: Add "Latest activity, authored, commented" information on the page/thread subscriptions page.
    - #356964: Add select/unselect all checkbox on the subscriptions pages.
