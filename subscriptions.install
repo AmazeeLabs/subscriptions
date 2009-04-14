@@ -127,16 +127,12 @@ function subscriptions_uninstall() {
   variable_del('subscriptions_form_link_only');
   variable_del('subscriptions_generate_full_node');
   variable_del('subscriptions_link_teaser');
-  variable_del('subscriptions_number_of_mails');
   variable_del('subscriptions_omitted_taxa');
   variable_del('subscriptions_restricted_taxa');
   variable_del('subscriptions_send_intervals');
   variable_del('subscriptions_show_by_author_options');
-  variable_del('subscriptions_site_mail');
   variable_del('subscriptions_static_content_types');
   variable_del('subscriptions_unlisted_content_types');
-  variable_del('subscriptions_watchgood');
-  variable_del('subscriptions_watchstats');
 
   // also remove legacy 5.x-1.9(-dev) variables:
   variable_del('subscriptions_allow_vid');
