@@ -487,7 +487,7 @@ function _subscriptions_validate_hook_result($stype, $data)
         }
       }
     }
-    drupal_set_message(t('The following modules return invalid data from %hook: !modules   Either they are buggy Subscriptions add-ons, or they are unrelated to Subscriptions and should not define %hook!', array('%hook' => 'hook_subscriptions()', '!modules' => '<ul><li>'. implode($modules, '</li><li>') .'</li></ul>')), 'error', FALSE);
+    drupal_set_message(t('The following modules return invalid data from %hook: !modules   Either they are buggy !Subscriptions add-ons, or they are unrelated to !Subscriptions and should not define %hook!', array('%hook' => 'hook_subscriptions()', '!modules' => '<ul><li>'. implode($modules, '</li><li>') .'</li></ul>', '!Subscriptions' => 'Subscriptions')), 'error', FALSE);
   }
   return FALSE;
 }

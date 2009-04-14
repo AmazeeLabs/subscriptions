@@ -715,6 +715,7 @@ function subscriptions_content_page_node($account, $form) {
  */
 function subscriptions_content_node_form(&$form_state, $account, $form) {
   $uid = $account->uid;
+  $tr = 't';
   $subscriptions = array();
   $sql = db_rewrite_sql("
     SELECT n.nid, n.uid, s.send_interval, s.author_uid, s.send_comments, s.send_updates, n.title, n.status, n.changed, n.comment AS comment_count, ncs.last_comment_timestamp,
@@ -775,8 +776,8 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       }
       $subscription['extra_info'] = t('@latest_activity, @authored, @commented', array(
         '@latest_activity' => format_interval(time() - $subscription['latest_activity']),
-        '@authored' => ($subscription['uid'] == $uid ? t('yes') : t('no')),
-        '@commented' => (!empty($subscription['commented']) ? t('yes') : t('no')),
+        '@authored' => ($subscription['uid'] == $uid ? $tr('Yes') : $tr('No')),
+        '@commented' => (!empty($subscription['commented']) ? $tr('Yes') : $tr('No')),
       ));
       subscriptions_form_helper($form[0], $defaults, $author_uid, $subscription['nid'], $title, $subscription);
     }

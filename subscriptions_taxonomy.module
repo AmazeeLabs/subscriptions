@@ -248,7 +248,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
         $tree = $subscriptions_terms_by_vid[$vocab->vid];
         $form[$vocab->vid][1] = array(
           '#type' => 'item',
-          '#description' => '<div>'. t('This is a restricted category group; inactive subscriptions will disappear. To subscribe to an unlisted category, go to a post in that category and subscribe from there.') .'</div>',
+          '#description' => '<div>'. t('This is a restricted category group; deactivated subscriptions will be removed from the list. To subscribe to an unlisted category, go to a post in that category and subscribe from there.') .'</div>',
         );
       }
     }
