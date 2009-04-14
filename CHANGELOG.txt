@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #430870: Check the syntax of the blocked node input field.
    - #324716: Allow modifying the "From" e-mail name.
    - #427642: Add Hungarian translation.
    - Minor clean-up (mostly strings).

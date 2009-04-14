@@ -346,6 +346,7 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
     '#default_value' => variable_get('subscriptions_blocked_nodes', ''),
     '#description'   => t('Enter the IDs of nodes that should be <strong>completely unavailable for subscribing</strong>, separated by spaces.'),
   );
+  $form['#validate'][] = '_subscriptions_content_validate_blocked_nodes';
 
   $statics = variable_get('subscriptions_static_content_types', array());
   $avoid_empty_subscribe_links = variable_get('subscriptions_avoid_empty_subscribe_links', 0);
@@ -376,6 +377,23 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
     '#default_value' => variable_get('subscriptions_generate_full_node', 0),
     '#description'   => t("Generating this variable causes considerable overhead even if it's not used, and <strong>it may even cause errors</strong>, depending on the !content_type! Default is OFF.", array('!content_type' => $tr('content type'))),
   );
+}
+
+/**
+ * Validate the 'subscriptions_blocked_nodes' input.
+ */
+function _subscriptions_content_validate_blocked_nodes($form, $form_state) {
+  $form_values = $form_state['values'];
+  $values = $form_values['subscriptions_blocked_nodes'];
+  if (!empty($values)) {
+    $values = explode(' ', $values);
+    foreach ($values as $v) {
+      if (!empty($v) && !is_numeric($v)) {
+        form_set_error('subscriptions_blocked_nodes', t('Enter a series of numbers, separated by spaces.'));
+        break;
+      }
+    }
+  }
 }
 
 /**
