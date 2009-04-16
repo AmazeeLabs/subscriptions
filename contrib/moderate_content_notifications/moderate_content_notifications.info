@@ -1,5 +1,0 @@
-; $Id$
-name = Moderate Content Notifications
-description = Spam deterrent: make sure no spam is sent from our web site.
-package = "Subscriptions"
-dependencies = subscriptions_content
