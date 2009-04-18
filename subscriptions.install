@@ -126,6 +126,7 @@ function subscriptions_uninstall() {
   variable_del('subscriptions_form_in_block');
   variable_del('subscriptions_form_link_only');
   variable_del('subscriptions_generate_full_node');
+  variable_del('subscriptions_hide_overview_page');
   variable_del('subscriptions_link_teaser');
   variable_del('subscriptions_omitted_taxa');
   variable_del('subscriptions_restricted_taxa');

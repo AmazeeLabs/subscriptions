@@ -386,6 +386,12 @@ function subscriptions_user_settings_form(&$form_state, $account) {
         )
       ) .'</div>',
     );
+    $form['settings']['info']['hide_overview_page'] = array(
+      '#type'          => 'checkbox',
+      '#title'         => t('Hide the %Overview page from your users', array('%Overview' => t('Overview'))),
+      '#default_value' => variable_get('subscriptions_hide_overview_page', 0),
+      '#description'   => t("If you hide this page, your users won't be able to change any of these settings. The default is OFF."),
+    );
   }
   $form['settings']['autosub'] = array(
     '#type'          => 'fieldset',
@@ -542,6 +548,10 @@ function subscriptions_user_settings_form_submit($form, &$form_state) {
     }
     else {
       $uid = -DRUPAL_AUTHENTICATED_RID;
+      if (variable_get('subscriptions_hide_overview_page', 0) != $form_state['values']['hide_overview_page']) { 
+        variable_set('subscriptions_hide_overview_page', $form_state['values']['hide_overview_page']);
+        menu_rebuild();
+      }
     }
     $send_interval_visible = 1-$form_state['values']['send_interval_visible'];
     $send_updates_visible = 1-$form_state['values']['send_updates_visible'];

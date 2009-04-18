@@ -86,13 +86,26 @@ function subscriptions_menu() {
     'access callback' => '_subscriptions_access',
     'access arguments' => array(1),
   );
-  $items['user/%user/subscriptions/overview'] = array(
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'title' => 'Overview',
-    'weight' => -10,
-  );
+
+  $hide_overview_page = variable_get('subscriptions_hide_overview_page', 0);
+  if (!$hide_overview_page) {
+    $items['user/%user/subscriptions/overview'] = array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => 'Overview',
+      'weight' => -10,
+    );
+  }
+  else {
+    $minimum_weight = 0;
+    foreach (subscriptions_types() as $stype => $data) {
+      if (isset($data['weight']) && $data['weight'] < $minimum_weight) {
+        $minimum_weight = $data['weight'];
+      }
+    }
+  }
 
   foreach (subscriptions_types() as $stype => $data) {
+    $weight = (isset($data['weight']) ? $data['weight'] : 0);
     $items['subscriptions/add/'. $stype] = array(
       'title' => 'Add subscription',
       'type' => MENU_CALLBACK,
@@ -118,8 +131,22 @@ function subscriptions_menu() {
       'page arguments' => array(1, $stype),
       'access callback' => '_subscriptions_access',
       'access arguments' => array(1, $data['access']),
-      'weight' => (isset($data['weight']) ? $data['weight'] : 0),
+      'weight' => $weight,
     );
+
+    if ($hide_overview_page && $minimum_weight == $weight) {
+      // Install the first subscription type page as the default task.
+      $items['user/%user/subscriptions/'. $stype]['type'] = MENU_DEFAULT_LOCAL_TASK;
+      $default_item = $items['user/%user/subscriptions/'. $stype];
+      $items['user/%user/subscriptions'] = array_merge($items['user/%user/subscriptions'], array(
+        'file' => $default_item['file'],
+        'page callback' => $default_item['page callback'],
+        'page arguments' => $default_item['page arguments'],
+        'access callback' => $default_item['access callback'],
+        'access arguments' => $default_item['access arguments'],
+      ));
+      $hide_overview_page = FALSE;
+    }
 
     if ($stype == 'node') {
       continue;  // not in site settings
@@ -131,7 +158,7 @@ function subscriptions_menu() {
       'page callback' => 'subscriptions_page',
       'page arguments' => array(NULL, $stype),
       'access arguments' => array('administer site configuration'),
-      'weight' => (isset($data['weight']) ? $data['weight'] : 0),
+      'weight' => $weight,
     );
   }
 
