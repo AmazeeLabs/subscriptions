@@ -1,7 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
-   - #277441: Allow hiding the Overview user page.
+   - Define new hook_subscriptions_ui() to allow arbitration of multiple node UIs.
    - #301229: Remove subscriptions_moderate_content_notifications module.
    - Update strings, .pot file and German translation.
    - #430870: Check the syntax of the blocked node input field.
