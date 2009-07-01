@@ -553,6 +553,13 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   else {
     $mailvars['!comments'] = '';
   }
+  $files = '';
+  if (isset($node->files) && user_access('view uploaded files')) {
+    foreach($node->files as $file) {
+      $files .= file_create_url($file->filepath) ."\n";
+    }
+  }
+  $mailvars['!files'] = $files;
 }
 
 /**
@@ -963,6 +970,7 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         '!is_updated'          => t('The type of notification: 1 = updated (possibly new and already updated) item, 0 = otherwise.'),
         '!is_old'              => t('The type of notification: 1 = neither new nor updated item, 0 = otherwise.'),
         '!is_published'        => t('The publication state: 1 = published, 0 = unpublished.<br />(Unpublished nodes are sent to users with the %administer_nodes permission only.)', array('%administer_nodes' => $tr('administer nodes'))),
+        '!files'               => t('The list of attached files, one per line, if any, otherwise empty.'),
         '!has_new_comments'    => t('The comments state: 1 = comments are available in !comments, 0 = no comments.'),
         '!comments'            => t('One or more comments if available, otherwise empty.') .'<br />',
       );
