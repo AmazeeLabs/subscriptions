@@ -567,14 +567,18 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
  */
 function _subscriptions_content_format_text($text, $format = NULL) {
   static $have_img_assist;
-  if (!empty($have_img_assist) || !isset($have_img_assist) && module_exists('img_assist')) {
+  if (!isset($have_img_assist)) {
+    $have_img_assist = module_exists('img_assist');
+  }
+  if (!empty($have_img_assist)) {
     foreach (img_assist_get_macros($text) as $unexpanded_macro => $macro) {
       $expanded_macro = img_assist_render_image($macro);
-      if (preg_match('/<img src="([^"]*)".*title="([^"]*)"/', $text, $matches)) {
+      if (preg_match('/<img src="([^"]*)".*title="([^"]*)"/', $expanded_macro, $matches)) {
         $text = str_replace($unexpanded_macro, " [<a href=\"$matches[1]\">$matches[2]</a>] ", $text);
       }
     }
   }
+
   if (isset($format)) {
     $text = check_markup($text, $format, FALSE);
   }
