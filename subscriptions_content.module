@@ -244,6 +244,7 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
 function subscriptions_content_comment($comment, $op) {
   global $user;
   static $is_unpublished;
+  static $inserted_cid = 0;
   $comment = (array)$comment;  // $comment can be an object or an array.
 
   if ($op == 'form') {
@@ -273,7 +274,7 @@ function subscriptions_content_comment($comment, $op) {
     return (isset($form) ? $form : NULL);
   }
 
-  if (!isset($comment['nomail']) && ($op == 'insert' || $op == 'update' || $op == 'publish')) {
+  if (!isset($comment['nomail']) && ($op == 'insert' || $op == 'update' || ($op == 'publish' && $comment['cid'] != $inserted_cid))) {
     if (!isset($comment['subscriptions_notify']) || $comment['subscriptions_notify']) {
       $node = node_load($comment['nid']);
       $event = array(
@@ -288,6 +289,7 @@ function subscriptions_content_comment($comment, $op) {
         'comment' => (object)$comment,
       );
       subscriptions_queue($event);
+      $inserted_cid = $comment['cid'];
     }
     _subscriptions_content_autosubscribe($node->type, 'node', 'nid', $comment['nid'], 'on_comment');
   }
