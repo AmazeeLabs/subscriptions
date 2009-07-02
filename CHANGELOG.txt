@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #507898: Avoid creating duplicate taxa entries in {subscriptions_queue}.
    - Add img_assist module support (provide URLs of embedded pictures).
    - Add the !files variable to list attached files.
    - Define new hook_subscriptions_ui() to allow arbitration of multiple node UIs.

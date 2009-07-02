@@ -304,6 +304,7 @@ function subscriptions_queue($event) {
       foreach ($module_query as $field => $query) {
         $join = empty($query['join']) ? '' : $query['join'];
         $where = empty($query['where']) ? array() : array($query['where']);
+        $group_by = empty($query['group_by']) ? '' : $query['group_by']; 
         $args = array($event['load_function'], $event['load_args'], $event['is_new'], $module, $field);
         // author-specific subscriptions trigger on comments, when the node author is subscribed to:
         $args[] = ($module == 'node' && $event['type'] == 'comment' && isset($event['node']->uid) ? $event['node']->uid : $event['uid']);
@@ -333,7 +334,8 @@ function subscriptions_queue($event) {
           WHERE
             s.module = '%s' AND
             s.field = '%s' AND
-            s.author_uid IN (%d, -1) AND $conditions";
+            s.author_uid IN (%d, -1) AND $conditions
+          $group_by";
         $result = db_query($sql, $args);
         $affected_rows = db_affected_rows();
         /*  for debugging:

@@ -29,10 +29,11 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
       if ($arg0['module'] == 'node') {
         $node = $arg0['node'];
         $params['node']['tid'] = array(
-          'join' => 'INNER JOIN {term_node} t ON s.value = '. ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                                         .'t.tid'. ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : ''),
-          'where' => 't.nid = %d',
+          'join' => 'INNER JOIN {term_node} tn ON s.value = '. ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+                                                          .'tn.tid'. ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : ''),
+          'where' => 'tn.nid = %d',
           'args' => array($node->nid),
+          'group_by' => 'GROUP BY tn.nid',
         );
         if ($arg0['type'] == 'comment') {
           $where = ' AND s.send_comments = 1';
