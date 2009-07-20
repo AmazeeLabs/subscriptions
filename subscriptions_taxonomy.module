@@ -33,7 +33,6 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
                                                           .'tn.tid'. ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : ''),
           'where' => 'tn.nid = %d',
           'args' => array($node->nid),
-          'group_by' => 'GROUP BY tn.nid',
         );
         if ($arg0['type'] == 'comment') {
           $where = ' AND s.send_comments = 1';

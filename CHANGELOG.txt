@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #524332-5: Undo the taxa optimization; it destroys potentially useful data and is non-conformant SQL.
    - #507898: Avoid creating duplicate entries in {subscriptions_queue} for new comments.
    - #507898: Avoid creating duplicate taxa entries in {subscriptions_queue}.
    - Add img_assist module support (provide URLs of embedded pictures).
