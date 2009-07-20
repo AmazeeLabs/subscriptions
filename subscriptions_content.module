@@ -704,17 +704,16 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
       WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
     $sql = db_rewrite_sql($sql, 'c', 'cid');
     $result = db_query($sql, $user->uid, 'subscriptions_content_comment_load', $nid);
-    $sqids = $placeholders = array();
+    $sqids = array();
     while ($comment = db_fetch_object($result)) {
       comment_invoke_comment($comment, 'view');
       if ($comment && user_access('access comments') && !isset($node->_subscriptions_comments[$comment->cid])) {
         $node->_subscriptions_comments[$comment->cid] = $comment;
       }
       $sqids[] = $comment->_subscriptions_sqid;
-      $placeholders[] = '%d';
     }
     if ($sqids) {
-      db_query('DELETE FROM {subscriptions_queue} WHERE sqid IN ('. implode(',', $placeholders) .')', $sqids);
+      db_query('DELETE FROM {subscriptions_queue} WHERE sqid IN ('. db_placeholders($sqids) .')', $sqids);
     }
   }
   return (empty($node) ? NULL : $node);
@@ -753,7 +752,6 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
 
   // check whether we've commented:
   $nids = array_keys($subscriptions);
-  $placeholders = db_placeholders($nids);
   $result = db_query("
     SELECT nid FROM {comments}
       WHERE
@@ -801,10 +799,10 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       subscriptions_form_helper($form[0], $defaults, $author_uid, $subscription['nid'], $title, $subscription);
     }
   }
-  $form[0]['extra_info']['#title'] = t('Latest activity, authored, commented');
   unset($form[0]['author']);
 
   if (count(element_children($form[0]))) {
+    $form[0]['extra_info']['#title'] = t('Latest activity, authored, commented');
     $form[0]['defaults'] = array(
       '#type' => 'value',
       '#value' => $defaults,
@@ -817,6 +815,7 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     $form['field'] = array('#type' => 'value', '#value' => 'nid');
     $form['submit'] = array('#type' => 'submit', '#value' => t('Save'), '#weight' => 10);
     $form['#submit'][] = 'subscriptions_page_form_submit';
+    $form['note'] = array('#type' => 'item', '#description' => '<div>'. t('Note: Deactivated subscriptions will be removed from the list.') .'</div>' );
   }
   else {
     $form = array(
@@ -826,10 +825,6 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       ),
     );
   }
-  $form['note'] = array(
-    '#type' => 'item',
-    '#description' => '<div>'. t('Note: Deactivated subscriptions will be removed from the list.') .'</div>',
-  );
   return $form;
 }
 

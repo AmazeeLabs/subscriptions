@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #524362: Fix empty subscriptions_content_node_form().
    - Fix the fix: MySQL doesn't like CAST(... AS VARCHAR).
    - #524332: PostgreSQL fixes.
    - #524332-5: Undo the taxa optimization; it destroys potentially useful data and is non-conformant SQL.
