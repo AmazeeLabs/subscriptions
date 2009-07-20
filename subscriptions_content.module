@@ -231,7 +231,7 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
       break;
 
     case 'delete':
-      db_query("DELETE FROM {subscriptions} WHERE module = 'node' AND field = 'nid' AND value = %d", $node->nid);
+      db_query("DELETE FROM {subscriptions} WHERE module = 'node' AND field = 'nid' AND value = '%s'", $node->nid);
       break;
   }
 }
@@ -691,7 +691,7 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
     }
     if (!empty($comment_load_sqid)) {
       // check for a later queued update notification (don't send comments past that one because it will go out as node/type with its own comments later!)
-      if ($cutoff_sqid = db_result(db_query_range("SELECT sqid FROM {subscriptions_queue} WHERE module = 'node' AND field = 'nid' AND value = %d AND uid = %d AND load_function = 'subscriptions_content_node_load' AND sqid > %d", array($nid, $user->uid, $comment_load_sqid), 0, 1))) {
+      if ($cutoff_sqid = db_result(db_query_range("SELECT sqid FROM {subscriptions_queue} WHERE module = 'node' AND field = 'nid' AND value = '%s' AND uid = %d AND load_function = 'subscriptions_content_node_load' AND sqid > %d", array($nid, $user->uid, $comment_load_sqid), 0, 1))) {
         $limit_sqids = 'AND q.sqid < '. (integer) $cutoff_sqid;
       }
     }
@@ -699,7 +699,7 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
       SELECT q.sqid AS _subscriptions_sqid, q.is_new AS _subscriptions_is_new, c.* 
       FROM {comments} c 
         INNER JOIN {subscriptions_queue} q ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                            ."c.cid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : '')
+                                            ."c.cid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
                                                  ." = q.load_args AND q.uid = %d AND q.load_function = '%s' 
       WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
     $sql = db_rewrite_sql($sql, 'c', 'cid');
@@ -741,7 +741,7 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       IF(s.send_comments + s.send_updates = 0, n.created, IF(s.send_comments + s.send_updates = 2, IF(n.changed > ncs.last_comment_timestamp, n.changed, ncs.last_comment_timestamp), IF(s.send_comments = 1, ncs.last_comment_timestamp, n.changed))) AS latest_activity
     FROM {node} n
     INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                  ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : '')
+                                  ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
                                        ." = s.value
     LEFT JOIN {node_comment_statistics} ncs ON n.nid = ncs.nid
     WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d

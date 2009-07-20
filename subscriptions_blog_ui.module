@@ -60,7 +60,7 @@ function subscriptions_blog_ui_page_blog($account, $form) {
     FROM {node} n
     INNER JOIN {users} u ON n.uid = u.uid
     WHERE n.type = 'blog' AND n.status = 1
-    GROUP BY u.uid
+    GROUP BY u.uid, u.name
     ORDER BY u.name");
   $result = db_query($sql);
   while ($usr = db_fetch_array($result)) {

@@ -30,7 +30,7 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
         $node = $arg0['node'];
         $params['node']['tid'] = array(
           'join' => 'INNER JOIN {term_node} tn ON s.value = '. ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                                          .'tn.tid'. ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : ''),
+                                                          .'tn.tid'. ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : ''),
           'where' => 'tn.nid = %d',
           'args' => array($node->nid),
         );
@@ -214,7 +214,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
     SELECT s.value, s.send_interval, s.author_uid, s.send_comments, s.send_updates, t.tid, t.vid, t.name
     FROM {term_data} t
     INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                  ."t.tid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS CHAR)' : '')
+                                  ."t.tid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
                                        ." = s.value
     WHERE s.module = 'node' AND s.field = 'tid' AND s.recipient_uid = %d
     ORDER BY s.author_uid", 't', 'tid');
