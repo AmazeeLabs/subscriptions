@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Subscriptions 6.x-1.x\n"
 "POT-Creation-Date: 2009-04-14 07:22+0200\n"
-"PO-Revision-Date: 2009-04-14 07:25+0100\n"
+"PO-Revision-Date: 2009-07-22 17:16+0100\n"
 "Last-Translator: Hans Salvisberg <drupal-xlat@salvisberg.com>\n"
 "Language-Team: German Drupal translation team\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: subscriptions.admin.inc:20
 msgid "Links"
-msgstr "Verweise"
+msgstr "Links"
 
 #: subscriptions.admin.inc:44
 msgid "Run cron manually!"
@@ -119,7 +119,7 @@ msgstr "Anmerkung: Aus technischen Gründen können die Zahlen auf dieser Seite 
 
 #: subscriptions.admin.inc:371
 msgid "The subtabs here under %User_defaults mirror those found at !My_account_Subscriptions, except that the fieldsets here come up already expanded. Please go there now and familiarize yourself with what's there!"
-msgstr "Die Unterreiter hier unter %User_defaults spiegeln diejenigen unter !My_account_Subscriptions wieder, nur dass die aufklappbaren Teile hier bereits aufgeklappt dargestellt werden. Bitte folgen Sie dem Verweis und schauen Sie, welche Einstellmöglichkeiten es dort für Ihre Benutzer gibt."
+msgstr "Die Unterreiter hier unter %User_defaults spiegeln diejenigen unter !My_account_Subscriptions wieder, nur dass die aufklappbaren Teile hier bereits aufgeklappt dargestellt werden. Bitte folgen Sie dem Link und schauen Sie, welche Einstellmöglichkeiten es dort für Ihre Benutzer gibt."
 
 #: subscriptions.admin.inc:381
 msgid "The default settings that you define here are used for those users that haven't (yet) saved their own settings."
@@ -398,8 +398,8 @@ msgstr ""
 "{{!is_old==1?:\n"
 "!teaser\n"
 "\n"
-"}}| Verweis: !url\n"
-"| Direkter Verweis zum Löschen des Abos für diese Benachrichtigung (!subs_type):\n"
+"}}| Link: !url\n"
+"| Direkter Link zum Löschen des Abos für diese Benachrichtigung (!subs_type):\n"
 "| !unsubscribe_url\n"
 "{{!has_new_comments==1?!SEPARATOR!comments:}}!SEPARATOR!FOOTER"
 
@@ -419,7 +419,7 @@ msgstr ""
 "\n"
 "!comment_text\n"
 "\n"
-"| Verweis: !comment_url\n"
+"| Link: !comment_url\n"
 
 #: subscriptions_mail.templates.inc:60
 msgid "[!site] Subscription Digest for !name"
@@ -454,8 +454,8 @@ msgstr ""
 "{{!sender_name==!sender_name?:| Autor: !sender_name\n"
 "}}| Titel: !title\n"
 "{{!is_new==0?:!teaser\n"
-"}}| Verweis: !url\n"
-"| Direkter Verweis zum Löschen des Abonnements (!subs_type):\n"
+"}}| Link: !url\n"
+"| Direkter Link zum Löschen des Abonnements (!subs_type):\n"
 "| !unsubscribe_url\n"
 "{{!has_new_comments!=1?:!comments}}"
 
@@ -643,11 +643,11 @@ msgstr "Inhaltstypen wählen, die nicht ändern und keine Kommentare erlauben, u
 
 #: subscriptions_content.module:369
 msgid "Avoid empty %Subscribe links"
-msgstr "Leere %Subscribe-Verweise vermeiden"
+msgstr "Leere %Subscribe-Links vermeiden"
 
 #: subscriptions_content.module:371
 msgid "Nodes of %Static_content_types may end up with no %Subscribe options at all. Turn this option on to avoid displaying %Subscribe links in this case. The default is OFF, because this option causes processing overhead for each node view operation."
-msgstr "Nodes von statischen Inhaltstypen haben möglicherweise gar keine %Subscribe-Optionen. Diese Option vermeidet das Anzeigen von %Subscribe-Verweisen in diesem Fall. Standard ist AUS, weil diese Option bei jeder Node-View-Operation Verarbeitungszeit braucht."
+msgstr "Nodes von statischen Inhaltstypen haben möglicherweise gar keine %Subscribe-Optionen. Diese Option vermeidet das Anzeigen von %Subscribe-Links in diesem Fall. Standard ist AUS, weil diese Option bei jeder Node-View-Operation Verarbeitungszeit braucht."
 
 #: subscriptions_content.module:376
 msgid "Generate the %full_node variable"
@@ -732,7 +732,7 @@ msgstr "Der Veröffentlichungs-Status des Kommentars: 1 = veröffentlicht, 0 = n
 
 #: subscriptions_content.module:940
 msgid "The user can unsubscribe by clicking this link."
-msgstr "Der Benutzer kann das Abonnement durch Anklicken dieses Verweises löschen."
+msgstr "Der Benutzer kann das Abonnement durch Anklicken dieses Links löschen."
 
 #: subscriptions_content.module:941
 msgid "The name of the sender (if the sender is visible)."
@@ -1077,7 +1077,7 @@ msgstr "Bereich immer anzeigen."
 
 #: subscriptions_ui.module:337
 msgid "Display only a @subscribe link that makes the fieldset visible"
-msgstr "Nur einen @subscribe-Verweis anzeigen, welcher den Bereich sichtbar macht."
+msgstr "Nur einen @subscribe-Link anzeigen, welcher den Bereich sichtbar macht."
 
 #: subscriptions_ui.module:340
 msgid "What to display.  Default is the first option."
