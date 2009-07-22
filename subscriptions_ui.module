@@ -212,7 +212,7 @@ function subscriptions_ui_node_form(&$form_state, $node, $account = NULL) {
     '#options' => $nonlabeled_options,
     '#access' => _subscriptions_get_setting('send_updates_visible', $user) > 0,
   );
-  if (module_exists('comment') && $node->comment == COMMENT_NODE_READ_WRITE && user_access('access comments')) {
+  if (module_exists('comment') && user_access('access comments')) {
     $form['wrapper']['comments'] = array(
       '#type' => 'checkboxes',
       '#default_value' => $default_comments,
