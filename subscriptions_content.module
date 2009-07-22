@@ -156,7 +156,7 @@ function _subscriptions_content_access($load_function, $load_args, $node) {
 function _subscriptions_content_types() {
   $tr = 't';
   $types['node'] = array(
-    'title' => 'Pages',
+    'title' => 'Pages/Threads',
     'access' => 'subscribe to content',
     'page' => 'subscriptions_content_page_node',
     'fields' => array('node', 'nid'),
@@ -174,7 +174,6 @@ function _subscriptions_content_types() {
   // help potx to pick up these strings:
   t('subscribe to content');
   t('subscribe to content types');
-  t('Pages');
 }
 
 /**
@@ -920,7 +919,7 @@ function subscriptions_content_type_form(&$form_state, $account, $form) {
  * @ingroup hooks
  */
 function subscriptions_content_mailkeys() {
-  $mailkeys['node-nid'] = t('Notifications for %Pages subscriptions', array('%Pages' => t('Pages')));
+  $mailkeys['node-nid'] = t('Notifications for %Pages (update/comment) subscriptions', array('%Pages' => t('Pages/Threads')));
   foreach (array_keys(node_get_types()) as $type) {
     $mailkeys['node-type-'. $type] = t('Notifications for %type !content_type subscriptions', array('%type' => $type, '!content_type' => t('content type')));
   }
@@ -1019,6 +1018,12 @@ function subscriptions_content_form_mail_edit_trans_alter(&$form, &$form_state) 
   if ($form['id']['#value'] == $mailkey) {
     $tr = 't';
     $langcode = $form['language']['#value'];
+
+    $form['mail']['note'] = array(
+      '#value' => '<div>'. t("Note: 'new' and 'update' notifications for %Pages subscriptions use the matching !content_type subscriptions template rather than this one, if allowed; this does not apply to 'comment'-only notifications.", array('%Pages' => t('Pages/Threads'), '!content_type' => t('content type'))) .'</div>',
+      '#weight' => -1,
+    );
+
     $comment_body = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $langcode, 'body', 'CITEM');
     $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $langcode, 'subject', 'SEP');
 

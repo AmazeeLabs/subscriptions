@@ -89,6 +89,7 @@ function subscriptions_mail_cron() {
           if ($module == 'node' && $field == 'nid' && (!empty($object->_subscriptions_is_updated) || !empty($object->_subscriptions_is_new)) && user_access('subscribe to content types', $user)) {
             $unlisteds = variable_get('subscriptions_unlisted_content_types', array());
             if (isset($object->type) && !in_array($object->type, $unlisteds)) {
+              // Convert node-nid to node-type because that can give more specific information.
               $field = 'type';
               $value = $object->type;
             }
