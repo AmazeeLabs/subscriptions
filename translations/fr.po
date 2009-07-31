@@ -6,13 +6,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Subscriptions 6.x-1.x\n"
 "POT-Creation-Date: 2009-07-22 17:04+0200\n"
-"PO-Revision-Date: 2009-07-22 18:32+0100\n"
+"PO-Revision-Date: 2009-07-31 19:23+0100\n"
 "Last-Translator: Hans Salvisberg <drupal-xlat@salvisberg.com>\n"
 "Language-Team: matkeane <drupal@matkeane.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplural=2;plural=(n !=1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: subscriptions.admin.inc:20
 msgid "Links"
@@ -45,12 +45,12 @@ msgstr "Intervalle d'envoi"
 #: subscriptions.admin.inc:111
 #: subscriptions_ui.module:259
 msgid "On&nbsp;updates"
-msgstr "Lors&nbsp;de&nbsp;mises&nbsp;à&nbsp;jour"
+msgstr "Lors&nbsp;de mises&nbsp;à&nbsp;jour"
 
 #: subscriptions.admin.inc:114
 #: subscriptions_ui.module:260
 msgid "On&nbsp;comments"
-msgstr "Lors&nbsp;de&nbsp;commentaires"
+msgstr "Lors&nbsp;de commentaires"
 
 #: subscriptions.admin.inc:205
 msgid "Your subscriptions were updated."
@@ -104,7 +104,6 @@ msgstr "Selon les paramètres du site, d'autres options peuvent etre disponible 
 #: subscriptions_mail.info:0
 #: subscriptions_taxonomy.info:0
 #: subscriptions_ui.info:0
-#: contrib/moderate_content_notifications.SAVE/moderate_content_notifications.info:0
 msgid "Subscriptions"
 msgstr "Abonnements"
 
@@ -126,7 +125,7 @@ msgstr "Les paramètres par défaut choisi ici seront appliqués aux utilisateur
 
 #: subscriptions.admin.inc:391
 msgid "Hide the %Overview page from your users"
-msgstr ""
+msgstr "Cachez la page %Overview de vos utilisateurs"
 
 #: subscriptions.admin.inc:391
 #: subscriptions.module:181
@@ -135,7 +134,7 @@ msgstr "Aperçu"
 
 #: subscriptions.admin.inc:393
 msgid "If you hide this page, your users won't be able to change any of these settings. The default is OFF."
-msgstr ""
+msgstr "Par défaut cette page est visible; si vous la cachez, vos utilisateurs ne pourraient modifier aucune de ces options."
 
 #: subscriptions.admin.inc:398
 msgid "Auto-subscribe"
@@ -313,7 +312,7 @@ msgstr "NB: pour un fonctionnement standard, les modules suivantes doivent être
 
 #: (duplicate) subscriptions.install.inc:17
 msgid "(requires !mail_edit for customizing the templates)"
-msgstr "(nécessite !mail_edit pour adapter les masqes)"
+msgstr "(nécessite !mail_edit pour adapter les masques)"
 
 #: subscriptions_mail.mail_edit_D5.inc:17
 msgid "!Subscriptions module"
@@ -805,7 +804,7 @@ msgstr "Etat de publication: 1 = publié, 0 = non-publié.<br />(les noeuds non-
 
 #: subscriptions_content.module:979
 msgid "The list of attached files, one per line, if any, otherwise empty."
-msgstr ""
+msgstr "La liste des fichiers liés - une par ligne, sinon vide."
 
 #: subscriptions_content.module:980
 msgid "The comments state: 1 = comments are available in !comments, 0 = no comments."
@@ -829,7 +828,7 @@ msgstr "modèles de commentaires"
 
 #: subscriptions_content.module:1023
 msgid "Note: 'new' and 'update' notifications for %Pages subscriptions use the matching !content_type subscriptions template rather than this one, if allowed; this does not apply to 'comment'-only notifications."
-msgstr ""
+msgstr "NB: Si autorisé, les notifications de contenu nouveau, ou mise à jour, pour les abonnements aux %Pages utilisent la masque !content_type subscriptions correspondante plutôt que celle-ci; Notifications de commentaires uniquement ne sont pas concernées."
 
 #: subscriptions_content.module:1031
 msgid "Comment body"
