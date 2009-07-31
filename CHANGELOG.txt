@@ -1,7 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
-   - #259377: Added some new French strings, corrected plural formula.
+   - #259377: Add some new French strings, corrected plural formula.
 
 
 Subscriptions 6.x-1.x-BETA6 (2009-07-22):
