@@ -130,6 +130,9 @@ function subscriptions_mail_cron() {
             $mailvars['!comments'] = _subscriptions_content_format_comments($object, $digest_comment_template, '');
           }
           $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
+          if (variable_get('subscriptions_showmailkeys', 0)) {
+            $body .= t('| Mailkey: @mailkey/@langcode', array('@mailkey' => $mailkey, '@langcode' => $langcode)) ."\n";
+          }
           if ($digest) {
             $mails[$s['uid']]['bodies'][] = $body;
             $mails[$s['uid']]['send'] = array(
@@ -320,6 +323,12 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#title'         => t('Display summary watchdog entries per cron job'),
     '#default_value' => variable_get('subscriptions_watchstats', 1),
     '#description'   => t('Logs the mailing counts, time spent, and size of the remaining queue to the watchdog log.  This is valuable information for estimating the load on the cron job and on your mail server.  Default is ON.'),
+  );
+  $form['mail_settings']['subscriptions_showmailkeys'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Append the mailkey to every notification'),
+    '#default_value' => variable_get('subscriptions_showmailkeys', 0),
+    '#description'   => t('Appends the Mail Editor mailkey in use, to assist with development/testing. Default is OFF.'),
   );
 }
 
