@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - Add a !has_files variable to help with conditional text for the !files variable.
    - #259377: Add some new French strings, corrected plural formula.
 
 
