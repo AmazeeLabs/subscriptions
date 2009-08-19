@@ -224,6 +224,26 @@ an issue of Subscriptions.
 
 
 
+Attached files
+--------------
+With a conditional expression like
+
+{{!has_files==0?:| Files:
+!files}}
+
+you can send links to attached files along with the node in question.
+We like showing the ugly login block only where needed, like on nodes
+that aren't accessible without logging in and also when trying to download
+an attached file through a direct link (if the Download method is Private).
+To achieve that goal, you need to set the Login block to show only on 
+the following URLs:
+
+node/*
+system/files/*
+
+
+
+
 Unpublished Nodes/Comments
 --------------------------
 
