@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #528136: Remove HTML tags from CCK fields.
 
 
 Subscriptions 6.x-1.x-RC1 (2009-08-22):
