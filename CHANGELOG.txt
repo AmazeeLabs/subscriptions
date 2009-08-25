@@ -1,8 +1,10 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
-   - #528136: Remove HTML tags from CCK fields.
 
+
+Subscriptions 6.x-1.0 (2009-08-26):
+   - #528136: Remove HTML tags from CCK fields.
 
 Subscriptions 6.x-1.x-RC1 (2009-08-22):
    - Add a system option to append the mailkey in use to each mail message, for development/testing.
