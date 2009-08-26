@@ -27,7 +27,6 @@ function subscriptions_mail_cron() {
   $loaded_objects = array();
   $users = array();
   $fields = array();
-  $mails = array();
 
   // Strategy for cron:
   // Use 50% of the remaining time to process queue items, send single messages, and assemble digest messages;
@@ -37,11 +36,11 @@ function subscriptions_mail_cron() {
   $available_seconds = $total_seconds - $lost_seconds;
   //TEST: watchdog('cron', "Subscriptions has $available_seconds of $total_seconds seconds available.");
 
-  while (($mails_allowed <= 0 || $single_count + count($mails) < $mails_allowed)
+  while (($mails_allowed <= 0 || $single_count + $digest_count < $mails_allowed)
           && $total_seconds - timer_read('page')/1000 > $available_seconds*variable_get('subscriptions_cron_percent', 50)/100) {
     $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE last_sent + send_interval < %d ORDER BY sqid', time(), 0, 1);
     if (!($s = db_fetch_array($result))) {
-      break;  // No more subscriptions, terminate loop.
+      break;  // No more ready queue items, terminate loop.
     }
     
     if (!isset($users[$s['uid']])) {
@@ -53,7 +52,8 @@ function subscriptions_mail_cron() {
     $user = $users[$s['uid']];
     drupal_init_language();
     $langcode = $language->language;
-
+    $user_mails = array();
+    
     do {  // once and repeat while adding to a digest
       if ($user->status && $user->access) {
         $cids = array();
@@ -134,18 +134,19 @@ function subscriptions_mail_cron() {
             $body .= t('| Mailkey: @mailkey/@langcode', array('@mailkey' => $mailkey, '@langcode' => $langcode)) ."\n";
           }
           if ($digest) {
-            $mails[$s['uid']]['bodies'][] = $body;
-            $mails[$s['uid']]['send'] = array(
+            $user_mails['bodies'][] = $body;
+            $user_mails['send'] = array(
               'name' => $s['name'],
               'mail' => $s['mail'],
               'from' => $from,
               '!name' => $mailvars['!name'],
               '!manage_url' => $mailvars['!manage_url'],
             );
+            $user_mails['send_intervals'][$s['send_interval']] = $s['send_interval'];
           }
           else {
             $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
-            _subscriptions_mail_send('passthru', $s['name'], $s['mail'], $subject, $body, $from, $s['uid']);
+            _subscriptions_mail_send('passthru', $s['name'], $s['mail'], $subject, $body, $from, $s['uid'], array($s['send_interval']));
             ++$single_count;
           }
         }
@@ -153,41 +154,31 @@ function subscriptions_mail_cron() {
       db_query("DELETE FROM {subscriptions_queue} WHERE load_function = '%s' AND load_args = '%s' AND uid = %d", $s['load_function'], $s['load_args'], $s['uid']);
 
       if ($digest) {
-        // TODO: Get the next queue item for this user and finish off this user's digest
-        // before moving on to the next user. All messages in one digest together count
-        // as one mail, and if the number of mails is limited (per cron run), we must
-        // not let this cause a split up of the digest.
-        // Issue: We must know which notifications to send according to their send_interval.
+        // Get next ready queue item for this user.
+        $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE uid = %d AND last_sent + send_interval < %d ORDER BY sqid', $user->uid, time(), 0, 1);
+        if (!($s = db_fetch_array($result))) {
+          // No more ready queue items for this user, finish off this digest.
+          $s = $user_mails['send'];
+          $subject_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'subject', 'DSUBJ');
+          $body_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'body', 'DBODY');
+          $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'subject', 'SEP');
+          $mailvars['!bodies'] = implode($separator, $user_mails['bodies']);
+          $mailvars['!name'] = $s['!name'];
+          $mailvars['!manage_url'] = $s['!manage_url'];
+          $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
+          $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
+          _subscriptions_mail_send(SUBSCRIPTIONS_DIGEST_MAILKEY, $s['name'], $s['mail'], $subject, $body, $s['from'], $user->uid, $user_mails['send_intervals']);
+          ++$digest_count;
+          $digest = false;
+        }
       }
-    } while ( FALSE );  // TODO: while adding to a digest
+    } while ( $digest );
 
     $user = $saved_user;
     $language = $saved_language;
     session_save_session(TRUE);
   }
 
-  if ($mails) {
-    session_save_session(FALSE);
-    foreach ($mails as $uid => $user_mails) {
-      $user = $users[$uid];
-      drupal_init_language();
-      $langcode = $language->language;
-      $s = $user_mails['send'];
-      $subject_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'subject', 'DSUBJ');
-      $body_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'body', 'DBODY');
-      $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'subject', 'SEP');
-      $mailvars['!bodies'] = implode($separator, $user_mails['bodies']);
-      $mailvars['!name'] = $s['!name'];
-      $mailvars['!manage_url'] = $s['!manage_url'];
-      $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
-      $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
-      _subscriptions_mail_send(SUBSCRIPTIONS_DIGEST_MAILKEY, $s['name'], $s['mail'], $subject, $body, $s['from'], $uid);
-      ++$digest_count;
-    }
-    $user = $saved_user;
-    $language = $saved_language;
-    session_save_session(TRUE);
-  }
   if ($single_count + $digest_count > 0) {
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
     $watchdog('cron', '!module sent !single_count single and !digest_count digest notifications in !used_seconds of !available_seconds available seconds; !remaining_items queue items left.', array(
@@ -219,7 +210,7 @@ function subscriptions_mail_mail($key, &$message, $params) {
 /**
  * Send the notification by mail.
  */
-function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, $uid) {
+function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, $uid, $send_intervals) {
   global $user;
 
   $mail_success = drupal_mail('subscriptions_mail', $mailkey, $to, user_preferred_language($user), array(
@@ -237,9 +228,11 @@ function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, 
     if (variable_get('subscriptions_watchgood', 1)) {
       watchdog('subscriptions', 'notification for @name at @to', $watchdog_params);
     }
-    db_query("UPDATE {subscriptions_user} SET last_sent = %d WHERE uid = %d", time(), $uid);
-    if (!db_affected_rows()) {
-      @db_query("INSERT INTO {subscriptions_user} (uid, last_sent) VALUES(%d, %d)", $uid, time());
+    foreach ($send_intervals as $send_interval) {
+      db_query("UPDATE {subscriptions_last_sent} SET last_sent = %d WHERE uid = %d AND send_interval = %d", time(), $uid, $send_interval);
+      if (!db_affected_rows()) {
+        @db_query("INSERT INTO {subscriptions_last_sent} (uid, send_interval, last_sent) VALUES(%d, %d, %d)", $uid, $send_interval, time());
+      }
     }
   }
   else {

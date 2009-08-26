@@ -244,6 +244,7 @@ function subscriptions_user($type, $edit, &$account, $category = NULL) {
     case 'delete':
       db_query("DELETE FROM {subscriptions_user} WHERE uid = %d", $account->uid);
       db_query("DELETE FROM {subscriptions} WHERE recipient_uid = %d", $account->uid);
+      db_query("DELETE FROM {subscriptions_last_sent} WHERE uid = %d", $account->uid);
       break;
   }
 }
@@ -325,11 +326,12 @@ function subscriptions_queue($event) {
         $conditions = implode(' AND ', $where);
         $sql = "
           INSERT INTO {subscriptions_queue} (uid, name, mail, language, module, field, value, author_uid, send_interval, digest, last_sent, load_function, load_args, is_new)
-          SELECT u.uid, u.name, u.mail, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, su.last_sent, '%s', '%s', '%d'
+          SELECT u.uid, u.name, u.mail, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, COALESCE(sls.last_sent, 0), '%s', '%s', '%d'
           FROM {subscriptions} s
           INNER JOIN {subscriptions_user} su ON s.recipient_uid = su.uid
           INNER JOIN {users} u ON su.uid = u.uid
           $join
+          LEFT JOIN {subscriptions_last_sent} sls ON su.uid = sls.uid AND s.send_interval = sls.send_interval
           WHERE
             s.module = '%s' AND
             s.field = '%s' AND

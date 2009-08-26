@@ -1,17 +1,18 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #350077: Fix maximum number of notification to send per cron job breaks Digest mode.
 
 
 Subscriptions 6.x-1.0 (2009-08-26):
    - #528136: Remove HTML tags from CCK fields.
 
-Subscriptions 6.x-1.x-RC1 (2009-08-22):
+Subscriptions 6.x-1.0-RC1 (2009-08-22):
    - Add a system option to append the mailkey in use to each mail message, for development/testing.
    - Add a !has_files variable to help with conditional text for the !files variable.
    - #259377: Add some new French strings, corrected plural formula.
 
-Subscriptions 6.x-1.x-BETA6 (2009-07-22):
+Subscriptions 6.x-1.0-BETA6 (2009-07-22):
    - #367093: Don't suppress "On comments" checkboxes.
    - #259377: French translation.
    - #500148: Mention 'comment' in the node-nid template description; also change 'Pages' to 'Pages/Threads'; update .pot and de.po.
@@ -44,10 +45,10 @@ Subscriptions 6.x-1.x-BETA6 (2009-07-22):
    - Clean up database schema to keep schema module happy.
    - #305235: Revert previous patch because it didn't work.
  
-Subscriptions 6.x-1.x-BETA5 (2008-12-27):
+Subscriptions 6.x-1.0-BETA5 (2008-12-27):
    - #351606: Fix deprecated call-time pass-by-reference.
 
-Subscriptions 6.x-1.x-BETA4 (2008-12-27):
+Subscriptions 6.x-1.0-BETA4 (2008-12-27):
    - #339076: Decode entities in CCK field values.
    - #305235: Make 'Subscribe' links compatible with Pathauto.
    - Provide an upgrade path for the D5 mail templates (requires latest mail_edit, see #318324).
@@ -58,7 +59,7 @@ Subscriptions 6.x-1.x-BETA4 (2008-12-27):
    - #322131: Fix user default subscriptions forms.
    - #318150: Get by without hook_nodeapi('prepare') for inserting nodes programmatically.
  
-Subscriptions 6.x-1.x-BETA3 (2008-10-14):
+Subscriptions 6.x-1.0-BETA3 (2008-10-14):
    - #316367: Fix multiple-comments template garbage.
    - #318236: Explanation of CCK variables missing from digest page in mail_edit.
    - #311343: Warn about bad 'http://' site url.
@@ -69,7 +70,7 @@ Subscriptions 6.x-1.x-BETA3 (2008-10-14):
    - #302961: Fix bogus "error mailing notification" in watchdog log.
    - #303298: Remove call-time pass-by-reference.
 
-Subscriptions 6.x-1.x-BETA2 (2008-08-30):
+Subscriptions 6.x-1.0-BETA2 (2008-08-30):
    - Add subscriptions_cck.module for D6.
    - Two missing pieces for mail_edit 6.x-1.x.
    - Avoid potential naming conflicts.
@@ -98,7 +99,7 @@ Subscriptions 6.x-1.x-BETA2 (2008-08-30):
    - #273960: Fix multi-language support.
    - #273537: Allow translating the entries in the 'Type' column of the Overview page.
 
-Subscriptions 6.x-1.x-BETA1 (2008-06-22):
+Subscriptions 6.x-1.0-BETA1 (2008-06-22):
    - Various fixes.
    - Initial port to D6 (ALPHA quality).
    - Copied Subscriptions 5.x-2.1-dev (2008-05-18).

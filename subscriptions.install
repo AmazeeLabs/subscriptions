@@ -48,7 +48,8 @@ function subscriptions_schema() {
       'last_sent'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
     'primary key'     => array('sqid'),
     'indexes'         => array(
-      'load_args'     => array('load_args', 'load_function', 'uid')),
+      'load_args'     => array('load_args', 'load_function', 'uid'),
+      'uid'           => array('uid')),
   );
 
 
@@ -65,11 +66,18 @@ function subscriptions_schema() {
       'autosub_on_post'       => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1),
       'autosub_on_update'     => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1),
       'autosub_on_comment'    => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1),
-      'send_self'             => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1),
-      'last_sent'             => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
+      'send_self'             => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => -1)),
     'primary key'             => array('uid'),
   );
 
+
+  $schema['subscriptions_last_sent'] = array(
+    'fields'          => array(
+      'uid'           => array('type' => 'int', 'not null' => FALSE),
+      'send_interval' => array('type' => 'int', 'not null' => FALSE),
+      'last_sent'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
+    'primary key'     => array('uid', 'send_interval'),
+  );
 
   return $schema;
 }
@@ -387,3 +395,28 @@ function subscriptions_update_9() {
   variable_del('subscriptions_email_subject');
   return $ret;
 }
+
+/**
+ * Database update function 6101: Add the {subscriptions_last_sent} table.
+ */
+function subscriptions_update_6101() {
+  $ret = array();
+
+  $schema['subscriptions_last_sent'] = array(
+    'fields'          => array(
+      'uid'           => array('type' => 'int', 'not null' => TRUE),
+      'send_interval' => array('type' => 'int', 'not null' => TRUE),
+      'last_sent'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
+    'primary key'     => array('uid', 'send_interval'),
+  );
+  
+  db_create_table($ret, 'subscriptions_last_sent', $schema['subscriptions_last_sent']);
+  db_add_index($ret, 'subscriptions_queue', 'uid', array('uid'));
+  
+  foreach (_subscriptions_send_intervals() as $send_interval => $text) {
+    db_query("INSERT INTO {subscriptions_last_sent} (uid, send_interval, last_sent) SELECT uid, %d, last_sent FROM {subscriptions_user} WHERE uid > 0", $send_interval);
+  }
+//  db_drop_field($ret, 'subscriptions_user', 'last_sent');  // not dropping this column allows going back to RC1
+  return $ret;
+}
+
