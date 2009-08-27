@@ -186,20 +186,18 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
   global $user;
   static $unpublished_nid;
   switch ($op) {
+    case 'load':
     case 'prepare':
       $unpublished_nid = ($node->status ? NULL : $node->nid);
       $node->subscriptions_notify = TRUE;
       break;
 
     case 'update':
-      /*
-      // prevent already published edits from sending notifications
-      // @ TODO send nodes that have been updated could be controlled here
-      if ($node->status == 1 && $node->subscriptions_currentstatus == '1') {
-        break;
+      if ($unpublished_nid == $node->nid && $node->status) {
+        // An unpublished node just became published -- treat this as an 'insert'!
+        $op = 'insert';
       }
-      //*/
-      // else, fall through
+      // fall through
 
     case 'insert':
       $event = array(
@@ -209,7 +207,7 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
         'load_args' => $node->nid,
         'type' => 'node',
         'action' => $op,
-        'is_new' => ($op == 'insert' || ($op == 'update' && $unpublished_nid == $node->nid && $node->status)),
+        'is_new' => ($op == 'insert'),
         'node' => $node,
       );
       $unpublished_nid = NULL;
