@@ -73,8 +73,8 @@ function subscriptions_schema() {
 
   $schema['subscriptions_last_sent'] = array(
     'fields'          => array(
-      'uid'           => array('type' => 'int', 'not null' => FALSE),
-      'send_interval' => array('type' => 'int', 'not null' => FALSE),
+      'uid'           => array('type' => 'int', 'not null' => TRUE),
+      'send_interval' => array('type' => 'int', 'not null' => TRUE),
       'last_sent'     => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
     'primary key'     => array('uid', 'send_interval'),
   );

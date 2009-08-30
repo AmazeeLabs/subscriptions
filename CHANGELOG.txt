@@ -2,6 +2,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
   Bugs fixed:
+   - Primary key fields in newly created {subscriptions_last_sent} table must be 'not null'.
    - #560146: Fix digest Subscriptions don't send if not set to "published" before cron runs.
    - #350077: Fix maximum number of notification to send per cron job breaks Digest mode.
 
