@@ -29,15 +29,24 @@ function subscriptions_mail_cron() {
   $fields = array();
 
   // Strategy for cron:
-  // Use 50% of the remaining time to process queue items, send single messages, and assemble digest messages;
-  // send the digest messages in the other half and hopefully leave some time for other modules.
+  // Use a defined percentage of the total cron time (default: 50%), but leave at least 5s.
   $total_seconds = ini_get('max_execution_time');
   $lost_seconds = timer_read('page')/1000;
   $available_seconds = $total_seconds - $lost_seconds;
+  $cron_percentage = variable_get('subscriptions_cron_percent', 50);
+  $usable_seconds = min(array($available_seconds - 5, $total_seconds*$cron_percentage/100));
   //TEST: watchdog('cron', "Subscriptions has $available_seconds of $total_seconds seconds available.");
+  if ($usable_seconds <= 0) {
+    $variables = array(
+      '!module' => 'Subscriptions',
+      '!link'   => l('cron job time', 'admin/settings/subscriptions'),
+    );
+    $watchdog = 'watchdog';  // keep potx from translating 'cron'
+    $watchdog('cron', t('Warning: !module cannot send any notifications because its !link is 0!', $variables), NULL, WATCHDOG_WARNING);
+  }
 
   while (($mails_allowed <= 0 || $single_count + $digest_count < $mails_allowed)
-          && $total_seconds - timer_read('page')/1000 > $available_seconds*variable_get('subscriptions_cron_percent', 50)/100) {
+          && timer_read('page')/1000 < $lost_seconds + $usable_seconds) {
     $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE last_sent + send_interval < %d ORDER BY sqid', time(), 0, 1);
     if (!($s = db_fetch_array($result))) {
       break;  // No more ready queue items, terminate loop.
@@ -180,14 +189,16 @@ function subscriptions_mail_cron() {
   }
 
   if ($single_count + $digest_count > 0) {
+    $current_seconds = timer_read('page')/1000;
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', '!module sent !single_count single and !digest_count digest notifications in !used_seconds of !available_seconds available seconds; !remaining_items queue items left.', array(
+    $watchdog('cron', '!module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue item(s) and !remaining_seconds seconds left.', array(
       '!module'            => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,
-      '!used_seconds'      => (integer) (timer_read('page')/1000 - $lost_seconds),
-      '!available_seconds' => (integer) $available_seconds . ($lost_seconds > 5*$total_seconds/100 ? " ($total_seconds)" : ''),
+      '!used_seconds'      => round($current_seconds - $lost_seconds),
+      '!total_seconds'     => $total_seconds,
       '!remaining_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d", time())),
+      '!remaining_seconds' => round($total_seconds - $current_seconds),
     ));
   }
 }
@@ -282,6 +293,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     drupal_set_message(t('Your installation returns %url as the base URL of the site. This is probably not what you want, and it can usually be fixed by setting the %variable variable in your %file file.', array('%url' => $url, '%variable' => '$base_url', '%file' => 'settings.php')), 'error');
   }
 
+  $variables = array('!module' => 'Subscriptions');
   $form['mail_settings'] = array(
       '#type' => 'fieldset',
       '#title' => t('Mail settings'),
@@ -291,7 +303,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#type'          => 'textfield',
     '#title'         => t('E-mail address'),
     '#default_value' => _subscriptions_mail_site_mail(TRUE),
-    '#description'   => t('A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website.', array('%From' => 'From', '%Reply_To' => 'Reply-To', '!module' => 'Subscriptions')) .'<br />'. t('Clear this field to use the default site e-mail address.'),
+    '#description'   => t('A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website.', $variables + array('%From' => 'From', '%Reply_To' => 'Reply-To')) .'<br />'. t('Clear this field to use the default site e-mail address.'),
   );
   $form['mail_settings']['subscriptions_site_mail_name'] = array(
     '#type'          => 'textfield',
@@ -303,8 +315,17 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#type'          => 'textfield',
     '#title'         => t('Maximum number of notifications to send per cron job'),
     '#default_value' => variable_get('subscriptions_number_of_mails', 0),
-    '#description'   => t("!module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited.", array('!module' => 'Subscriptions')),
+    '#description'   => t('If you need to limit the number of outgoing e-mails for some reason, then set that number here. The default is 0, which means unlimited.'),
   );
+  $form['mail_settings']['subscriptions_cron_percent'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Maximum percent of cron job time to use'),
+    '#default_value' => variable_get('subscriptions_cron_percent', 50),
+    '#description'   => t('Limit the percentage of cron job time that !module may use. If you have modules with cron jobs that run after !module, then be sure to leave enough time for them! The default is !value.<br />You can temporarily set this to 0 to keep !module from sending any notifications at all.', $variables + array('!value' => 50)),
+  );
+  if (empty($_POST) && $form['mail_settings']['subscriptions_cron_percent']['#default_value'] <= 0) {
+    drupal_set_message(t('Warning: !module cannot send any notifications because its !link is 0!', $variables + array('!link' => '<a href="#edit-subscriptions-cron-percent">'. t('cron job time') .'</a>')), 'error');
+  }
   $form['mail_settings']['subscriptions_watchgood'] = array(
     '#type'          => 'checkbox',
     '#title'         => t('Display watchdog entries for successful mailings'),
