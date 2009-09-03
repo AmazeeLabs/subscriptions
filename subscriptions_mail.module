@@ -7,6 +7,21 @@
  */
 
 /**
+ * Implementation of hook_menu().
+ *
+ * Registers a callback to purge the queue.
+ */
+function subscriptions_mail_menu() {
+  $items['admin/settings/subscriptions/purge-queue'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_subscriptions_mail_purge_queue_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
  * Implementation of hook_cron().
  *
  * Takes items from {subscriptions_queue} and generates notification emails.
@@ -33,16 +48,15 @@ function subscriptions_mail_cron() {
   $total_seconds = ini_get('max_execution_time');
   $lost_seconds = timer_read('page')/1000;
   $available_seconds = $total_seconds - $lost_seconds;
-  $cron_percentage = variable_get('subscriptions_cron_percent', 50);
-  $usable_seconds = min(array($available_seconds - 5, $total_seconds*$cron_percentage/100));
+  $usable_seconds = min(array($available_seconds - 5, $total_seconds*subscriptions_mail_get_cron_percentage()/100));
   //TEST: watchdog('cron', "Subscriptions has $available_seconds of $total_seconds seconds available.");
   if ($usable_seconds <= 0) {
     $variables = array(
-      '!module' => 'Subscriptions',
+      '!Module' => 'Subscriptions',
       '!link'   => l('cron job time', 'admin/settings/subscriptions'),
     );
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', t('Warning: !module cannot send any notifications because its !link is 0!', $variables), NULL, WATCHDOG_WARNING);
+    $watchdog('cron', t('!Module cannot send any notifications because its !link is 0!', $variables), NULL, WATCHDOG_WARNING);
   }
 
   while (($mails_allowed <= 0 || $single_count + $digest_count < $mails_allowed)
@@ -317,15 +331,28 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#default_value' => variable_get('subscriptions_number_of_mails', 0),
     '#description'   => t('If you need to limit the number of outgoing e-mails for some reason, then set that number here. The default is 0, which means unlimited.'),
   );
+  $cron_percentage = subscriptions_mail_get_cron_percentage();
   $form['mail_settings']['subscriptions_cron_percent'] = array(
     '#type'          => 'textfield',
     '#title'         => t('Maximum percent of cron job time to use'),
-    '#default_value' => variable_get('subscriptions_cron_percent', 50),
-    '#description'   => t('Limit the percentage of cron job time that !module may use. If you have modules with cron jobs that run after !module, then be sure to leave enough time for them! The default is !value.<br />You can temporarily set this to 0 to keep !module from sending any notifications at all.', $variables + array('!value' => 50)),
+    '#default_value' => $cron_percentage,
+    '#description'   => t('Limit the percentage of cron job time that !module may use. If you have modules with cron jobs that run after !module, then be sure to leave enough time for them! The default is !value.<br />You can temporarily set this to 0 to suspend processing of the notifications queue.', $variables + array('!value' => 50)),
   );
-  if (empty($_POST) && $form['mail_settings']['subscriptions_cron_percent']['#default_value'] <= 0) {
+  if (empty($_POST) && $cron_percentage <= 0) {
     drupal_set_message(t('Warning: !module cannot send any notifications because its !link is 0!', $variables + array('!link' => '<a href="#edit-subscriptions-cron-percent">'. t('cron job time') .'</a>')), 'error');
+    $form['mail_settings']['subscriptions_cron_percent']['#attributes'] = array('class' => 'error');
   }
+  $form['mail_settings']['queue_length'] = array(
+    '#type'          => 'item',
+    '#title'         => t('Queue'),
+    '#value'         => t('There are %count item(s) in the queue.', array('%count' => db_result(db_query("SELECT COUNT(sqid) FROM {subscriptions_queue}")))) .' &nbsp; ',
+    '#description'   => t('Note: The number of generated e-mails is typically much lower than the number of queue items.'),
+  );
+  $form['mail_settings']['queue_length']['purge_queue'] = array(
+    '#type'          => 'submit',
+    '#name'          => 'op',
+    '#value'         => t('Purge the queue'),
+  );
   $form['mail_settings']['subscriptions_watchgood'] = array(
     '#type'          => 'checkbox',
     '#title'         => t('Display watchdog entries for successful mailings'),
@@ -342,8 +369,39 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#type'          => 'checkbox',
     '#title'         => t('Append the mailkey to every notification'),
     '#default_value' => variable_get('subscriptions_showmailkeys', 0),
-    '#description'   => t('Appends the Mail Editor mailkey in use, to assist with development/testing. Default is OFF.'),
+    '#description'   => t('Appends the key of the !Mail_Editor_template that was used to create each e-mail, to assist with configuration and testing. Default is OFF.', array('!Mail_Editor_template' => l('Mail Editor template', (module_exists('mail_edit') ? 'admin/build/mail-edit' : 'http://drupal.org/project/mail_edit')))),
   );
+  $handlers = array_reverse($form['#submit']);
+  $handlers[] = '_subscriptions_mail_submit_subscriptions_settings_form';
+  $form['#submit'] = array_reverse($handlers);   // put our handler in front
+}
+
+/**
+ * Submit handler for the Purge-the-queue button on the Subscriptions settings form.
+ */
+function _subscriptions_mail_submit_subscriptions_settings_form($form, &$form_state) {
+  if ($form_state['values']['op'] == $form_state['values']['purge_queue']) {
+    drupal_goto('admin/settings/subscriptions/purge-queue', drupal_get_destination());
+  }
+}
+
+/**
+ * Form builder for the purge Subscriptions queue confirmation form.
+ */
+function _subscriptions_mail_purge_queue_form(&$form_state) {
+  $form['#submit'][] = 'subscriptions_purge_queue';
+  return confirm_form($form, t('Are you sure you want to purge the !Module queue?', array('!Module' => 'Subscriptions')), array('path' => $_GET['destination'], 'fragment' => 'edit-purge-queue'), NULL, t('Purge the queue'));
+}
+
+/**
+ * Purge the Subscriptions queue.
+ */
+function subscriptions_purge_queue() {
+  db_query("DELETE FROM {subscriptions_queue}");
+  $variables = array('!Module' => 'Subscriptions', '%count' => db_affected_rows());
+  drupal_set_message(t('All %count rows have been purged.', $variables));
+  $watchdog = 'watchdog';  // keep potx from translating 'cron'
+  $watchdog('cron', '!Module: all %count rows have been purged.', $variables, WATCHDOG_WARNING);
 }
 
 /**
@@ -591,5 +649,12 @@ function subscriptions_mail_template_preprocess($template, $mailvars) {
  */
 function subscriptions_mail_mail_alter(&$message) {
   $message['body'] = preg_replace('/ +(\r?\n)/', '\\1', $message['body']);
+}
+
+/**
+ * Get the sanitized value of the 'subscriptions_cron_percent' variable.
+ */
+function subscriptions_mail_get_cron_percentage() {
+  return max(array(0, intval(variable_get('subscriptions_cron_percent', 50))));
 }
 
