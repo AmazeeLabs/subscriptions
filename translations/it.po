@@ -722,8 +722,8 @@ msgid "(disabled)"
 msgstr "(disattivato)"
 
 #: subscriptions_mail.module:188
-msgid "!module sent !single_count single and !digest_count digest notifications in !used_seconds of !available_seconds available seconds; !remaining_items queue items left."
-msgstr "!module ha inviato !single_count avvisi singoli and !digest_count avvisi in riassunti in !used_seconds su !available_seconds secondi disponibili; sono rimasti !remaining_items elementi in attesa."
+msgid "!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !available_seconds available seconds; !remaining_items queue items left."
+msgstr "!Module ha inviato !single_count avvisi singoli and !digest_count avvisi in riassunti in !used_seconds su !available_seconds secondi disponibili; sono rimasti !remaining_items elementi in attesa."
 
 #: subscriptions_mail.module:207
 msgid "notification for @name at @to"
@@ -742,20 +742,20 @@ msgid "E-mail address"
 msgstr "Indirizzo e-mail"
 
 #: subscriptions_mail.module:242
-msgid "A valid e-mail address to be used as the \"From\" address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
-msgstr "Un indirizzo e-mail valido da usare nel campo \"Da\" dal mailer automatico per gli avvisi di !module. Per diminuire la probabilità che l'e-mail sia marcata come spam, questo indirizzo e-mail dovrebbe usare lo stesso dominio del sito."
+msgid "A valid e-mail address to be used as the \"From\" address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
+msgstr "Un indirizzo e-mail valido da usare nel campo \"Da\" dal mailer automatico per gli avvisi di !Module. Per diminuire la probabilità che l'e-mail sia marcata come spam, questo indirizzo e-mail dovrebbe usare lo stesso dominio del sito."
 
 #: subscriptions_mail.module:242
 msgid "Clear this field to use the default site e-mail address."
 msgstr "Svuota questo campo per usare l'indirizzo e-mail predefinito del sito."
 
 #: subscriptions_mail.module:246
-msgid "Maximum number of notifications to send per cron job"
+msgid "Maximum number of notifications to send per cron run"
 msgstr "Numero massimo di avvisi da inviare per ogni cron job"
 
 #: subscriptions_mail.module:248
-msgid "!module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
-msgstr "!module prova a utilizzare la maggior parte del tempo rimanente durante ogni esecuzione di cron. Se ne usa troppo o vuoi limitare il numero di e-mail in uscita per qualche ragione, imposta qui il numero. Quello predefinito è 0, che significa invii illimitati."
+msgid "!Module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
+msgstr "!Module prova a utilizzare la maggior parte del tempo rimanente durante ogni esecuzione di cron. Se ne usa troppo o vuoi limitare il numero di e-mail in uscita per qualche ragione, imposta qui il numero. Quello predefinito è 0, che significa invii illimitati."
 
 #: subscriptions_mail.module:252
 msgid "Display watchdog entries for successful mailings"
@@ -766,7 +766,7 @@ msgid "Logs successful mailings to the watchdog log.  Default is ON, but with ma
 msgstr "Scrive nel log watchdog gli invii di e-mail riusciti. È predefinito su ATTIVO, ma se hai molte iscrizioni genererà una grossa quantità di dati nel log."
 
 #: subscriptions_mail.module:258
-msgid "Display summary watchdog entries per cron job"
+msgid "Display summary watchdog entries per cron run"
 msgstr "Visualizza voci di watchdog di sommario per ogni cron job"
 
 #: subscriptions_mail.module:260

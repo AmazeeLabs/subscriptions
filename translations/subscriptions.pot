@@ -4,8 +4,8 @@
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
 #  subscriptions.admin.inc,v 1.21 2009/04/18 20:26:35 salvis
-#  subscriptions_ui.module,v 1.15 2009/06/29 12:03:57 salvis
-#  subscriptions_mail.module,v 1.22 2009/04/14 02:26:21 salvis
+#  subscriptions_ui.module,v 1.16 2009/07/22 16:58:07 salvis
+#  subscriptions_mail.module,v 1.28 2009/09/28 08:34:49 salvis
 #  subscriptions_taxonomy.module,v 1.13 2009/07/20 21:55:53 salvis
 #  subscriptions.info,v 1.4 2008/05/18 20:43:03 salvis
 #  subscriptions_blog_ui.info,v 1.3 2008/06/22 14:12:54 salvis
@@ -15,13 +15,13 @@
 #  subscriptions_mail.info,v 1.4 2008/06/18 11:28:41 salvis
 #  subscriptions_taxonomy.info,v 1.3 2008/05/18 20:43:03 salvis
 #  subscriptions_ui.info,v 1.3 2008/05/18 20:43:03 salvis
-#  subscriptions.module,v 1.88 2009/07/20 21:22:21 salvis
+#  subscriptions.module,v 1.89 2009/08/26 00:11:50 salvis
 #  subscriptions_blog_ui.module,v 1.7 2009/07/20 21:55:53 salvis
-#  subscriptions_content.module,v 1.37 2009/07/20 23:28:11 salvis
-#  subscriptions.install.inc,v 1.6 2008/06/18 15:28:56 salvis
+#  subscriptions_content.module,v 1.40 2009/08/27 19:05:27 salvis
+#  subscriptions.install.inc,v 1.7 2009/09/03 00:25:16 salvis
 #  subscriptions_mail.mail_edit_D5.inc,v 1.1 2008/12/25 12:15:34 salvis
 #  subscriptions_mail.templates.inc,v 1.5 2008/08/30 12:42:40 salvis
-#  subscriptions_cck.module,v 1.4 2008/12/26 15:50:13 salvis
+#  subscriptions_cck.module,v 1.5 2009/08/25 23:00:45 salvis
 #  subscriptions_event.module: n/a
 #  subscriptions_tableselect.js,v 1.5 2009/04/13 21:50:29 salvis
 #
@@ -29,7 +29,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2009-07-22 17:04+0200\n"
+"POT-Creation-Date: 2009-09-28 12:29+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -114,7 +114,7 @@ msgstr ""
 msgid "Depending on the setup of the site, you may have additional options for active subscriptions."
 msgstr ""
 
-#: subscriptions.admin.inc:289;336 subscriptions_mail.module:208 subscriptions_taxonomy.module:160 subscriptions_ui.module:52 subscriptions.info:0;0 subscriptions_blog_ui.info:0 subscriptions_cck.info:0 subscriptions_content.info:0 subscriptions_event.info:0 subscriptions_mail.info:0 subscriptions_taxonomy.info:0 subscriptions_ui.info:0 contrib/moderate_content_notifications.SAVE/moderate_content_notifications.info:0
+#: subscriptions.admin.inc:289;336 subscriptions_mail.module:237 subscriptions_taxonomy.module:160 subscriptions_ui.module:52 subscriptions.info:0;0 subscriptions_blog_ui.info:0 subscriptions_cck.info:0 subscriptions_content.info:0 subscriptions_event.info:0 subscriptions_mail.info:0 subscriptions_taxonomy.info:0 subscriptions_ui.info:0 contrib/moderate_content_notifications.SAVE/moderate_content_notifications.info:0
 msgid "Subscriptions"
 msgstr ""
 
@@ -254,7 +254,7 @@ msgstr ""
 msgid "you can even hide the %Preferences, so that what you've set right above is cast in stone."
 msgstr ""
 
-#: subscriptions.admin.inc:521;602 subscriptions_blog_ui.module:146 subscriptions_content.module:815;904 subscriptions_taxonomy.module:306 subscriptions_ui.module:230
+#: subscriptions.admin.inc:521;602 subscriptions_blog_ui.module:146 subscriptions_content.module:814;903 subscriptions_taxonomy.module:306 subscriptions_ui.module:230
 msgid "Save"
 msgstr ""
 
@@ -274,7 +274,7 @@ msgstr ""
 msgid "Every line has the format of seconds|human readable text"
 msgstr ""
 
-#: subscriptions.admin.inc:666 subscriptions_content.module:370;372 subscriptions_ui.module:84;197;338
+#: subscriptions.admin.inc:666 subscriptions_content.module:368;370 subscriptions_ui.module:84;197;338
 msgid "Subscribe"
 msgstr ""
 
@@ -426,23 +426,23 @@ msgstr ""
 msgid "administer user subscriptions"
 msgstr ""
 
-#: subscriptions.module:215 subscriptions_content.module:340
+#: subscriptions.module:215 subscriptions_content.module:338
 msgid "subscribe to all content types"
 msgstr ""
 
-#: subscriptions.module:408
+#: subscriptions.module:410
 msgid "Are you sure you want to unsubscribe?"
 msgstr ""
 
-#: subscriptions.module:408
+#: subscriptions.module:410
 msgid "Unsubscribe"
 msgstr ""
 
-#: subscriptions.module:416
+#: subscriptions.module:418
 msgid "Your subscription was deactivated."
 msgstr ""
 
-#: subscriptions.module:517
+#: subscriptions.module:519
 msgid "The following modules return invalid data from %hook: !modules   Either they are buggy !Subscriptions add-ons, or they are unrelated to !Subscriptions and should not define %hook!"
 msgstr ""
 
@@ -466,15 +466,15 @@ msgstr ""
 msgid "The value(s) of the CCK field %fieldname, as defined for your !content_type, newline-separated."
 msgstr ""
 
-#: subscriptions_content.module:56;958
+#: subscriptions_content.module:56;957
 msgid "thread"
 msgstr ""
 
-#: subscriptions_content.module:61;869;924;1023
+#: subscriptions_content.module:61;868;923;1023
 msgid "content type"
 msgstr ""
 
-#: subscriptions_content.module:90;365
+#: subscriptions_content.module:90;363
 msgid "Subscribe to this page"
 msgstr ""
 
@@ -494,228 +494,232 @@ msgstr ""
 msgid "subscribe to content types"
 msgstr ""
 
-#: subscriptions_content.module:255;417
+#: subscriptions_content.module:253;415
 msgid "Send subscriptions notifications"
 msgstr ""
 
-#: subscriptions_content.module:260
+#: subscriptions_content.module:258
 msgid "Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out \"new\" notifications, unless you suppress this here."
 msgstr ""
 
-#: subscriptions_content.module:266
+#: subscriptions_content.module:264
 msgid "Subscriptions notifications are not sent for unpublished comments, except to users who have the %administer_comments permission, and you can even suppress the latter here."
 msgstr ""
 
-#: subscriptions_content.module:270
+#: subscriptions_content.module:268
 msgid "You can suppress sending subscriptions notifications here; this option is not saved."
 msgstr ""
 
-#: subscriptions_content.module:310 subscriptions_taxonomy.module:150
+#: subscriptions_content.module:308 subscriptions_taxonomy.module:150
 msgid "none"
 msgstr ""
 
-#: subscriptions_content.module:317
+#: subscriptions_content.module:315
 msgid "Content settings"
 msgstr ""
 
-#: subscriptions_content.module:323
+#: subscriptions_content.module:321
 msgid "Unlisted content types"
 msgstr ""
 
-#: subscriptions_content.module:326
+#: subscriptions_content.module:324
 msgid "Select content types which should be <strong>removed from subscription listings</strong>.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by content type will be unavailable for the selected types."
 msgstr ""
 
-#: subscriptions_content.module:331
+#: subscriptions_content.module:329
 msgid "Blocked content types"
 msgstr ""
 
-#: subscriptions_content.module:334
+#: subscriptions_content.module:332
 msgid "Select content types which should be <strong>completely unavailable for subscribing</strong>, i.e. content of the selected types will never trigger notifications for regular users."
 msgstr ""
 
-#: subscriptions_content.module:339
+#: subscriptions_content.module:337
 msgid "Note"
 msgstr ""
 
-#: subscriptions_content.module:340
+#: subscriptions_content.module:338
 msgid "The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types and links will be marked with a '!symbol' symbol (and appear !red_ON like this !red_OFF in the case of blocked types)."
 msgstr ""
 
-#: subscriptions_content.module:344
+#: subscriptions_content.module:342
 msgid "Blocked nodes"
 msgstr ""
 
-#: subscriptions_content.module:348
+#: subscriptions_content.module:346
 msgid "Enter the IDs of nodes that should be <strong>completely unavailable for subscribing</strong>, separated by spaces."
 msgstr ""
 
-#: subscriptions_content.module:356
+#: subscriptions_content.module:354
 msgid "Static content"
 msgstr ""
 
-#: subscriptions_content.module:362;372
+#: subscriptions_content.module:360;370
 msgid "Static content types"
 msgstr ""
 
-#: subscriptions_content.module:365
+#: subscriptions_content.module:363
 msgid "Select content types which do not change nor receive comments and thus should not have the %option option."
 msgstr ""
 
-#: subscriptions_content.module:370
+#: subscriptions_content.module:368
 msgid "Avoid empty %Subscribe links"
 msgstr ""
 
-#: subscriptions_content.module:372
+#: subscriptions_content.module:370
 msgid "Nodes of %Static_content_types may end up with no %Subscribe options at all. Turn this option on to avoid displaying %Subscribe links in this case. The default is OFF, because this option causes processing overhead for each node view operation."
 msgstr ""
 
-#: subscriptions_content.module:377
+#: subscriptions_content.module:375
 msgid "Generate the %full_node variable"
 msgstr ""
 
-#: subscriptions_content.module:379
+#: subscriptions_content.module:377
 msgid "Generating this variable causes considerable overhead even if it's not used, and <strong>it may even cause errors</strong>, depending on the !content_type! Default is OFF."
 msgstr ""
 
-#: subscriptions_content.module:393
+#: subscriptions_content.module:391
 msgid "Enter a series of numbers, separated by spaces."
 msgstr ""
 
-#: subscriptions_content.module:418
+#: subscriptions_content.module:416
 msgid "You may want to turn this OFF when you only change %Promoted_to_front_page or %Sticky_at_top_of_lists, otherwise Subscriptions will send out \"update\" notifications; this option is not saved.<br />Subscriptions does not send notifications for unpublished nodes (except to users who have the %administer_nodes permission), but when you set %Published to ON, Subscriptions will send out \"new\" notifications, unless you turn this off here."
 msgstr ""
 
-#: subscriptions_content.module:793
+#: subscriptions_content.module:792
 msgid "@latest_activity, @authored, @commented"
 msgstr ""
 
-#: subscriptions_content.module:804
+#: subscriptions_content.module:803
 msgid "Latest activity, authored, commented"
 msgstr ""
 
-#: subscriptions_content.module:817
+#: subscriptions_content.module:816
 msgid "Note: Deactivated subscriptions will be removed from the list."
 msgstr ""
 
-#: subscriptions_content.module:823
+#: subscriptions_content.module:822
 msgid "There are no subscribed pages."
 msgstr ""
 
-#: subscriptions_content.module:869
+#: subscriptions_content.module:868
 msgid "This !content_type is blocked."
 msgstr ""
 
-#: subscriptions_content.module:908 subscriptions_taxonomy.module:202
+#: subscriptions_content.module:907 subscriptions_taxonomy.module:202
 msgid "There are no available !subs_types."
 msgstr ""
 
-#: subscriptions_content.module:908
+#: subscriptions_content.module:907
 msgid "content types"
 msgstr ""
 
-#: subscriptions_content.module:922
+#: subscriptions_content.module:921
 msgid "Notifications for %Pages (update/comment) subscriptions"
 msgstr ""
 
-#: subscriptions_content.module:922;1023
+#: subscriptions_content.module:921;1023
 msgid "Pages/Threads"
 msgstr ""
 
-#: subscriptions_content.module:924
+#: subscriptions_content.module:923
 msgid "Notifications for %type !content_type subscriptions"
 msgstr ""
 
-#: subscriptions_content.module:942
+#: subscriptions_content.module:941
 msgid "The name of the comment author."
 msgstr ""
 
-#: subscriptions_content.module:943
+#: subscriptions_content.module:942
 msgid "The title of the comment."
 msgstr ""
 
-#: subscriptions_content.module:944
+#: subscriptions_content.module:943
 msgid "The body text of the comment."
 msgstr ""
 
-#: subscriptions_content.module:945
+#: subscriptions_content.module:944
 msgid "The direct URL of the comment."
 msgstr ""
 
-#: subscriptions_content.module:946
+#: subscriptions_content.module:945
 msgid "The type of comment notification: 1 = new comment, 0 = updated comment."
 msgstr ""
 
-#: subscriptions_content.module:947
+#: subscriptions_content.module:946
 msgid "The comment publication state: 1 = published, 0 = unpublished.<br />(Unpublished comments are sent to users with the %administer_comments permission only.)"
 msgstr ""
 
-#: subscriptions_content.module:953
+#: subscriptions_content.module:952
 msgid "The user can unsubscribe by clicking this link."
 msgstr ""
 
-#: subscriptions_content.module:954
+#: subscriptions_content.module:953
 msgid "The name of the sender (if the sender is visible)."
 msgstr ""
 
-#: subscriptions_content.module:955
+#: subscriptions_content.module:954
 msgid "The user page of the sender (if the sender is visible)."
 msgstr ""
 
-#: subscriptions_content.module:956
+#: subscriptions_content.module:955
 msgid "The sender's contact setting: 1 = contact form enabled, 0 = disabled."
 msgstr ""
 
-#: subscriptions_content.module:957
+#: subscriptions_content.module:956
 msgid "The contact page of the sender."
 msgstr ""
 
-#: subscriptions_content.module:958
+#: subscriptions_content.module:957
 msgid "The type of the subscription, like '!thread' or '!category'."
 msgstr ""
 
-#: subscriptions_content.module:959
+#: subscriptions_content.module:958
 msgid "The type of the node, like '!forum' or '!story'."
 msgstr ""
 
-#: subscriptions_content.module:960
+#: subscriptions_content.module:959
 msgid "The title of the subscriptions item."
 msgstr ""
 
-#: subscriptions_content.module:961
+#: subscriptions_content.module:960
 msgid "An excerpt of the subscriptions item."
 msgstr ""
 
-#: subscriptions_content.module:962
+#: subscriptions_content.module:961
 msgid "The body of the subscriptions item."
 msgstr ""
 
-#: subscriptions_content.module:971
+#: subscriptions_content.module:970
 msgid "The full node as it appears on the website (must be specifically enabled !here)."
 msgstr ""
 
-#: subscriptions_content.module:971 subscriptions_ui.module:331
+#: subscriptions_content.module:970 subscriptions_ui.module:331
 msgid "here"
 msgstr ""
 
-#: subscriptions_content.module:974
+#: subscriptions_content.module:973
 msgid "The URL of the item."
 msgstr ""
 
-#: subscriptions_content.module:975
+#: subscriptions_content.module:974
 msgid "The type of notification: 1 = new item, 0 = otherwise."
 msgstr ""
 
-#: subscriptions_content.module:976
+#: subscriptions_content.module:975
 msgid "The type of notification: 1 = updated (possibly new and already updated) item, 0 = otherwise."
 msgstr ""
 
-#: subscriptions_content.module:977
+#: subscriptions_content.module:976
 msgid "The type of notification: 1 = neither new nor updated item, 0 = otherwise."
 msgstr ""
 
-#: subscriptions_content.module:978
+#: subscriptions_content.module:977
 msgid "The publication state: 1 = published, 0 = unpublished.<br />(Unpublished nodes are sent to users with the %administer_nodes permission only.)"
+msgstr ""
+
+#: subscriptions_content.module:978
+msgid "The presence of attached files or img_assist images: 1 = files are available in !files, 0 = no files."
 msgstr ""
 
 #: subscriptions_content.module:979
@@ -770,131 +774,191 @@ msgstr ""
 msgid "The event end timestamp."
 msgstr ""
 
-#: subscriptions_mail.module:119
+#: subscriptions_mail.module:65;352
+msgid "!Module cannot send any notifications because its <a href=\"@link\">cron job time</a> is 0!"
+msgstr ""
+
+#: subscriptions_mail.module:68
+msgid "!Module cannot send any notifications because the cron run has less than 5 available seconds left!"
+msgstr ""
+
+#: subscriptions_mail.module:152
 msgid "(disabled)"
 msgstr ""
 
-#: subscriptions_mail.module:286
+#: subscriptions_mail.module:167
+msgid "| Mailkey: @mailkey/@langcode"
+msgstr ""
+
+#: subscriptions_mail.module:317
 msgid "Your installation returns %url as the base URL of the site. This is probably not what you want, and it can usually be fixed by setting the %variable variable in your %file file."
 msgstr ""
 
-#: subscriptions_mail.module:291
+#: subscriptions_mail.module:323
 msgid "Mail settings"
 msgstr ""
 
-#: subscriptions_mail.module:296
+#: subscriptions_mail.module:328
 msgid "E-mail address"
 msgstr ""
 
-#: subscriptions_mail.module:298
-msgid "A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
+#: subscriptions_mail.module:330
+msgid "A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
 msgstr ""
 
-#: subscriptions_mail.module:298
+#: subscriptions_mail.module:330
 msgid "Clear this field to use the default site e-mail address."
 msgstr ""
 
-#: subscriptions_mail.module:302
+#: subscriptions_mail.module:334
 msgid "E-mail name"
 msgstr ""
 
-#: subscriptions_mail.module:304
+#: subscriptions_mail.module:336
 msgid "An optional name to go with the e-mail address above, no \"double-quotes\"."
 msgstr ""
 
-#: subscriptions_mail.module:304
+#: subscriptions_mail.module:336
 msgid "Clear this field to use the e-mail address only &mdash; some e-mail clients will display only the portion of the address to the left of the @ sign."
 msgstr ""
 
-#: subscriptions_mail.module:308
-msgid "Maximum number of notifications to send per cron job"
+#: subscriptions_mail.module:340
+msgid "Maximum number of notifications to send per cron run"
 msgstr ""
 
-#: subscriptions_mail.module:310
-msgid "!module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
+#: subscriptions_mail.module:342
+msgid "If you need to limit the number of outgoing e-mails for some reason, then set that number here. The default is 0, which means unlimited."
 msgstr ""
 
-#: subscriptions_mail.module:314
-msgid "Display watchdog entries for successful mailings"
-msgstr ""
-
-#: subscriptions_mail.module:316
-msgid "Logs successful mailings to the watchdog log.  Default is ON, but with many subscribers this will generate a huge number of log entries."
-msgstr ""
-
-#: subscriptions_mail.module:320
-msgid "Display summary watchdog entries per cron job"
-msgstr ""
-
-#: subscriptions_mail.module:322
-msgid "Logs the mailing counts, time spent, and size of the remaining queue to the watchdog log.  This is valuable information for estimating the load on the cron job and on your mail server.  Default is ON."
-msgstr ""
-
-#: subscriptions_mail.module:334
-msgid "Digest subscriptions notifications"
+#: subscriptions_mail.module:347
+msgid "Maximum percent of cron job time to use"
 msgstr ""
 
 #: subscriptions_mail.module:349
-msgid "The digested items (separated by a separator), as defined below:"
+msgid "Limit the percentage of cron job time that !Module may use. If you have modules with cron jobs that run after !Module, then be sure to leave enough time for them! The default is !value.<br />You can temporarily set this to 0 to suspend processing of the notifications queue."
 msgstr ""
 
-#: subscriptions_mail.module:370
-msgid "The name of the site."
+#: subscriptions_mail.module:353
+msgid "Warning: @message"
+msgstr ""
+
+#: subscriptions_mail.module:358
+msgid "Queue"
+msgstr ""
+
+#: subscriptions_mail.module:359
+msgid "There are %count item(s) in the queue."
+msgstr ""
+
+#: subscriptions_mail.module:360
+msgid "Note: The number of generated e-mails is typically much lower than the number of queue items."
+msgstr ""
+
+#: subscriptions_mail.module:365;404
+msgid "Purge the queue"
+msgstr ""
+
+#: subscriptions_mail.module:369
+msgid "Display watchdog entries for successful mailings"
 msgstr ""
 
 #: subscriptions_mail.module:371
-msgid "Name of the recipient."
+msgid "Logs successful mailings to the watchdog log.  Default is ON, but with many subscribers this will generate a huge number of log entries."
 msgstr ""
 
-#: subscriptions_mail.module:372
-msgid "The user page of the recipient."
+#: subscriptions_mail.module:375
+msgid "Display summary watchdog entries per cron job"
 msgstr ""
 
-#: subscriptions_mail.module:373
-msgid "The URL where the user can manage her subscriptions."
+#: subscriptions_mail.module:377
+msgid "Logs the mailing counts, time spent, and size of the remaining queue to the watchdog log.  This is valuable information for estimating the load on the cron job and on your mail server.  Default is ON."
+msgstr ""
+
+#: subscriptions_mail.module:381
+msgid "Append the mailkey to every notification"
+msgstr ""
+
+#: subscriptions_mail.module:383
+msgid "Appends the key of the !Mail_Editor_template that was used to create each e-mail, to assist with configuration and testing. Default is OFF."
+msgstr ""
+
+#: subscriptions_mail.module:404
+msgid "Are you sure you want to purge the !Module queue?"
+msgstr ""
+
+#: subscriptions_mail.module:413
+msgid "All %count items have been purged."
+msgstr ""
+
+#: subscriptions_mail.module:415
+msgid "!Module: all %count items have been purged."
 msgstr ""
 
 #: subscriptions_mail.module:426
-msgid "Digest subject"
+msgid "Digest subscriptions notifications"
 msgstr ""
 
-#: subscriptions_mail.module:427
-msgid "Digest body"
-msgstr ""
-
-#: subscriptions_mail.module:435
-msgid "Digest item"
-msgstr ""
-
-#: subscriptions_mail.module:458
-msgid "Digest item comment"
+#: subscriptions_mail.module:441
+msgid "The digested items (separated by a separator), as defined below:"
 msgstr ""
 
 #: subscriptions_mail.module:462
+msgid "The name of the site."
+msgstr ""
+
+#: subscriptions_mail.module:463
+msgid "Name of the recipient."
+msgstr ""
+
+#: subscriptions_mail.module:464
+msgid "The user page of the recipient."
+msgstr ""
+
+#: subscriptions_mail.module:465
+msgid "The URL where the user can manage her subscriptions."
+msgstr ""
+
+#: subscriptions_mail.module:518
+msgid "Digest subject"
+msgstr ""
+
+#: subscriptions_mail.module:519
+msgid "Digest body"
+msgstr ""
+
+#: subscriptions_mail.module:527
+msgid "Digest item"
+msgstr ""
+
+#: subscriptions_mail.module:550
+msgid "Digest item comment"
+msgstr ""
+
+#: subscriptions_mail.module:554
 msgid "The comments inside a digest item body."
 msgstr ""
 
-#: subscriptions_mail.module:472
+#: subscriptions_mail.module:564
 msgid "Replacement patterns"
 msgstr ""
 
-#: subscriptions_mail.module:482
+#: subscriptions_mail.module:574
 msgid "Digest item separator"
 msgstr ""
 
-#: subscriptions_mail.module:486
+#: subscriptions_mail.module:578
 msgid "The separator between digest items (if needed)."
 msgstr ""
 
-#: subscriptions_mail.module:235;243
+#: subscriptions_mail.module:264;274
 msgid "subscriptions"
 msgstr ""
 
-#: subscriptions_mail.module:235
+#: subscriptions_mail.module:264
 msgid "notification for @name at @to"
 msgstr ""
 
-#: subscriptions_mail.module:243
+#: subscriptions_mail.module:274
 msgid "error mailing notification for @name at @to"
 msgstr ""
 

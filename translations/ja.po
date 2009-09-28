@@ -831,7 +831,7 @@ msgid "Clear this field to use the default site e-mail address."
 msgstr "サイトのデフォルトのメールアドレスを使用する場合は空欄にします。"
 
 #: subscriptions_mail.module:268
-msgid "Maximum number of notifications to send per cron job"
+msgid "Maximum number of notifications to send per cron run"
 msgstr "送信する通知のcronジョブあたりの最大数"
 
 #: subscriptions_mail.module:270
@@ -847,7 +847,7 @@ msgid "Logs successful mailings to the watchdog log.  Default is ON, but with ma
 msgstr "メールの送信に成功すればwatchdogにログを記録します。デフォルトはオンですが、配信登録者が多ければそれだけ膨大なログが生成されます。"
 
 #: subscriptions_mail.module:280
-msgid "Display summary watchdog entries per cron job"
+msgid "Display summary watchdog entries per cron run"
 msgstr "cronジョブ毎にwatchdogエントリ表示"
 
 #: subscriptions_mail.module:282

@@ -65,7 +65,7 @@ function subscriptions_mail_cron() {
       $watchdog('cron', t('!Module cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables), NULL, WATCHDOG_WARNING);
     }
     else {
-      $watchdog('cron', t('!Module cannot send any notifications because the cron job has less than 5 available seconds left!', $variables), NULL, WATCHDOG_WARNING);
+      $watchdog('cron', t('!Module cannot send any notifications because the cron run has less than 5 available seconds left!', $variables), NULL, WATCHDOG_WARNING);
     }
   }
 
@@ -215,8 +215,8 @@ function subscriptions_mail_cron() {
   if ($single_count + $digest_count > 0) {
     $current_seconds = timer_read('page')/1000;
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', '!module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue item(s) and !remaining_seconds seconds left.', array(
-      '!module'            => 'Subscriptions',
+    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue item(s) and !remaining_seconds seconds left.', array(
+      '!Module'            => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,
       '!used_seconds'      => round($current_seconds - $lost_seconds),
@@ -317,7 +317,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     drupal_set_message(t('Your installation returns %url as the base URL of the site. This is probably not what you want, and it can usually be fixed by setting the %variable variable in your %file file.', array('%url' => $url, '%variable' => '$base_url', '%file' => 'settings.php')), 'error');
   }
 
-  $variables = array('!module' => 'Subscriptions');
+  $variables = array('!Module' => 'Subscriptions');
   $form['mail_settings'] = array(
       '#type' => 'fieldset',
       '#title' => t('Mail settings'),
@@ -327,7 +327,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#type'          => 'textfield',
     '#title'         => t('E-mail address'),
     '#default_value' => _subscriptions_mail_site_mail(TRUE),
-    '#description'   => t('A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website.', $variables + array('%From' => 'From', '%Reply_To' => 'Reply-To')) .'<br />'. t('Clear this field to use the default site e-mail address.'),
+    '#description'   => t('A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website.', $variables + array('%From' => 'From', '%Reply_To' => 'Reply-To')) .'<br />'. t('Clear this field to use the default site e-mail address.'),
   );
   $form['mail_settings']['subscriptions_site_mail_name'] = array(
     '#type'          => 'textfield',
@@ -337,7 +337,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
   );
   $form['mail_settings']['subscriptions_number_of_mails'] = array(
     '#type'          => 'textfield',
-    '#title'         => t('Maximum number of notifications to send per cron job'),
+    '#title'         => t('Maximum number of notifications to send per cron run'),
     '#default_value' => variable_get('subscriptions_number_of_mails', 0),
     '#description'   => t('If you need to limit the number of outgoing e-mails for some reason, then set that number here. The default is 0, which means unlimited.'),
   );
@@ -346,10 +346,11 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#type'          => 'textfield',
     '#title'         => t('Maximum percent of cron job time to use'),
     '#default_value' => $cron_percentage,
-    '#description'   => t('Limit the percentage of cron job time that !module may use. If you have modules with cron jobs that run after !module, then be sure to leave enough time for them! The default is !value.<br />You can temporarily set this to 0 to suspend processing of the notifications queue.', $variables + array('!value' => 50)),
+    '#description'   => t('Limit the percentage of cron job time that !Module may use. If you have modules with cron jobs that run after !Module, then be sure to leave enough time for them! The default is !value.<br />You can temporarily set this to 0 to suspend processing of the notifications queue.', $variables + array('!value' => 50)),
   );
   if (empty($_POST) && $cron_percentage <= 0) {
-    drupal_set_message(t('Warning: !module cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables + array('@link' => '#edit-subscriptions-cron-percent')), 'error');
+    $message = t('!Module cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables + array('@link' => '#edit-subscriptions-cron-percent'));
+    drupal_set_message(t('Warning: @message', array('@message' => $message)), 'error');
     $form['mail_settings']['subscriptions_cron_percent']['#attributes'] = array('class' => 'error');
   }
   $form['mail_settings']['queue_length'] = array(
@@ -409,9 +410,9 @@ function _subscriptions_mail_purge_queue_form(&$form_state) {
 function subscriptions_purge_queue() {
   db_query("DELETE FROM {subscriptions_queue}");
   $variables = array('!Module' => 'Subscriptions', '%count' => db_affected_rows());
-  drupal_set_message(t('All %count rows have been purged.', $variables));
+  drupal_set_message(t('All %count items have been purged.', $variables));
   $watchdog = 'watchdog';  // keep potx from translating 'cron'
-  $watchdog('cron', '!Module: all %count rows have been purged.', $variables, WATCHDOG_WARNING);
+  $watchdog('cron', t('!Module: all %count items have been purged.', $variables), NULL, WATCHDOG_WARNING);
 }
 
 /**

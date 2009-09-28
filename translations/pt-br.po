@@ -829,20 +829,20 @@ msgid "E-mail address"
 msgstr "Endereço de email"
 
 #: subscriptions_mail.module:264
-msgid "A valid e-mail address to be used as the \"From\" address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
-msgstr "Um endereço de email válido para ser usado como o endereço \"De\" pelo auto-mailer para notificações do módulo !module. Para diminuir a chance do email ser marcado como spam, este endereço de email deve ter o mesmo domínio que seu website."
+msgid "A valid e-mail address to be used as the \"From\" address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
+msgstr "Um endereço de email válido para ser usado como o endereço \"De\" pelo auto-mailer para notificações do módulo !Module. Para diminuir a chance do email ser marcado como spam, este endereço de email deve ter o mesmo domínio que seu website."
 
 #: subscriptions_mail.module:264
 msgid "Clear this field to use the default site e-mail address."
 msgstr "Limpe este campo para usar o endereço de email padrão."
 
 #: subscriptions_mail.module:268
-msgid "Maximum number of notifications to send per cron job"
+msgid "Maximum number of notifications to send per cron run"
 msgstr "Número máximo de notificações a serem enviados por cron job."
 
 #: subscriptions_mail.module:270
-msgid "!module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
-msgstr "O módulo !module tenta usar uma boa parte do tempo restante durante cada execução do cron. Se isto estiver usando tempo demais ou se você precisa limitar o número de email enviados por alguma outra razão, então ajuste o número aqui. O padrão é 0, que significa ilimitado."
+msgid "!Module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
+msgstr "O módulo !Module tenta usar uma boa parte do tempo restante durante cada execução do cron. Se isto estiver usando tempo demais ou se você precisa limitar o número de email enviados por alguma outra razão, então ajuste o número aqui. O padrão é 0, que significa ilimitado."
 
 #: subscriptions_mail.module:274
 msgid "Display watchdog entries for successful mailings"
@@ -853,7 +853,7 @@ msgid "Logs successful mailings to the watchdog log.  Default is ON, but with ma
 msgstr "Registra os envios de emais bem sucedidos para o registro do watchdog. O padrão é ATIVADO, mas com muitos assinantes isto irá gerar um imensa quantidade de dados no registro."
 
 #: subscriptions_mail.module:280
-msgid "Display summary watchdog entries per cron job"
+msgid "Display summary watchdog entries per cron run"
 msgstr "Exibe resumo dos registros do watchdog para cada cron job."
 
 #: subscriptions_mail.module:282

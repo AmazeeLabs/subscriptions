@@ -524,8 +524,8 @@ msgid "Your subscription was deactivated."
 msgstr "Votre abonnement a été désactivé."
 
 #: subscriptions.module:517
-msgid "The following modules return invalid data from %hook: !modules   Either they are buggy !Subscriptions add-ons, or they are unrelated to !Subscriptions and should not define %hook!"
-msgstr "Les modules suivants envoient des données invalides depuis %hook: !modules   Soit il s'agit de bogues dans des modules d'extension de !Subscriptions, ou il s'agit de modules sans lien avec !Subscriptions qui ne devraient pas utiliser %hook!"
+msgid "The following modules return invalid data from %hook: !Modules   Either they are buggy !Subscriptions add-ons, or they are unrelated to !Subscriptions and should not define %hook!"
+msgstr "Les modules suivants envoient des données invalides depuis %hook: !Modules   Soit il s'agit de bogues dans des modules d'extension de !Subscriptions, ou il s'agit de modules sans lien avec !Subscriptions qui ne devraient pas utiliser %hook!"
 
 #: subscriptions_blog_ui.module:47
 msgid "subscribe to blogs"
@@ -871,8 +871,8 @@ msgid "E-mail address"
 msgstr "Adresse Email"
 
 #: subscriptions_mail.module:298
-msgid "A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
-msgstr "Une adresse email valide qui servira comme adresse %From et %Reply_To pour l'envoi automatique des mails de notifications du module !module. Pour réduire les chances d'être identifié comme spam, cette adresse mail devrait être sur le même domaine que votre site."
+msgid "A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
+msgstr "Une adresse email valide qui servira comme adresse %From et %Reply_To pour l'envoi automatique des mails de notifications du module !Module. Pour réduire les chances d'être identifié comme spam, cette adresse mail devrait être sur le même domaine que votre site."
 
 #: subscriptions_mail.module:298
 msgid "Clear this field to use the default site e-mail address."
@@ -891,12 +891,12 @@ msgid "Clear this field to use the e-mail address only &mdash; some e-mail clien
 msgstr "Laissez ce champ vide pour n'utiliser que l'adresse email &mdash; certains applications mail n'afficheront que la partie de l'adresse avant le symbole @."
 
 #: subscriptions_mail.module:308
-msgid "Maximum number of notifications to send per cron job"
+msgid "Maximum number of notifications to send per cron run"
 msgstr "Nombre maximale d'envois par tache 'cron'."
 
 #: subscriptions_mail.module:310
-msgid "!module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
-msgstr "Le module !module va essayer d'utiliser une bonne partie du temps accorder au cron. Si les envois prennent trop de temps ou si, pour une autre raison, vous souhaitez limiter le nombre d'envois, vous pouvez fixer une limite ici. Par défaut cette limite est de 0, qui signifie illimité."
+msgid "!Module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
+msgstr "Le module !Module va essayer d'utiliser une bonne partie du temps accorder au cron. Si les envois prennent trop de temps ou si, pour une autre raison, vous souhaitez limiter le nombre d'envois, vous pouvez fixer une limite ici. Par défaut cette limite est de 0, qui signifie illimité."
 
 #: subscriptions_mail.module:314
 msgid "Display watchdog entries for successful mailings"
@@ -907,7 +907,7 @@ msgid "Logs successful mailings to the watchdog log.  Default is ON, but with ma
 msgstr "Ajoutera une entrée de journal pour chaque envoi réussi. Activé par défaut, mais ca risque de générer enormément d'entrées de journal."
 
 #: subscriptions_mail.module:320
-msgid "Display summary watchdog entries per cron job"
+msgid "Display summary watchdog entries per cron run"
 msgstr "Créer une entrée journal résumé"
 
 #: subscriptions_mail.module:322

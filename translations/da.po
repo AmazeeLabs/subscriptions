@@ -680,8 +680,8 @@ msgid "(disabled)"
 msgstr "(deaktiveret)"
 
 #: subscriptions_mail.module:190
-msgid "!module sent !single_count single and !digest_count digest notifications in !used_seconds of !available_seconds available seconds; !remaining_items queue items left."
-msgstr "!module har sendt !single_count enkelte adviseringer og !digest_count oversigts-adviseringer på !used_seconds af !available_seconds; !remaining_items emner i køen."
+msgid "!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !available_seconds available seconds; !remaining_items queue items left."
+msgstr "!Module har sendt !single_count enkelte adviseringer og !digest_count oversigts-adviseringer på !used_seconds af !available_seconds; !remaining_items emner i køen."
 
 #: subscriptions_mail.module:209
 msgid "notification for @name at @to"
@@ -704,20 +704,20 @@ msgid "E-mail address"
 msgstr "Email adresse"
 
 #: subscriptions_mail.module:250
-msgid "A valid e-mail address to be used as the \"From\" address by the auto-mailer for !module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
-msgstr "En gyldig email-adresse der kan bruges som \"Fra\" adresse til !module adviseringer. For at mindske sansynligheden for at mails bliver markeret som spam bør denne email-adresse brge det samme domæne som hjemmesiden."
+msgid "A valid e-mail address to be used as the \"From\" address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website."
+msgstr "En gyldig email-adresse der kan bruges som \"Fra\" adresse til !Module adviseringer. For at mindske sansynligheden for at mails bliver markeret som spam bør denne email-adresse brge det samme domæne som hjemmesiden."
 
 #: subscriptions_mail.module:250
 msgid "Clear this field to use the default site e-mail address."
 msgstr "Slet indholdet af dette felt for at bruge hjemmesidens standard email-adresse."
 
 #: subscriptions_mail.module:254
-msgid "Maximum number of notifications to send per cron job"
+msgid "Maximum number of notifications to send per cron run"
 msgstr "Maksimalt antal adviseringer at sende pr cron-job"
 
 #: subscriptions_mail.module:256
-msgid "!module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
-msgstr "!module forsøger at bruge hovedparten af den resterende tid ved hvert cron-job. Hvis der bruges for meget tid eller du har brug for at begrænse antallet af udgående email af den ene eller den anden grund kan du instille antallet her. Standard er 0, som betyder ubegrænset."
+msgid "!Module tries to use a good part of the remaining time during each cron run. If it's using too much time or you need to limit the number of outgoing e-mails for some other reason, then set the number here. The default is 0, which means unlimited."
+msgstr "!Module forsøger at bruge hovedparten af den resterende tid ved hvert cron-job. Hvis der bruges for meget tid eller du har brug for at begrænse antallet af udgående email af den ene eller den anden grund kan du instille antallet her. Standard er 0, som betyder ubegrænset."
 
 #: subscriptions_mail.module:260
 msgid "Display watchdog entries for successful mailings"
@@ -728,7 +728,7 @@ msgid "Logs successful mailings to the watchdog log.  Default is ON, but with ma
 msgstr "Logger succesfulde udsendelser til watchdog loggen.Standard er TIL, men med mange abonnenter vil dette give et stort antal log-meddelelser."
 
 #: subscriptions_mail.module:266
-msgid "Display summary watchdog entries per cron job"
+msgid "Display summary watchdog entries per cron run"
 msgstr "Vis opsummering pr cron-job i loggen"
 
 #: subscriptions_mail.module:268
