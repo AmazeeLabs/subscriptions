@@ -1,6 +1,9 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+
+
+Subscriptions 6.x-1.1:
   Enhancements:
    - Update .pot file and German translation, tune some strings.
    - #581644: Provide a (temporary) work-around for bug in D6.14, which disables the cron job, and improve warning messages.
