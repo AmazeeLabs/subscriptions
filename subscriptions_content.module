@@ -743,7 +743,14 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     LEFT JOIN {node_comment_statistics} ncs ON n.nid = ncs.nid
     WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d
     ORDER BY latest_activity DESC");
-  $result = db_query($sql, $uid);
+  $sql_count = db_rewrite_sql("
+    SELECT COUNT(n.nid) 
+    FROM {node} n
+    INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+                                  ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
+                                       ." = s.value
+    WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d");
+  $result = pager_query($sql, 50, 0, $sql_count, $uid);
   while ($s = db_fetch_array($result)) {
     $subscriptions[$s['nid']][$s['author_uid']] = $s;
   }
@@ -814,6 +821,7 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     $form['submit'] = array('#type' => 'submit', '#value' => t('Save'), '#weight' => 10);
     $form['#submit'][] = 'subscriptions_page_form_submit';
     $form['note'] = array('#type' => 'item', '#description' => '<div>'. t('Note: Deactivated subscriptions will be removed from the list.') .'</div>' );
+    $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
   }
   else {
     $form = array(
