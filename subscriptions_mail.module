@@ -46,6 +46,11 @@ function subscriptions_mail_cron() {
   // Strategy for cron:
   // Use a defined percentage of the total cron time (default: 50%), but leave at least 5s.
   $total_seconds = ini_get('max_execution_time');
+  if (empty($total_seconds)) {
+    // Work-around for D6.14, which broke this in #193383-106 with http://cvs.drupal.org/viewvc.py/drupal/drupal/includes/common.inc?r1=1.756.2.65&r2=1.756.2.66&pathrev=DRUPAL-6
+    // D6.15 will revert this to a hard-coded 240 in http://cvs.drupal.org/viewvc.py/drupal/drupal/includes/common.inc?r1=1.756.2.70&r2=1.756.2.71&pathrev=DRUPAL-6
+    $total_seconds = 240;
+  }
   $lost_seconds = timer_read('page')/1000;
   $available_seconds = $total_seconds - $lost_seconds;
   $usable_seconds = min(array($available_seconds - 5, $total_seconds*subscriptions_mail_get_cron_percentage()/100));
@@ -53,10 +58,15 @@ function subscriptions_mail_cron() {
   if ($usable_seconds <= 0) {
     $variables = array(
       '!Module' => 'Subscriptions',
-      '!link'   => l('cron job time', 'admin/settings/subscriptions'),
+      '@link'   => url('admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-cron-percent')),
     );
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', t('!Module cannot send any notifications because its !link is 0!', $variables), NULL, WATCHDOG_WARNING);
+    if ($usable_seconds == 0) {
+      $watchdog('cron', t('!Module cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables), NULL, WATCHDOG_WARNING);
+    }
+    else {
+      $watchdog('cron', t('!Module cannot send any notifications because the cron job has less than 5 available seconds left!', $variables), NULL, WATCHDOG_WARNING);
+    }
   }
 
   while (($mails_allowed <= 0 || $single_count + $digest_count < $mails_allowed)
@@ -339,7 +349,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$for
     '#description'   => t('Limit the percentage of cron job time that !module may use. If you have modules with cron jobs that run after !module, then be sure to leave enough time for them! The default is !value.<br />You can temporarily set this to 0 to suspend processing of the notifications queue.', $variables + array('!value' => 50)),
   );
   if (empty($_POST) && $cron_percentage <= 0) {
-    drupal_set_message(t('Warning: !module cannot send any notifications because its !link is 0!', $variables + array('!link' => '<a href="#edit-subscriptions-cron-percent">'. t('cron job time') .'</a>')), 'error');
+    drupal_set_message(t('Warning: !module cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables + array('@link' => '#edit-subscriptions-cron-percent')), 'error');
     $form['mail_settings']['subscriptions_cron_percent']['#attributes'] = array('class' => 'error');
   }
   $form['mail_settings']['queue_length'] = array(
