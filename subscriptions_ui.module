@@ -147,9 +147,13 @@ function subscriptions_ui_node_form(&$form_state, $node, $account = NULL) {
   }
   uasort($node_options, '_subscriptions_cmp_by_weight');
 
-  $result = db_query("SELECT sid, module, field, value, author_uid, send_interval, send_updates, send_comments FROM {subscriptions} WHERE module = 'node' AND recipient_uid = %d", $account->uid);
-  while ($s = db_fetch_array($result)) {
-    $subscriptions[$s['field']][$s['value']][$s['author_uid']] = $s;
+  foreach (array(
+    db_query("SELECT sid, module, field, value, author_uid, send_interval, send_updates, send_comments FROM {subscriptions} WHERE module = 'node' AND field = 'nid' AND value = '%s' AND recipient_uid = %d", $node->nid, $account->uid),
+    db_query("SELECT sid, module, field, value, author_uid, send_interval, send_updates, send_comments FROM {subscriptions} WHERE module = 'node' AND field <> 'nid' AND recipient_uid = %d", $account->uid),
+  ) as $result) {
+    while ($s = db_fetch_array($result)) {
+      $subscriptions[$s['field']][$s['value']][$s['author_uid']] = $s;
+    }
   }
   // Process all options building the array of indexed params for each
   $nonlabeled_options = $options = $params = $default_comments = $default_updates = $default_subscriptions = array();
