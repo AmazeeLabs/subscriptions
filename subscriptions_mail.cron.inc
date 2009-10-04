@@ -200,7 +200,7 @@ function _subscriptions_mail_cron() {
   if ($single_count + $digest_count > 0) {
     $current_seconds = timer_read('page')/1000;
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue item(s) and !remaining_seconds seconds left.', array(
+    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue items and !remaining_seconds seconds left.', array(
       '!Module'            => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,

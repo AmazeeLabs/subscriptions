@@ -60,7 +60,7 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
   $form['mail_settings']['queue_length'] = array(
     '#type'          => 'item',
     '#title'         => t('Queue'),
-    '#value'         => t('There are %count item(s) in the queue.', array('%count' => db_result(db_query("SELECT COUNT(sqid) FROM {subscriptions_queue}")))) .' &nbsp; ',
+    '#value'         => t('There are %count items in the queue.', array('%count' => db_result(db_query("SELECT COUNT(sqid) FROM {subscriptions_queue}")))) .' &nbsp; ',
     '#description'   => t('Note: The number of generated e-mails is typically much lower than the number of queue items.'),
   );
   $form['mail_settings']['queue_length']['purge_queue'] = array(

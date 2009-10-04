@@ -934,7 +934,7 @@ msgid "Queue"
 msgstr "Warteschlange"
 
 #: subscriptions_mail.module:359
-msgid "There are %count item(s) in the queue."
+msgid "There are %count items in the queue."
 msgstr "Es sind %count Einträge in der Warteschlange."
 
 #: subscriptions_mail.module:360
