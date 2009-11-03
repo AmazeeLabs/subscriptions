@@ -839,7 +839,7 @@ msgid "Limit the percentage of cron job time that !Module may use. If you have m
 msgstr ""
 
 #: subscriptions_mail.module:353
-msgid "Warning: @message"
+msgid "Warning: !message"
 msgstr ""
 
 #: subscriptions_mail.module:358

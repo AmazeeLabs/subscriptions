@@ -54,7 +54,7 @@ function _subscriptions_mail_cron() {
     }
   }
 
-  while (($mails_allowed <= 0 || $single_count + $digest_count < $mails_allowed)
+  while ((empty($mails_allowed) || $single_count + $digest_count < $mails_allowed)
           && timer_read('page')/1000 < $lost_seconds + $usable_seconds) {
     $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE last_sent + send_interval < %d ORDER BY sqid', time(), 0, 1);
     if (!($s = db_fetch_array($result))) {
@@ -200,7 +200,7 @@ function _subscriptions_mail_cron() {
   if ($single_count + $digest_count > 0) {
     $current_seconds = timer_read('page')/1000;
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue items and !remaining_seconds seconds left.', array(
+    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue items remaining, !remaining_seconds seconds left for other cron client modules.', array(
       '!Module'            => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,
@@ -217,10 +217,10 @@ function _subscriptions_mail_cron() {
  */
 function subscriptions_mail_mail($key, &$message, $params) {
   global $base_url;
-  
+
   $url = parse_url($base_url);
   $list_id = variable_get('site_name', '') .' '. t('Subscriptions') .' <subscriptions.'. $url['host'] .'>'; 
-  
+
   $message['subject'] = $params['context']['subject'];
   $message['body'] = $params['context']['message'];
   $message['headers']['List-Id'] = $list_id;

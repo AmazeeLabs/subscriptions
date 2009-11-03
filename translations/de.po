@@ -926,8 +926,8 @@ msgid "Limit the percentage of cron job time that !Module may use. If you have m
 msgstr "Dies begrenzt den Prozentsatz der Cron-Job-Zeit, die !Module verwenden darf. Wenn nach !Module noch andere Module im Cron-Job laufen, dann sollte für diese genügend Zeit übrig bleiben! Standard ist !value.<br />Dieser Wert kann vorübergehend auf 0 gesetzt werden, um das Bearbeiten der Benachrichtigungs-Warteschlange zu unterdrücken."
 
 #: subscriptions_mail.module:353
-msgid "Warning: @message"
-msgstr "Warnung: @message"
+msgid "Warning: !message"
+msgstr "Warnung: !message"
 
 #: subscriptions_mail.module:358
 msgid "Queue"

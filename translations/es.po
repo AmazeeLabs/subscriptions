@@ -657,7 +657,7 @@ msgid "(disabled)"
 msgstr "(desactivado)"
 
 #: subscriptions_mail.module:188
-msgid "!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !available_seconds available seconds; !remaining_items queue items left."
+msgid "!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue items remaining, !remaining_seconds seconds left for other cron client modules."
 msgstr ""
 
 #: subscriptions_mail.module:207
