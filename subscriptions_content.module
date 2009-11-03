@@ -133,6 +133,9 @@ function _subscriptions_content_access($load_function, $load_args, $node) {
   ///global $user;  /// keep this for remote debugging
   if (($load_function == 'subscriptions_content_node_load' || ($load_function == 'subscriptions_content_comment_load' && $node->_subscriptions_comments)) &&
     ($node->status || user_access('administer nodes')) && node_access('view', $node)) {
+    if (!empty($node->type) && subscriptions_content_type_is_blocked($node->type) && !user_access('subscribe to all content types')) {
+      return FALSE;
+    }
     // We vote 'yes'. Other modules might vote 'no' and then that wins.
     ///watchdog('subs debug', "_sca returns TRUE for node $node->nid, user $user->uid.");  ///
     return TRUE;
@@ -499,11 +502,21 @@ function subscriptions_content_node_admin_nodes_submit($form, &$form_state) {
  */
 function _subscriptions_content_autosubscribe($content_type, $module, $field, $value, $context)
 {
-  $blockeds = variable_get('subscriptions_blocked_content_types', array());
-  if (in_array($content_type, $blockeds)) {
+  if (subscriptions_content_type_is_blocked($content_type)) {
     return;
   }
   subscriptions_autosubscribe($module, $field, $value, $context);
+}
+
+/**
+ * Return TRUE if the content type is blocked.
+ *
+ * @param $content_type
+ */
+function subscriptions_content_type_is_blocked($content_type)
+{
+  $blockeds = variable_get('subscriptions_blocked_content_types', array());
+  return in_array($content_type, $blockeds);
 }
 
 /**
