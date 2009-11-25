@@ -608,3 +608,15 @@ function _subscriptions_get_setting($name, $account) {
   }
   return $defaults[$uid][$name];
 }
+
+/**
+ * Load (and cache) a user.
+ */
+function subscriptions_user_load($uid) {
+  static $users = array();
+
+  if (!isset($users[$uid])) {
+    $users[$uid] = user_load($uid);
+  }
+  return $users[$uid];
+}

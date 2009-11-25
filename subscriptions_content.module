@@ -573,6 +573,9 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   }
   $mailvars['!has_files'] = empty($files) ? 0 : 1;
   $mailvars['!files'] = $files;
+
+  $mailvars['!revision_name'] = subscriptions_user_load($node->revision_uid)->name;
+  $mailvars['!revision_log'] = _subscriptions_content_format_text($node->log);
 }
 
 /**
@@ -977,6 +980,8 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         '!sender_contact_page' => t('The contact page of the sender.'),
         '!subs_type'           => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => $tr('category'))),
         '!node_type'           => t("The type of the node, like '!forum' or '!story'.", array('!forum' => 'forum', '!story' => 'story')),
+        '!revision_name'       => t('The name of the user who made the last change to the node.'),
+        '!revision_log'        => t('The revision log entry of the node.'),
         '!title'               => t('The title of the subscriptions item.'),
         '!teaser'              => t('An excerpt of the subscriptions item.'),
         '!body'                => t('The body of the subscriptions item.'),

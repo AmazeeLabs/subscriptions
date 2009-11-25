@@ -25,7 +25,6 @@ function _subscriptions_mail_cron() {
   $single_count = 0;
   $digest_count = 0;
   $loaded_objects = array();
-  $users = array();
   $fields = array();
 
   // Strategy for cron:
@@ -61,13 +60,10 @@ function _subscriptions_mail_cron() {
       break;  // No more ready queue items, terminate loop.
     }
     
-    if (!isset($users[$s['uid']])) {
-      $users[$s['uid']] = user_load(array('uid' => $s['uid']));
-    }
     $saved_user = $user;
     $saved_language = $language;
     session_save_session(FALSE);
-    $user = $users[$s['uid']];
+    $user = subscriptions_user_load($s['uid']);
     drupal_init_language();
     $langcode = $language->language;
     $user_mails = array();
@@ -94,10 +90,7 @@ function _subscriptions_mail_cron() {
           }
         }
         if ($object = $loaded_objects[$user->uid][$load_function][$index]) {
-          if (!isset($users[$object->uid])) {
-            $users[$object->uid] = user_load(array('uid' => $object->uid));
-          }
-          $sender = $users[$object->uid];
+          $sender = subscriptions_user_load($object->uid);
           $module = $s['module'];
           $ori_field = $field = $s['field'];
           $ori_value = $value = $s['value'];
