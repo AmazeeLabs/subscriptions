@@ -66,7 +66,7 @@ function _subscriptions_mail_cron() {
     $user = subscriptions_user_load($s['uid']);
     drupal_init_language();
     $langcode = $language->language;
-    $user_mails = array();
+    $digest_data = array();
     
     do {  // once and repeat while adding to a digest
       if ($user->status && $user->access) {
@@ -145,15 +145,15 @@ function _subscriptions_mail_cron() {
             $body .= t('| Mailkey: @mailkey/@langcode', array('@mailkey' => $mailkey, '@langcode' => $langcode)) ."\n";
           }
           if ($digest) {
-            $user_mails['bodies'][] = $body;
-            $user_mails['send'] = array(
+            $digest_data['bodies'][] = $body;
+            $digest_data['send'] = array(
               'name' => $s['name'],
               'mail' => $s['mail'],
               'from' => $from,
               '!name' => $mailvars['!name'],
               '!manage_url' => $mailvars['!manage_url'],
             );
-            $user_mails['send_intervals'][$s['send_interval']] = $s['send_interval'];
+            $digest_data['send_intervals'][$s['send_interval']] = $s['send_interval'];
           }
           else {
             $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
@@ -169,17 +169,28 @@ function _subscriptions_mail_cron() {
         $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE uid = %d AND last_sent + send_interval < %d ORDER BY sqid', $user->uid, time(), 0, 1);
         if (!($s = db_fetch_array($result))) {
           // No more ready queue items for this user, finish off this digest.
-          $s = $user_mails['send'];
+          $s = $digest_data['send'];
           $subject_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'subject', 'DSUBJ');
           $body_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'body', 'DBODY');
           $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'subject', 'SEP');
-          $mailvars['!bodies'] = implode($separator, $user_mails['bodies']);
+          $mailvars['!bodies'] = implode($separator, $digest_data['bodies']);
           $mailvars['!name'] = $s['!name'];
           $mailvars['!manage_url'] = $s['!manage_url'];
-          $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
-          $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
-          _subscriptions_mail_send(SUBSCRIPTIONS_DIGEST_MAILKEY, $s['name'], $s['mail'], $subject, $body, $s['from'], $user->uid, $user_mails['send_intervals']);
-          ++$digest_count;
+          $digest_data['mailvars'] = $mailvars;
+          foreach (module_implements('subscriptions_digest_alter') as $module) {
+            $function = $module .'_subscriptions_digest_alter';
+            $function($digest_data);
+            if (empty($digest_data)) {
+              break;  // forget it
+            }
+          }
+          if (!empty($digest_data)) {
+            $mailvars = $digest_data['mailvars'];
+            $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
+            $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
+            _subscriptions_mail_send(SUBSCRIPTIONS_DIGEST_MAILKEY, $s['name'], $s['mail'], $subject, $body, $s['from'], $user->uid, $digest_data['send_intervals']);
+            ++$digest_count;
+          }
           $digest = false;
         }
       }
