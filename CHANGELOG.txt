@@ -1,6 +1,9 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+
+
+Subscriptions 6.x-1.2 (2010-02-17):
   Enhancements:
    - Some minor code tuning.
    - #648600: Create new subscriptions_digest_alter().
