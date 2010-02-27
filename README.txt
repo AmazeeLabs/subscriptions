@@ -27,6 +27,7 @@ Initial Translations:
 - Danish:               wulff / Anders Lund
 - Brazilian Portuguese: Márcio Moreira
 - Hungarian:            muczy
+- Arabic:               N2H
 
 Contributed Modules:
 - moderate_content_notifications:  written and maintained by beginner.

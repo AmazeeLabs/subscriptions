@@ -1,6 +1,7 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+   - #727608: Add Arabic translation.
 
 
 Subscriptions 6.x-1.2 (2010-02-17):
