@@ -247,33 +247,6 @@ function subscriptions_content_comment($comment, $op) {
   static $inserted_cid = 0;
   $comment = (array)$comment;  // $comment can be an object or an array.
 
-  if ($op == 'form') {
-    $is_unpublished = (isset($comment['admin']) ? $comment['admin']['status']['#default_value'] : !user_access('post comments without approval'));
-    if (user_access('administer comments')) {
-      $tr = 't';
-      $form['subscriptions_notify'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Send subscriptions notifications'),
-        '#default_value' => TRUE,
-      ); // hook_form_alter() will move the checkbox inside the Administration fieldset!
-
-      if (isset($comment['admin']) && $is_unpublished) {  // for update
-        $form['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out "new" notifications, unless you suppress this here.',
-                                                          array('%administer_comments' => $tr('administer comments'),
-                                                                '!Status' => $tr('Status'),
-                                                                '%Published' => $tr('Published')));
-      }
-      elseif ($is_unpublished) {
-        $form['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments, except to users who have the %administer_comments permission, and you can even suppress the latter here.',
-                                                          array('%administer_comments' => $tr('administer comments')));
-      }
-      else {
-        $form['subscriptions_notify']['#description'] = t('You can suppress sending subscriptions notifications here; this option is not saved.');
-      }
-    }
-    return (isset($form) ? $form : NULL);
-  }
-
   if (!isset($comment['nomail']) && ($op == 'insert' || $op == 'update' || ($op == 'publish' && $comment['cid'] != $inserted_cid))) {
     if (!isset($comment['subscriptions_notify']) || $comment['subscriptions_notify']) {
       $node = node_load($comment['nid']);
@@ -454,10 +427,11 @@ function subscriptions_content_form_node_admin_nodes_alter(&$form, &$form_state)
  */
 function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
 
-  if (isset($form['subscriptions_notify'])) {
+  $is_unpublished = (isset($form['admin']) ? $form['admin']['status']['#default_value'] : !user_access('post comments without approval'));
+  if (user_access('administer comments')) {
+    $tr = 't';
     // create the Administration fieldset if it doesn't exist:
     if (!isset($form['admin'])) {
-      $tr = 't';
       $form['admin'] = array(
         '#type' => 'fieldset',
         '#title' => $tr('Administration'),
@@ -466,9 +440,28 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
         '#weight' => -2,
       );
     }
-    // move the checkbox inside the Administration fieldset:
-    $form['admin']['subscriptions_notify'] = $form['subscriptions_notify'];
-    unset($form['subscriptions_notify']);
+    $form['admin']['subscriptions_notify'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Send subscriptions notifications'),
+      '#default_value' => TRUE,
+      '#weight' => -1,
+    );
+
+    if (isset($form['admin']) && $is_unpublished) {  // for update
+      $form['admin']['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out "new" notifications, unless you suppress this here.', array(
+        '%administer_comments' => $tr('administer comments'),
+        '!Status' => $tr('Status'),
+        '%Published' => $tr('Published'),
+      ));
+    }
+    elseif ($is_unpublished) {
+      $form['admin']['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments, except to users who have the %administer_comments permission, and you can even suppress the latter here.', array(
+        '%administer_comments' => $tr('administer comments'),
+      ));
+    }
+    else {
+      $form['admin']['subscriptions_notify']['#description'] = t('You can suppress sending subscriptions notifications here; this option is not saved.');
+    }
   }
 }
 

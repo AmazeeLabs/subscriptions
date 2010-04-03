@@ -2,6 +2,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
   Enhancements:
+   - #761260: Add a /Send subscriptions notifications/ option to the comment's Administration fieldset (was lost when porting from D5).
    - #756964: Add some helpful information to the admin/settings/subscriptions/intervals page.
    - #727608: Add Arabic translation.
 
