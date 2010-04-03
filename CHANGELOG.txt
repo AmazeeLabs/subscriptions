@@ -1,6 +1,8 @@
 CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
+  Enhancements:
+   - #756964: Add some helpful information to the admin/settings/subscriptions/intervals page.
    - #727608: Add Arabic translation.
 
 
