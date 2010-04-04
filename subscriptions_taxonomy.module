@@ -262,7 +262,9 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
         if (is_array($term)) {
           $term = (object)$term;
         }
-        $title = str_repeat('--&nbsp;', (empty($term->depth) ? 0 : $term->depth)) . l($term->name, 'taxonomy/term/'. $term->tid);
+        $depth = (empty($term->depth) ? 0 : $term->depth);
+        $title = '<span class="indenter">'. str_repeat('--&nbsp;', $depth) .'</span>'.
+          l($term->name, 'taxonomy/term/'. $term->tid, array('attributes' => array('class' => 'depth-'. $depth)));
         if (!isset($subscriptions_vid[$term->tid][-1])) {
           // author-less item is missing -- add it here:
           $subscriptions_vid[$term->tid][-1] = array(
