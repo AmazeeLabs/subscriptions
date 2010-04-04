@@ -5,6 +5,8 @@ Subscriptions 6.x-1.x-dev:
    - #761260: Add a /Send subscriptions notifications/ option to the comment's Administration fieldset (was lost when porting from D5).
    - #756964: Add some helpful information to the admin/settings/subscriptions/intervals page.
    - #727608: Add Arabic translation.
+  Bugs fixed:
+   - Avoid double check_plain() causing taxonomy terms to be double-&quote;quoted&quote;.
 
 
 Subscriptions 6.x-1.2 (2010-02-17):
