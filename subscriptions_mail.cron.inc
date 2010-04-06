@@ -134,6 +134,13 @@ function _subscriptions_mail_cron() {
             '!subs_type' => $fields[$langcode][$module][$field]['!subs_type'],
             '!unsubscribe_url' => url("s/del/$module/$ori_field/$ori_value/". $s['author_uid'] .'/'. $s['uid'] .'/'. md5(drupal_get_private_key() . $module . $ori_field . $ori_value . $s['author_uid'] . $s['uid']), array('absolute' => TRUE)),
           );
+          if (function_exists('realname_make_name')) {
+            $recipient = (object) array('uid' => $s['uid']);
+            $mailvars += array(
+              '!recipient_realname' => realname_make_name($recipient),
+              '!sender_realname' => realname_make_name($sender),
+            );
+          }
           $mailvars_function($mailvars, $object, $field, $s);
           $mailvars += module_invoke_all('subscriptions_get_mailvars', $object);
           if ($digest && !empty($object->_subscriptions_comments) && module_exists('subscriptions_content')) {

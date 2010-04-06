@@ -656,6 +656,12 @@ function _subscriptions_content_format_comments($node, $comment_template, $separ
       '!comment_is_new' => (integer)$comment->_subscriptions_is_new,
       '!comment_is_published' => (integer)($comment->status == COMMENT_PUBLISHED),
     );
+    if (function_exists('realname_make_name')) {
+      $mailvars += array(
+        '!comment_realname' => realname_make_name($comment),
+      );
+    }
+
     $template = module_invoke('subscriptions_mail', 'template_preprocess', $comment_template, $mailvars);
     $comments[] = strtr($template ? $template : $comment_template, $mailvars);
   }
@@ -1002,6 +1008,13 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
     case 'comments':
       $tokens += array(
         '!comment_name'         => t('The name of the comment author.'),
+      );
+      if (module_exists('realname')) {
+        $tokens += array(
+          '!comment_realname'   => t('The real name of the comment author (provided by Realname module).'),
+        );
+      }
+      $tokens += array(
         '!comment_title'        => t('The title of the comment.'),
         '!comment_text'         => t('The body text of the comment.'),
         '!comment_url'          => t('The direct URL of the comment.'),
@@ -1014,6 +1027,13 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
       $tokens += array(
         '!unsubscribe_url'     => t('The user can unsubscribe by clicking this link.'),
         '!sender_name'         => t('The name of the sender (if the sender is visible).'),
+      );
+      if (module_exists('realname')) {
+        $tokens += array(
+          '!sender_realname'   => t('The real name of the sender (provided by RealName module).'),
+        );
+      }
+      $tokens += array(
         '!sender_page'         => t('The user page of the sender (if the sender is visible).'),
         '!sender_has_contact_page' => t("The sender's contact setting: 1 = contact form enabled, 0 = disabled."),
         '!sender_contact_page' => t('The contact page of the sender.'),

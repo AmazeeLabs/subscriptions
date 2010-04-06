@@ -2,6 +2,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
   Enhancements:
+   - #751870: Integration with realname module.
    - #572216: Add CSS depth classes on the taxonomy subscription page.
    - #761264: Set /Send subscriptions notifications/ /Publishing option/ defaults by content type.
    - #761260: Add a /Send subscriptions notifications/ option to the comment's Administration fieldset (was lost when porting from D5).
