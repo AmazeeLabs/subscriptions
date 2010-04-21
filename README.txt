@@ -203,7 +203,8 @@ You can use conditional text in the templates. The syntax is
 !varname can be the any variable and will be replaced;
 value is a string that doesn't contain a '?';
 then_text is a string that doesn't contain a ':' and
-else_text doesn't have that limitation.
+else_text must not contain '}}'. The exception is: each of then_text and
+else_text can be another conditional expressen (one level of recursion).
 
 Both then_text and else_text can contain newlines and variables.
 

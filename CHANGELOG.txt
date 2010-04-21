@@ -2,6 +2,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
   Enhancements:
+   - Allow one level of recursion in mail template conditional expressions.
    - #751870: Integration with realname module.
    - #572216: Add CSS depth classes on the taxonomy subscription page.
    - #761264: Set /Send subscriptions notifications/ /Publishing option/ defaults by content type.
