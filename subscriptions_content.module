@@ -613,7 +613,8 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   $mailvars['!has_files'] = empty($files) ? 0 : 1;
   $mailvars['!files'] = $files;
 
-  $mailvars['!revision_name'] = subscriptions_user_load($node->revision_uid)->name;
+  $account = subscriptions_user_load($node->revision_uid);
+  $mailvars['!revision_name'] = $account->name;
   $mailvars['!revision_log'] = _subscriptions_content_format_text($node->log);
 }
 

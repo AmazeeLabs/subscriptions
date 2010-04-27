@@ -10,6 +10,7 @@ Subscriptions 6.x-1.x-dev:
    - #756964: Add some helpful information to the admin/settings/subscriptions/intervals page.
    - #727608: Add Arabic translation.
   Bugs fixed:
+   - #751212: Avoid rvalue->member construct, which is apparently not supported by PHP 4.x.
    - Avoid double check_plain() causing taxonomy terms to be double-&quote;quoted&quote;.
 
 
