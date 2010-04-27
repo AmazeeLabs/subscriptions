@@ -395,7 +395,7 @@ function subscriptions_content_form_node_type_form_alter(&$form, &$form_state) {
       'c_pub' => t('Published comments (as update)'),
     ),
     '#multiple' => TRUE,
-    '#description' => t('Select all situations where generation of notifications should ON.') .'<br />'.
+    '#description' => t('Select all situations where generation of notifications should be ON.') .'<br />'.
       t('Items that are created in unpublished state create notifications to administrators only; when they are later published, "new" notifications are generated.') .'<br />'.
       t('Users with the %administer_nodes / %administer_comments permissions will be able to override these options.', array(
         '%administer_nodes' => $tr('administer nodes'),
