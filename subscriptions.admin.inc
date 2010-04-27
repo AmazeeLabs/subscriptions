@@ -593,7 +593,6 @@ function subscriptions_intervals(&$form_state) {
   }
   $form['info'] = array(
     '#value' => t('Define the selection of %Send_interval options available through the user interface. Adding additional ones is easy, but removing one that is already in use is not recommended.', array('%Send_interval' => t('Send interval'))),
-    '#description' => t('test'),
   );
   $form['intervals'] = array(
     '#type' => 'textarea',
