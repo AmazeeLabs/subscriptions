@@ -2,6 +2,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
   Enhancements:
+   - #817342: Allow CCK to configure the position of the Subscribe fieldset within the node.
    - Allow one level of recursion in mail template conditional expressions.
    - #751870: Integration with realname module.
    - #572216: Add CSS depth classes on the taxonomy subscription page.
