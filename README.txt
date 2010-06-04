@@ -15,7 +15,7 @@ Subscriptions 5.x-2.0 has been rewritten from scratch by chx and salvis.
 Ported to Drupal 6 and continuously enhanced by salvis.
 Doxygen documentation by develCuy, sponsored by www.transit.york.ac.uk.
 
-http://api.drupal-contrib.org/api/subscriptions provides on-line developer documentation.
+http://drupalcontrib.org/drupal-6-modules provides on-line developer documentation.
 
 Initial Translations:
 - German:               salvis
@@ -30,7 +30,7 @@ Initial Translations:
 - Arabic:               N2H
 
 Contributed Modules:
-- moderate_content_notifications:  written and maintained by beginner.
+-
 
 Known independent add-on modules:
 - subscriptions_author:  by develCuy, sponsored by www.transit.york.ac.uk.
