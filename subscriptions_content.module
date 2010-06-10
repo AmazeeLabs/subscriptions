@@ -756,11 +756,11 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
       }
     }
     $sql = "
-      SELECT q.sqid AS _subscriptions_sqid, q.is_new AS _subscriptions_is_new, c.* 
-      FROM {comments} c 
+      SELECT q.sqid AS _subscriptions_sqid, q.is_new AS _subscriptions_is_new, c.*
+      FROM {comments} c
         INNER JOIN {subscriptions_queue} q ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
                                             ."c.cid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
-                                                 ." = q.load_args AND q.uid = %d AND q.load_function = '%s' 
+                                                 ." = q.load_args AND q.uid = %d AND q.load_function = '%s'
       WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
     $sql = db_rewrite_sql($sql, 'c', 'cid');
     $result = db_query($sql, $user->uid, 'subscriptions_content_comment_load', $nid);
@@ -806,7 +806,7 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d
     ORDER BY latest_activity DESC");
   $sql_count = db_rewrite_sql("
-    SELECT COUNT(n.nid) 
+    SELECT COUNT(n.nid)
     FROM {node} n
     INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
                                   ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
@@ -886,11 +886,12 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
   }
   else {
-    $form = array(
-      array(
-        '#type' => 'item',
-        '#value' => t('There are no subscribed pages.'),
-      ),
+    unset($form['header']);
+    unset($form['footer']);
+    $form['notice'] = array(
+      '#type' => 'item',
+      '#value' => t('There are no subscribed pages.'),
+      '#weight' => 10,
     );
   }
   return $form;
@@ -1023,7 +1024,7 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         '!comment_is_published' => t('The comment publication state: 1 = published, 0 = unpublished.<br />(Unpublished comments are sent to users with the %administer_comments permission only.)', array('%administer_comments' => $tr('administer comments'))),
       );
       return $tokens;
-      
+
     default:
       $tokens += array(
         '!unsubscribe_url'     => t('The user can unsubscribe by clicking this link.'),
@@ -1144,12 +1145,12 @@ function subscriptions_content_form_mail_edit_trans_alter(&$form, &$form_state) 
       '#rows' => 2,
       '#description' => t('The separator between comments (if needed).'),
     );
-    
+
     $form['op']['#submit'][] = 'subscriptions_content_form_mail_edit_trans_save';
     if (isset($form['delete'])) {
       $form['delete']['#submit'][] = 'subscriptions_content_form_mail_edit_trans_delete';
     }
-  } 
+  }
 }
 
 /**

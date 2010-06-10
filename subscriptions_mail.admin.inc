@@ -57,10 +57,20 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
     drupal_set_message(t('Warning: !message', array('!message' => $message)), 'error');
     $form['mail_settings']['subscriptions_cron_percent']['#attributes'] = array('class' => 'error');
   }
+  $result = db_query("SELECT COUNT(sqid) AS count, suspended FROM {subscriptions_queue} GROUP BY suspended");
+  $active_count = $suspended_count = 0;
+  while ($record = db_fetch_array($result)) {
+    if (!$record['suspended']) {
+      $active_count = $record['count'];
+    }
+    else {
+      $suspended_count += $record['count'];
+    }
+  }
   $form['mail_settings']['queue_length'] = array(
     '#type'          => 'item',
     '#title'         => t('Queue'),
-    '#value'         => t('There are %count items in the queue.', array('%count' => db_result(db_query("SELECT COUNT(sqid) FROM {subscriptions_queue}")))) .' &nbsp; ',
+    '#value'         => t('There are %active_count active and %suspended_count suspended items in the queue.', array('%active_count' => $active_count, '%suspended_count' => $suspended_count)) .' &nbsp; ',
     '#description'   => t('Note: The number of generated e-mails is typically much lower than the number of queue items.'),
   );
   $form['mail_settings']['queue_length']['purge_queue'] = array(
@@ -117,7 +127,7 @@ function _subscriptions_mail_form_mail_edit_trans_alter(&$form, &$form_state) {
     $form['mail']['subject']['#title'] = t('Digest subject');
     $form['mail']['body']['#title'] = t('Digest body');
     $form['mail']['body']['#rows'] = 8;
-    
+
     $digest_item = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'body', 'DITEM');
     $digest_item_separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'subject', 'SEP');
     $digest_item_comment = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+comment', $langcode, 'body', 'DITEMCMT');
@@ -176,12 +186,12 @@ function _subscriptions_mail_form_mail_edit_trans_alter(&$form, &$form_state) {
       '#rows' => 2,
       '#description' => t('The separator between digest items (if needed).'),
     );
-    
+
     $form['op']['#submit'][] = 'subscriptions_mail_form_mail_edit_trans_save';
     if (isset($form['delete'])) {
       $form['delete']['#submit'][] = 'subscriptions_mail_form_mail_edit_trans_delete';
     }
-  } 
+  }
 }
 
 /**

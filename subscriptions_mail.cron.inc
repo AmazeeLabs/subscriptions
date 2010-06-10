@@ -55,11 +55,11 @@ function _subscriptions_mail_cron() {
 
   while ((empty($mails_allowed) || $single_count + $digest_count < $mails_allowed)
           && timer_read('page')/1000 < $lost_seconds + $usable_seconds) {
-    $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE last_sent + send_interval < %d ORDER BY sqid', time(), 0, 1);
+    $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE suspended = 0 AND last_sent + send_interval < %d ORDER BY sqid', time(), 0, 1);
     if (!($s = db_fetch_array($result))) {
       break;  // No more ready queue items, terminate loop.
     }
-    
+
     $saved_user = $user;
     $saved_language = $language;
     session_save_session(FALSE);
@@ -67,7 +67,7 @@ function _subscriptions_mail_cron() {
     drupal_init_language();
     $langcode = $language->language;
     $digest_data = array();
-    
+
     do {  // once and repeat while adding to a digest
       if ($user->status && $user->access) {
         $cids = array();
@@ -211,13 +211,14 @@ function _subscriptions_mail_cron() {
   if ($single_count + $digest_count > 0) {
     $current_seconds = timer_read('page')/1000;
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue items remaining, !remaining_seconds seconds left for other cron client modules.', array(
+    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other cron client modules.', array(
       '!Module'            => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,
       '!used_seconds'      => round($current_seconds - $lost_seconds),
       '!total_seconds'     => $total_seconds,
-      '!remaining_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d", time())),
+      '!remaining_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d AND suspended = 0", time())),
+      '!suspended_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d AND suspended <> 0", time())),
       '!remaining_seconds' => round($total_seconds - $current_seconds),
     ));
   }
@@ -230,7 +231,7 @@ function subscriptions_mail_mail($key, &$message, $params) {
   global $base_url;
 
   $url = parse_url($base_url);
-  $list_id = variable_get('site_name', '') .' '. t('Subscriptions') .' <subscriptions.'. $url['host'] .'>'; 
+  $list_id = variable_get('site_name', '') .' '. t('Subscriptions') .' <subscriptions.'. $url['host'] .'>';
 
   $message['subject'] = $params['context']['subject'];
   $message['body'] = $params['context']['message'];
