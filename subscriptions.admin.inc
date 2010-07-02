@@ -530,6 +530,11 @@ function subscriptions_user_settings_form(&$form_state, $account) {
     '#default_value' => _subscriptions_get_setting('digest', $account),
     '#description'   => t("Merges your notifications into a single email, sent at the interval you specify."),
   );
+  if (_subscriptions_get_setting('send_interval_visible', $account) == -2) {
+    $interval = _subscriptions_send_intervals();
+    $interval = $interval[_subscriptions_get_setting('send_interval', $account)];
+    $form['settings']['digest']['#description'] = t('Merges your notifications into a single email, sent at regular intervals (%interval).', array('%interval' => $interval));
+  }
   $form['settings']['preferences'] = array(
     '#type'          => 'fieldset',
     '#title'         => t('Preferences'),
