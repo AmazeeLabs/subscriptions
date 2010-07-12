@@ -421,12 +421,12 @@ function subscriptions_user_suspend_form_submit($form, &$form_state) {
  * are suspended.
  */
 function _subscriptions_suspended_alert($uid, $suspended) {
-  $path2 = url("/user/$uid/subscriptions/overview", array('fragment' => 'subscriptions-user-suspend-form'));
+  $path2 = url("user/$uid/subscriptions/overview", array('fragment' => 'subscriptions-user-suspend-form'));
   switch ($suspended) {
     case 2:
       $msg = t('Your subscriptions have been suspended because your e-mail address does not work anymore!');
       if (!(arg(0) == 'user' && arg(1) == $uid && arg(2) == 'edit')) {
-        drupal_set_message($msg .'<br />'. t('Please go <a href="@path1">here</a> to update your e-mail address and then <a href="@path2">here</a> to resume delivery of your notifications.', array('@path1' => url("/user/$uid/edit"), '@path2' => $path2)), 'error', FALSE);
+        drupal_set_message($msg .'<br />'. t('Please go <a href="@path1">here</a> to update your e-mail address and then <a href="@path2">here</a> to resume delivery of your notifications.', array('@path1' => url("user/$uid/edit"), '@path2' => $path2)), 'error', FALSE);
       }
       else {
         drupal_set_message($msg .'<br />'. t('Please correct/verify your e-mail address below and then go <a href="@path2">here</a> to resume delivery of your notifications.', array('@path2' => $path2)), 'error', FALSE);

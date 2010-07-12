@@ -1,9 +1,15 @@
+$Id$
+
 CHANGELOG for Subscriptions 1.x for Drupal 6
+
 
 Subscriptions 6.x-1.x-dev:
   Enhancements:
    - #840812: Clarify "digest mode" description in the case where the "send interval" is inaccessible.
    - Implement suspending sending of notifications.
+  Bugs fixed:
+   - Fix links in suspension message.
+
 
 Subscriptions 6.x-1.3 (2010-06-10):
   Enhancements:
