@@ -317,8 +317,8 @@ function subscriptions_queue($event) {
         }
         $conditions = implode(' AND ', $where);
         $sql = "
-          INSERT INTO {subscriptions_queue} (uid, name, mail, language, module, field, value, author_uid, send_interval, digest, last_sent, load_function, load_args, is_new, suspended)
-          SELECT u.uid, u.name, u.mail, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, COALESCE(sls.last_sent, 0), '%s', '%s', '%d', suspended
+          INSERT INTO {subscriptions_queue} (uid, name, language, module, field, value, author_uid, send_interval, digest, last_sent, load_function, load_args, is_new, suspended)
+          SELECT u.uid, u.name, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, COALESCE(sls.last_sent, 0), '%s', '%s', '%d', suspended
           FROM {subscriptions} s
           INNER JOIN {subscriptions_user} su ON s.recipient_uid = su.uid
           INNER JOIN {users} u ON su.uid = u.uid

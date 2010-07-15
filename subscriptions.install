@@ -34,7 +34,6 @@ function subscriptions_schema() {
       'sqid'          => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
       'uid'           => array('type' => 'int', 'not null' => FALSE),
       'name'          => array('type' => 'varchar', 'length' => '60', 'not null' => FALSE),
-      'mail'          => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
       'language'      => array('type' => 'varchar', 'length' => '12', 'not null' => FALSE),
       'module'        => array('type' => 'varchar', 'length' => '64', 'not null' => FALSE),
       'field'         => array('type' => 'varchar', 'length' => '32', 'not null' => FALSE),
@@ -444,6 +443,15 @@ function subscriptions_update_6103() {
   $ret = array();
   db_add_field($ret, 'subscriptions_queue', 'suspended', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
   db_add_field($ret, 'subscriptions_user', 'suspended', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
+  return $ret;
+}
+
+/**
+ * Database update function 6104: Remove the 'mail' column.
+ */
+function subscriptions_update_6104() {
+  $ret = array();
+  db_drop_field($ret, 'subscriptions_queue', 'mail');
   return $ret;
 }
 

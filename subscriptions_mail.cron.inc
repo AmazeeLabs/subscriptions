@@ -70,6 +70,7 @@ function _subscriptions_mail_cron() {
 
     do {  // once and repeat while adding to a digest
       if ($user->status && $user->access) {
+        $s['mail'] = $user->mail;
         $cids = array();
         $load_function = $s['load_function'];
         $index = $load_args = $s['load_args'];

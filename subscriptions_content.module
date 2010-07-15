@@ -719,7 +719,7 @@ function subscriptions_content_comment_load($cid, $sqid) {
   if (empty($nid)) {
     return;
   }
-  $item = db_fetch_array(db_query('SELECT * FROM {subscriptions_queue} WHERE sqid = %d', $sqid));
+  $item = db_fetch_array(db_query('SELECT sq.module, sq.field FROM {subscriptions_queue} sq WHERE sqid = %d', $sqid));
   if ($item['module'] != 'node' || $item['field'] != 'nid') {
     // Only if we're processing a node/nid queue item should we cut off the comments at an update item, otherwise not:
     $sqid = NULL;
