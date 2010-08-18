@@ -225,7 +225,7 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
         _subscriptions_content_autosubscribe($node->type, 'node', 'nid', $node->nid, ($op == 'insert' ? 'on_post' : 'on_update'));
       }
 
-      if (!isset($node->subscriptions_notify) || $node->subscriptions_notify) {
+      if ((!isset($node->subscriptions_notify) || $node->subscriptions_notify) && !subscriptions_content_suppress_notifications()) {
         subscriptions_queue($event);
       }
       break;
@@ -446,16 +446,32 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Implementation of hook_form_alter().
  *
+ * Add submit handler to catch bulk content operations and suppress
+ * notifications by default.
+ *
+ * @ingroup hooks
+ * @ingroup form
+ */
+function subscriptions_content_form_node_admin_content_alter(&$form, &$form_state) {
+  $form['admin']['options']['subscriptions_notify'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Send subscriptions notifications'),
+    '#description' => '<br />'. t('When publishing unpublished nodes, you probably want to turn this ON.'),
+    '#prefix' => '<br />',
+  );
+  array_unshift($form['admin']['options']['submit']['#submit'], 'subscriptions_content_node_admin_nodes_submit');
+}
+
+/**
+ * Implementation of hook_form_alter().
+ *
  * Add submit handler to catch bulk content moderation submissions.
  *
  * @ingroup hooks
  * @ingroup form
  */
 function subscriptions_content_form_node_admin_nodes_alter(&$form, &$form_state) {
-
-  $handlers = array_reverse($form['#submit']);
-  $handlers[] = 'subscriptions_content_node_admin_nodes_submit';
-  $form['#submit'] = array_reverse($handlers);  // run before node_admin_nodes_submit()!
+  array_unshift($form['#submit'], 'subscriptions_content_node_admin_nodes_submit');
 }
 
 /**
@@ -515,6 +531,10 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
  * Handle bulk publishing.
  */
 function subscriptions_content_node_admin_nodes_submit($form, &$form_state) {
+  if (!$form_state['values']['subscriptions_notify']) {
+    subscriptions_content_suppress_notifications(TRUE);
+    return;
+  }
   if ($form_state['values']['operation'] == 'publish') {
     foreach ($form_state['values']['nodes'] as $nid) {
       if ($nid != 0 && ($node = node_load($nid)) && !$node->status) {
@@ -523,6 +543,17 @@ function subscriptions_content_node_admin_nodes_submit($form, &$form_state) {
       }
     }
   }
+}
+
+/**
+ * Provide a static flag to suppress notifications.
+ */
+function subscriptions_content_suppress_notifications($set = NULL) {
+  static $suppress_notifications = FALSE; // not drupal_static!
+  if ($set !== NULL) {
+    $suppress_notifications = $set;
+  }
+  return $suppress_notifications;
 }
 
 /**

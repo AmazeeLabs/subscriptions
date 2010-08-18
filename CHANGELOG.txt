@@ -5,6 +5,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 6
 
 Subscriptions 6.x-1.x-dev:
   Enhancements:
+   - Default to suppress notifications on bulk node updates.
    - #840812: Clarify "digest mode" description in the case where the "send interval" is inaccessible.
    - Implement suspending sending of notifications and avoid using obsolete mail addresses.
   Bugs fixed:
