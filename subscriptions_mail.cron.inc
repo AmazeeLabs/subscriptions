@@ -211,8 +211,7 @@ function _subscriptions_mail_cron() {
 
   if ($single_count + $digest_count > 0) {
     $current_seconds = timer_read('page')/1000;
-    $watchdog = 'watchdog';  // keep potx from translating 'cron'
-    $watchdog('cron', '!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds; !remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other cron client modules.', array(
+    $variables = array(
       '!Module'            => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,
@@ -221,7 +220,18 @@ function _subscriptions_mail_cron() {
       '!remaining_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d AND suspended = 0", time())),
       '!suspended_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d AND suspended <> 0", time())),
       '!remaining_seconds' => round($total_seconds - $current_seconds),
-    ));
+      '%varname'           => 'subscriptions_mail_trash_silently',
+      '!cron'              => 'cron',
+    );
+    if (variable_get('subscriptions_mail_trash_silently', 0)) {
+      $message = t('!Module DISCARDED !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds, due to the %varname variable being set.', $variables);
+    }
+    else {
+      $message = t('!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
+    }
+    $message .= ' '. t('!remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other @cron client modules.', $variables);
+    $watchdog = 'watchdog'; // keep potx from translating 'cron'
+    $watchdog('cron', $message);
   }
 }
 
@@ -245,6 +255,11 @@ function subscriptions_mail_mail($key, &$message, $params) {
  */
 function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, $uid, $send_intervals) {
   global $user;
+
+  if (variable_get('subscriptions_mail_trash_silently', 0)) {
+    // Block notification mail; useful for staging and development servers.
+    return;
+  }
 
   $mail_success = drupal_mail('subscriptions_mail', $mailkey, $to, user_preferred_language($user), array(
     'account' => $user,

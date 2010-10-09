@@ -15,6 +15,10 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
   global $user;
   $tr = 't';
 
+  if (variable_get('subscriptions_mail_trash_silently', 0)) {
+    drupal_set_message(t('All notification mails are discarded because the %varname variable is set &mdash; see the @filename file for more information.', array('%varname' => 'subscriptions_mail_trash_silently', '@filename' => 'README.txt')), 'error');
+  }
+
   // check the $base_url (#199039, #226335)
   $url = url('', array('absolute' => TRUE));
   if (empty($_POST) && preg_match('!//($|/|localhost/|([0-9]{1,3}\.){3}[0-9]{1,3}/)!', $url)) {
