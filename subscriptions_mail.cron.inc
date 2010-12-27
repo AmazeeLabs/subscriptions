@@ -126,6 +126,7 @@ function _subscriptions_mail_cron() {
             '!site' => variable_get('site_name', 'drupal'),
             '!recipient_name' => $s['name'],
             '!recipient_page' => url($base, array('absolute' => TRUE)),
+            '!recipient_uid' => $s['uid'],
             '!sender_name' => ($show_node_info ? ($sender->uid ? $sender->name : variable_get('anonymous', '!sender_name')) : '!sender_name'),
             '!sender_page' => ($show_node_info && $sender->uid ? url("user/$sender->uid", array('absolute' => TRUE)) : '!sender_page'),
             '!sender_contact_page' => ($show_node_info ? (empty($sender->contact) ? t('(disabled)') : url("user/$sender->uid/contact", array('absolute' => TRUE))) : '!sender_contact_page'),

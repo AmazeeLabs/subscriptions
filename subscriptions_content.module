@@ -384,7 +384,7 @@ function subscriptions_content_form_node_type_form_alter(&$form, &$form_state) {
   $tr = 't';
   $form['workflow']['subscriptions_workflow'] = array(
     '#type' => 'select',
-    '#title' => t('Default %Send_subscriptions_notifications for', array('%Send_subscriptions_notifications' => t('Send subscriptions notifications'))),
+    '#title' => t('Default %Send_subscriptions_notifications options for', array('%Send_subscriptions_notifications' => t('Send subscriptions notifications'))),
     '#default_value' => subscriptions_content_get_default_workflow($form['#node_type']->type),
     '#options' => array(
       'n_new' => t('New nodes'),
@@ -612,6 +612,7 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   $mailvars['!title'] = trim($node->title);
   $mailvars['!teaser'] = _subscriptions_content_format_text($node->teaser, $node->format);
   $mailvars['!body'] = _subscriptions_content_format_text($node->body, $node->format);
+  $mailvars['!nid'] = $node->nid;
   $mailvars['!full_node'] = (variable_get('subscriptions_generate_full_node', 0) ? _subscriptions_content_format_text(node_view($node, FALSE, TRUE, FALSE)) : '!full_node');
   $mailvars['!is_new'] = (integer) !empty($node->_subscriptions_is_new);
   $mailvars['!is_updated'] = (integer) !empty($node->_subscriptions_is_updated);
@@ -682,8 +683,11 @@ function _subscriptions_content_format_comments($node, $comment_template, $separ
   foreach ($node->_subscriptions_comments as $comment) {
     $mailvars = array(
       '!comment_name' => ($comment->uid == 0 ? variable_get('anonymous', '!comment_name') : $comment->name),
+      '!comment_uid' => $comment->uid,
       '!comment_title' => trim($comment->subject),
       '!comment_text' => _subscriptions_content_format_text($comment->comment, $comment->format),
+      '!comment_cid' => $comment->cid,
+      '!comment_nid' => $comment->nid,
       '!comment_url' => url('node/'. $comment->nid, array('fragment' => 'comment-'. $comment->cid, 'absolute' => TRUE)),
       '!comment_is_new' => (integer)$comment->_subscriptions_is_new,
       '!comment_is_published' => (integer)($comment->status == COMMENT_PUBLISHED),
@@ -1048,8 +1052,11 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         );
       }
       $tokens += array(
+        '!comment_uid'          => t('The ID of the comment author (0 = %anonymous).', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
         '!comment_title'        => t('The title of the comment.'),
         '!comment_text'         => t('The body text of the comment.'),
+        '!comment_cid'          => t('The ID of the comment.'),
+        '!comment_nid'          => t("The ID of the comment's node."),
         '!comment_url'          => t('The direct URL of the comment.'),
         '!comment_is_new'       => t('The type of comment notification: 1 = new comment, 0 = updated comment.'),
         '!comment_is_published' => t('The comment publication state: 1 = published, 0 = unpublished.<br />(Unpublished comments are sent to users with the %administer_comments permission only.)', array('%administer_comments' => $tr('administer comments'))),
@@ -1070,10 +1077,12 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         '!sender_page'         => t('The user page of the sender (if the sender is visible).'),
         '!sender_has_contact_page' => t("The sender's contact setting: 1 = contact form enabled, 0 = disabled."),
         '!sender_contact_page' => t('The contact page of the sender.'),
+        '!sender_uid'          => t('The ID of the sender (even if the sender is not visible!) (0 = %anonymous).', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
         '!subs_type'           => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => $tr('category'))),
         '!node_type'           => t("The type of the node, like '!forum' or '!story'.", array('!forum' => 'forum', '!story' => 'story')),
         '!revision_name'       => t('The name of the user who made the last change to the node.'),
         '!revision_log'        => t('The revision log entry of the node.'),
+        '!nid'                 => t('The ID of the node.'),
         '!title'               => t('The title of the subscriptions item.'),
         '!teaser'              => t('An excerpt of the subscriptions item.'),
         '!body'                => t('The body of the subscriptions item.'),
