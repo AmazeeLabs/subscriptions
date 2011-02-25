@@ -1,4 +1,3 @@
-; $Id$
 name = CCK Fields
 description = Provides CCK field data as mail variables.
 package = "Subscriptions"

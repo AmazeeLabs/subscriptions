@@ -1,4 +1,3 @@
-$Id$
 
 CHANGELOG for Subscriptions 1.x for Drupal 6
 

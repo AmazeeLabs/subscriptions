@@ -1,4 +1,3 @@
-# $Id$
 #
 # Italian translation of Drupal (general)
 # Generated from files:

@@ -1,4 +1,3 @@
-; $Id$
 name = Subscriptions Mail
 description = Sends out mails with drupal_mail, customizable with the separate mail_edit module.
 package = "Subscriptions"

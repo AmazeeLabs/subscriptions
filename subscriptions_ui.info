@@ -1,4 +1,3 @@
-; $Id$
 name = Subscriptions UI
 description = Provides a UI to Subscriptions.
 package = "Subscriptions"

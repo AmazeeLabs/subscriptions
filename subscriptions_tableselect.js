@@ -1,4 +1,3 @@
-// $Id$
 
 Drupal.subscriptions_rowToggle = function(ckb) {
   var thisRow = $(ckb).parents('tr:first');
