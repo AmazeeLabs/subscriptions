@@ -12,13 +12,13 @@
  */
 
 /**
- * Implementation of hook_subscriptions().
+ * Implements hook_subscriptions().
  *
  * @ingroup hooks
  */
 function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $arg2 = NULL) {
   static $stypes = array('taxa' => array('node', 'tid'));
-  $function = '_subscriptions_taxonomy_'. $op;
+  $function = '_subscriptions_taxonomy_' . $op;
   if (function_exists($function)) {
     return $function($arg0, $arg1, $arg2);
   }
@@ -28,8 +28,8 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
       if ($arg0['module'] == 'node') {
         $node = $arg0['node'];
         $params['node']['tid'] = array(
-          'join' => 'INNER JOIN {term_node} tn ON s.value = '. ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                                          .'tn.tid'. ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : ''),
+          'join' => 'INNER JOIN {taxonomy_term_node} tn ON s.value = ' . ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+                                                          . 'tn.tid' . ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : ''),
           'where' => 'tn.nid = %d',
           'args' => array($node->nid),
           'groupby' => 'GROUP BY u.uid, tn.nid',
@@ -66,7 +66,7 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
 }
 
 /**
- * Implementation of hook_node_options(), subhook of hook_subscriptions().
+ * Implements _hook_node_options(), subhook of hook_subscriptions().
  *
  * This is called by subscriptions_ui_node_form() in subscriptions_ui.module.
  *
@@ -89,12 +89,12 @@ function _subscriptions_taxonomy_node_options($account, $node) {
     $options['tid'][] = array(
       'name' => t('To content in %term', array('%term' => $term->name)),
       'params' => array('module' => 'node', 'field' => 'tid', 'value' => $tid),
-      'link' => 'taxa/'. $tid,
+      'link' => 'taxa/' . $tid,
     );
     $options['tid'][] = array(
       'name' => t('To content in %term by %name', array('%term' => $term->name, '%name' => ($node->uid ? check_plain($node->name) : variable_get('anonymous', '???')))),
       'params' => array('module' => 'node', 'field' => 'tid', 'value' => $tid, 'author_uid' => $node->uid),
-      'link' => 'taxa/'. $tid .'/'. $node->uid,
+      'link' => 'taxa/' . $tid . '/' . $node->uid,
     );
     $options['tid']['weight'] = -1;
   }
@@ -102,7 +102,7 @@ function _subscriptions_taxonomy_node_options($account, $node) {
 }
 
 /**
- * Implementation of hook_types(), subhook of hook_subscriptions().
+ * Implements _hook_types(), subhook of hook_subscriptions().
  *
  * This is called by subscriptions_types() in subscriptions.module.
  *
@@ -118,19 +118,20 @@ function _subscriptions_taxonomy_types() {
   $tr = 't';
   $types['taxa'] = array(
     'title' => 'Categories',
-    'access' => 'subscribe to taxonomy terms',
+    'access' => array('subscribe to taxonomy terms' => array(
+      'title' => t('Subscribe to taxonomy terms'),
+    )),
     'page' => 'subscriptions_taxonomy_page_taxa',
     'fields' => array('node', 'tid'),
-    'weight' => -1,
+    'weight' => -10,
   );
   return $types;
-  t('subscribe to taxonomy terms');
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
- * Adds the Taxonomy Settings part to admin/settings/subscriptions.
+ * Adds the Taxonomy Settings part to admin/config/subscriptions.
  *
  * @ingroup hooks
  * @ingroup form
@@ -147,7 +148,7 @@ function subscriptions_taxonomy_form_subscriptions_settings_form_alter(&$form, &
   );
 
   $vocabularies = taxonomy_get_vocabularies();
-  $select[0] = '<'. t('none') .'>';
+  $select[0] = '<' . t('none') . '>';
   foreach ($vocabularies as $vocabulary) {
     $select[$vocabulary->vid] = check_plain($vocabulary->name);
   }
@@ -208,18 +209,20 @@ function subscriptions_taxonomy_page_taxa($account, $form) {
  *
  * @ingroup form
  */
-function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account, $form) {
+function subscriptions_taxonomy_taxa_form($form, &$form_state, $vocabularies, $account, $form) {
   $uid = (isset($account) ? $account->uid : (is_numeric(arg(5)) ? -arg(5) : -DRUPAL_AUTHENTICATED_RID));
-  $sql = db_rewrite_sql("
-    SELECT s.value, s.send_interval, s.author_uid, s.send_comments, s.send_updates, t.tid, t.vid, t.name
-    FROM {term_data} t
-    INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                  ."t.tid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
-                                       ." = s.value
-    WHERE s.module = 'node' AND s.field = 'tid' AND s.recipient_uid = %d
-    ORDER BY s.author_uid", 't', 'tid');
-  $result = db_query($sql, $uid);
-  while ($s = db_fetch_array($result)) {
+  $query = db_select('taxonomy_term_data', 't', PDO::FETCH_ASSOC);
+  $subscriptions_alias = $query->join('subscriptions', 's', ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(t.tid AS VARCHAR) = s.value' : 't.tid = s.value'));
+  $result = $query
+    ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
+    ->fields('t', array('tid', 'vid', 'name'))
+    ->condition('s.module', 'node')
+    ->condition('s.field', 'tid')
+    ->condition('s.recipient_uid', $uid)
+    ->addTag('taxonomy_access')
+    ->orderBy('s.author_uid')
+    ->execute();
+  foreach ($result as $s) {
     $subscriptions[$s['vid']][$s['value']][$s['author_uid']] = $s;
     $subscriptions_terms_by_vid[$s['vid']][$s['value']] = $s;
   }
@@ -248,7 +251,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
         $tree = $subscriptions_terms_by_vid[$vocab->vid];
         $form[$vocab->vid][1] = array(
           '#type' => 'item',
-          '#description' => '<div>'. t('This is a restricted category group; deactivated subscriptions will be removed from the list. To subscribe to an unlisted category, go to a post in that category and subscribe from there.') .'</div>',
+          '#description' => '<div>' . t('This is a restricted category group; deactivated subscriptions will be removed from the list. To subscribe to an unlisted category, go to a post in that category and subscribe from there.') . '</div>',
         );
       }
     }
@@ -260,11 +263,11 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
     if (isset($tree)) {
       foreach ($tree as $term) {
         if (is_array($term)) {
-          $term = (object)$term;
+          $term = (object) $term;
         }
         $depth = (empty($term->depth) ? 0 : $term->depth);
-        $title = '<span class="indenter">'. str_repeat('--&nbsp;', $depth) .'</span>'.
-          l($term->name, 'taxonomy/term/'. $term->tid, array('attributes' => array('class' => 'depth-'. $depth)));
+        $title = '<span class="indenter">' . str_repeat('--&nbsp;', $depth) . '</span>' .
+          l($term->name, 'taxonomy/term/' . $term->tid, array('attributes' => array('class' => 'depth-' . $depth)));
         if (!isset($subscriptions_vid[$term->tid][-1])) {
           // author-less item is missing -- add it here:
           $subscriptions_vid[$term->tid][-1] = array(
@@ -287,7 +290,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
       }
     }
     else {
-      $form[$vocab->vid]['info']['#value'] = '<p>'. t('This is a restricted category group; only subscribed categories show up in this list.<br />To subscribe to a category in this group, go to a post in that category and subscribe from there.') .'</p>';
+      $form[$vocab->vid]['info']['#value'] = '<p>' . t('This is a restricted category group; only subscribed categories show up in this list.<br />To subscribe to a category in this group, go to a post in that category and subscribe from there.') . '</p>';
     }
     $form[$vocab->vid][0]['defaults'] = array(
       '#type' => 'value',
@@ -312,7 +315,7 @@ function subscriptions_taxonomy_taxa_form(&$form_state, $vocabularies, $account,
 }
 
 /**
- * Implementation of hook_mailkeys().
+ * Implements hook_mailkeys().
  *
  * Provide mailkeys for mail_edit.
  *
@@ -323,7 +326,7 @@ function subscriptions_taxonomy_mailkeys() {
 }
 
 /**
- * Implementation of hook_mail_edit_tokens_list().
+ * Implements hook_mail_edit_tokens_list().
  *
  * Provide replacable tokens for mail_edit.
  *
@@ -333,7 +336,7 @@ function subscriptions_taxonomy_mail_edit_tokens_list($mailkey, $options = array
   $tokens = array();
   switch ($mailkey) {
     case 'node-tid':
-      $tokens['!term_name']= t('The name of the term/category/tag/forum/etc.');
+      $tokens['!term_name'] = t('The name of the term/category/tag/forum/etc.');
       break;
   }
   if (isset($options['tokens'])) {
@@ -344,7 +347,7 @@ function subscriptions_taxonomy_mail_edit_tokens_list($mailkey, $options = array
 }
 
 /**
- * Implementation of hook_mail_edit_text().
+ * Implements hook_mail_edit_text().
  *
  * Provide default template strings for mail_edit.
  *
@@ -356,7 +359,7 @@ function subscriptions_taxonomy_mail_edit_text($mailkey, $language) {
 }
 
 /**
- * Implementation of hook_taxonomy().
+ * Implements hook_taxonomy().
  *
  * Remove taxonomy subscriptions when the underlying terms or vocabularies are removed.
  *
@@ -369,27 +372,38 @@ function subscriptions_taxonomy_taxonomy($op, $type, $array) {
   switch ($type) {
     case 'term':
       $tid = $array['tid'];
-      db_query("DELETE FROM {subscriptions_queue} WHERE module = 'node' AND field = 'tid' AND value = '%s'", $tid);
-      db_query("DELETE FROM {subscriptions} WHERE module = 'node' AND field = 'tid' AND value = '%s'", $tid);
+      db_delete('subscriptions_queue')
+        ->condition('module', 'node')
+        ->condition('field', 'tid')
+        ->condition('value', $tid)
+        ->execute();
+      db_delete('subscriptions')
+        ->condition('module', 'node')
+        ->condition('field', 'tid')
+        ->condition('value', $tid)
+        ->execute();
       break;
-    case 'vocabulary':
+    case 'taxonomy_vocabulary':
       $vid = $array['vid'];
       foreach (array('omitted', 'restricted') as $key) {
-        $array = variable_get('subscriptions_'. $key .'_taxa', array());
+        $array = variable_get('subscriptions_' . $key . '_taxa', array());
         unset($array[$vid]);
-        variable_set('subscriptions_'. $key .'_taxa', $array);
+        variable_set('subscriptions_' . $key . '_taxa', $array);
       }
       break;
   }
 }
 
 /**
- * Implementation of hook_disable().
+ * Implements hook_disable().
  *
  * Remove our queue items.
  *
  * @ingroup hooks
  */
 function subscriptions_taxonomy_disable() {
-  db_query("DELETE FROM {subscriptions_queue} WHERE module = 'node' AND field = 'tid'");
+  db_delete('subscriptions_queue')
+    ->condition('module', 'node')
+    ->condition('field', 'tid')
+    ->execute();
 }

@@ -22,14 +22,14 @@ function _subscriptions_mail_form_mail_edit_list_form_alter(&$form, $form_state)
   );
   $lang_query = "SELECT DISTINCT(language) FROM {mail_edit} ORDER BY language ASC";
   $lang_result = db_query($lang_query);
-  $mail_langs = array();//fetch all current translations
-  while($row = db_fetch_object($lang_result)) {
+  $mail_langs = array();  //fetch all current translations
+  while ($row = db_fetch_object($lang_result)) {
     $mail_langs[$row->language] = $row->language;
   }
   foreach (language_list() as $lang_key => $language) {
     $mail_langs[$lang_key] = $lang_key;
   }//<!-- fetch all current translations
-  
+
   if (count($mail_langs) > 1) {
     $form['subscriptions']['languages'] = array(
       '#type'          => 'select',
@@ -70,89 +70,131 @@ function subscriptions_mail_mail_edit_list_form_validate($form, &$form_state) {
 
 function subscriptions_mail_mail_edit_list_form_submit($form, &$form_state) {
   $languages = (isset($form_state['values']['language']) ? array($form_state['values']['language']) : $form_state['values']['languages']);
-  
+
   switch ($form_state['values']['op']) {
-      
+
     case $form_state['values']['remove']:
       if (db_table_exists('subscriptions_mail_edit')) {
-        db_query("DELETE FROM {subscriptions_mail_edit}");
+        db_delete('subscriptions_mail_edit')
+          ->execute();
       }
       if (db_table_exists('mail_edit_d5')) {
-        db_query("DELETE FROM {mail_edit_d5} WHERE mailkey LIKE 'subscriptions-%'");
+        db_delete('mail_edit_d5')
+          ->condition('mailkey', 'subscriptions-%', 'LIKE')
+          ->execute();
       }
       break;
-  
-    case $form_state['values']['import']:    
+
+    case $form_state['values']['import']:
       // Import digest records:
       $old_mailkey = 'subscriptions-digest';
       $new_mailkey = 'subscriptions_mail_digest';
-      $result = db_query("SELECT * FROM {mail_edit_registry} WHERE id = '%s'", $new_mailkey);
+      $result = db_query("SELECT * FROM {mail_edit_registry} WHERE id = :id", array(':id' => $new_mailkey));
       if ($registry = db_fetch_array($result)) {
         if (_subscriptions_mail_mail_edit_import($old_mailkey, $new_mailkey, $registry['description'], $languages)) {
-          $digest_item = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", $old_mailkey .'-item'));
-          $digest_separator = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", $old_mailkey .'-separator'));
-          $digest_comment = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = '%s'", $old_mailkey .'-item-comment'));
+          $digest_item = db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = :mailkey", array(':mailkey' => $old_mailkey . '-item'))->fetchField();
+          $digest_separator = db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = :mailkey", array(':mailkey' => $old_mailkey . '-separator'))->fetchField();
+          $digest_comment = db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = :mailkey", array(':mailkey' => $old_mailkey . '-item-comment'))->fetchField();
           foreach ($languages as $language) {
-              db_query("INSERT INTO {mail_edit} (description, subject, id, body, language) VALUES ('%s', '%s', '%s', '%s', '%s')", '', $digest_separator, $new_mailkey .'+item', $digest_item, $language);
-              db_query("INSERT INTO {mail_edit} (description, subject, id, body, language) VALUES ('%s', '%s', '%s', '%s', '%s')", '', '', $new_mailkey .'+comment', $digest_comment, $language);
+            $id = db_insert('mail_edit')
+              ->fields(array(
+                'description' => '',
+                'subject' => $digest_separator,
+                'id' => $new_mailkey . '+item',
+                'body' => $digest_item,
+                'language' => $language,
+              ))
+              ->execute();
+            $id = db_insert('mail_edit')
+              ->fields(array(
+                'description' => '',
+                'subject' => '',
+                'id' => $new_mailkey . '+comment',
+                'body' => $digest_comment,
+                'language' => $language,
+              ))
+              ->execute();
           }
-          db_query("DELETE FROM {subscriptions_mail_edit} WHERE mailkey LIKE '%s'", $new_mailkey .'-%');
+          db_delete('subscriptions_mail_edit')
+            ->condition('mailkey', $new_mailkey . '-%', 'LIKE')
+            ->execute();
         }
       }
-      
+
       // Import node/nid (+ comment) records:
-      $result = db_query("SELECT * FROM {mail_edit_registry} WHERE id = '%s'", $new_mailkey);
+      $result = db_query("SELECT * FROM {mail_edit_registry} WHERE id = :id", array(':id' => $new_mailkey));
       if ($registry = db_fetch_array($result)) {
         if (_subscriptions_mail_mail_edit_import('subscriptions-node-nid', 'subscriptions_content_node-nid', $registry['description'], $languages)) {
-          $comment_item = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = 'subscriptions-comment-item'"));
-          $comment_separator = db_result(db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = 'subscriptions-comment-separator'"));
+          $comment_item = db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = :mailkey", array(':mailkey' => 'subscriptions-comment-item'))->fetchField();
+          $comment_separator = db_query("SELECT item_body FROM {subscriptions_mail_edit} WHERE mailkey = :mailkey", array(':mailkey' => 'subscriptions-comment-separator'))->fetchField();
           foreach ($languages as $language) {
-            db_query("INSERT INTO {mail_edit} (description, subject, id, body, language) VALUES ('%s', '%s', '%s', '%s', '%s')", '', $comment_separator, 'subscriptions_content_node-nid+comment', $comment_item, $language);
+            $id = db_insert('mail_edit')
+              ->fields(array(
+                'description' => '',
+                'subject' => $comment_separator,
+                'id' => 'subscriptions_content_node-nid+comment',
+                'body' => $comment_item,
+                'language' => $language,
+              ))
+              ->execute();
           }
-          db_query("DELETE FROM {subscriptions_mail_edit} WHERE mailkey LIKE 'subscriptions-comment-%'");
+          db_delete('subscriptions_mail_edit')
+            ->condition('mailkey', 'subscriptions-comment-%', 'LIKE')
+            ->execute();
         }
       }
-      
+
       // Import node/tid records:
-      $result = db_query("SELECT * FROM {mail_edit_registry} WHERE id = '%s'", $new_mailkey);
+      $result = db_query("SELECT * FROM {mail_edit_registry} WHERE id = :id", array(':id' => $new_mailkey));
       if ($registry = db_fetch_array($result)) {
         _subscriptions_mail_mail_edit_import('subscriptions-node-tid', 'subscriptions_taxonomy_node-tid', $registry['description'], $languages);
       }
-      
+
       // Import node-type-* records:
       $old_mailkey = 'subscriptions-node-type-';
       $new_mailkey = 'subscriptions_content_node-type-';
-      $result = db_query("SELECT * FROM {mail_edit_registry} WHERE id LIKE '%s'", $new_mailkey .'%');
-      while ($registry = db_fetch_array($result)) {
-        $type = substr($registry['id'], strlen($new_mailkey));
-        _subscriptions_mail_mail_edit_import($old_mailkey . $type, $new_mailkey . $type, $registry['description'], $languages);
+      $result = db_select('mail_edit_registry', 'mer')
+        ->fields('mer')
+        ->condition('id', $new_mailkey . '%', 'LIKE')
+        ->execute();
+      foreach ($result as $registry) {
+        $type = substr($registry->id, strlen($new_mailkey));
+        _subscriptions_mail_mail_edit_import($old_mailkey . $type, $new_mailkey . $type, $registry->description, $languages);
       }
       break;
   }
 
   $dummy = array();
-  if (db_table_exists('subscriptions_mail_edit') && db_result(db_query("SELECT COUNT(*) FROM {subscriptions_mail_edit}")) == 0) {
-    db_drop_table($dummy, 'subscriptions_mail_edit');
+  if (db_table_exists('subscriptions_mail_edit') && db_query("SELECT COUNT(*) FROM {subscriptions_mail_edit}")->fetchField() === 0) {
+    db_drop_table('subscriptions_mail_edit');
   }
-  if (db_table_exists('mail_edit_d5') && db_result(db_query("SELECT COUNT(*) FROM {mail_edit_d5}")) == 0) {
-    db_drop_table($dummy, 'mail_edit_d5');
+  if (db_table_exists('mail_edit_d5') && db_query("SELECT COUNT(*) FROM {mail_edit_d5}")->fetchField() === 0) {
+    db_drop_table('mail_edit_d5');
   }
 }
 
 function _subscriptions_mail_mail_edit_import($old_mailkey, $new_mailkey, $description, $languages) {
   $success = FALSE;
-  if ($row = db_fetch_array(db_query("SELECT * FROM {mail_edit_d5} WHERE mailkey = '%s'", $old_mailkey))) {
+  if ($row = db_fetch_array(db_query("SELECT * FROM {mail_edit_d5} WHERE mailkey = :mailkey", array(':mailkey' => $old_mailkey)))) {
     if (empty($row['description'])) {
       $row['description'] = filter_xss($description, array());
     }
     $success = TRUE;
     foreach ($languages as $language) {
       $variables = array('%key' => $new_mailkey, '%language' => $language);
-      if (db_result(db_query("SELECT COUNT(*) FROM {mail_edit} WHERE id = '%s' AND language = '%s'", $new_mailkey, $language))) {
+      if (db_query("SELECT COUNT(*) FROM {mail_edit} WHERE id = :id AND language = :language", array(':id' => $new_mailkey, ':language' => $language))->fetchField()) {
         drupal_set_message(t("%language translation of %key cannot be imported because it's already defined.", $variables), 'warning');
         $success = FALSE;
       }
-      elseif (db_query("INSERT INTO {mail_edit} (description, subject, id, body, language) VALUES ('%s', '%s', '%s', '%s', '%s')", $row['description'], $row['subject'], $new_mailkey, $row['body'], $language) && db_affected_rows()) {
+      elseif (db_insert('mail_edit')
+        ->fields(array(
+          'description' => $row['description'],
+          'subject' => $row['subject'],
+          'id' => $new_mailkey,
+          'body' => $row['body'],
+          'language' => $language,
+        ))
+        ->execute()) {
         drupal_set_message(t('%language translation of %key has been imported.', $variables));
       }
       else {
@@ -161,7 +203,9 @@ function _subscriptions_mail_mail_edit_import($old_mailkey, $new_mailkey, $descr
       }
     }
     if ($success) {
-      db_query("DELETE FROM {mail_edit_d5} WHERE mailkey = '%s'", $old_mailkey);
+      db_delete('mail_edit_d5')
+        ->condition('mailkey', $old_mailkey)
+        ->execute();
     }
   }
   return $success;

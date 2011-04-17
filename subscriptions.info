@@ -1,4 +1,6 @@
 name = Subscriptions
 description = The basic Subscriptions framework.
 package = "Subscriptions"
-core = 6.x
+core = 7.x
+
+configure = admin/config/subscriptions

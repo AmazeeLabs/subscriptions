@@ -15,8 +15,8 @@ function _subscriptions_mail_cron() {
   // set_time_limit(3600);  drupal_set_message('DON\'T FORGET TO REMOVE THE TIME LIMIT EXTENSION!!!');
 
   global $user, $language;
-  drupal_init_language();
-  include_once drupal_get_path('module', 'subscriptions_mail') .'/subscriptions_mail.templates.inc';
+  drupal_language_initialize();
+  include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions_mail') . '/subscriptions_mail.templates.inc';
 
   $mails_allowed = variable_get('subscriptions_number_of_mails', 0);
   $from = _subscriptions_mail_site_mail();
@@ -41,7 +41,7 @@ function _subscriptions_mail_cron() {
   if ($usable_seconds <= 0) {
     $variables = array(
       '!Module' => 'Subscriptions',
-      '@link'   => url('admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-cron-percent')),
+      '@link'   => url('admin/config/subscriptions', array('fragment' => 'edit-subscriptions-cron-percent')),
     );
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
     if ($usable_seconds == 0) {
@@ -62,7 +62,7 @@ function _subscriptions_mail_cron() {
     $saved_user = $user;
     $saved_language = $language;
     session_save_session(FALSE);
-    $user = subscriptions_user_load($s['uid']);
+    $user = user_load($s['uid']);
     drupal_init_language();
     $langcode = $language->language;
     $digest_data = array();
@@ -90,7 +90,7 @@ function _subscriptions_mail_cron() {
           }
         }
         if ($object = $loaded_objects[$user->uid][$load_function][$index]) {
-          $sender = subscriptions_user_load($object->uid);
+          $sender = user_load($object->uid);
           $module = $s['module'];
           $ori_field = $field = $s['field'];
           $ori_value = $value = $s['value'];
@@ -108,19 +108,19 @@ function _subscriptions_mail_cron() {
           $mailvars_function = $fields[$langcode][$module][$field]['mailvars_function'];
           $mailkey = $fields[$langcode][$module][$field]['mailkey'];
           if (!is_numeric($value)) {
-            $mailkey .= '-'. $value;
+            $mailkey .= '-' . $value;
           }
           $digest = $s['digest'] > 0 || $s['digest'] == -1 && _subscriptions_get_setting('digest', 0) > 0;
           if ($digest) {
-            $body_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'body', 'DITEM');
+            $body_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY . '+item', $langcode, 'body', 'DITEM');
           }
           else {
             $body_template = subscriptions_mail_template_load($mailkey, $langcode, 'body', 'BODY');
             $subject_template = subscriptions_mail_template_load($mailkey, $langcode, 'subject', 'SUBJ');
           }
           init_theme();
-          $show_node_info = (isset($object->type) ? theme_get_setting('toggle_node_info_'. $object->type) : TRUE);
-          $base = 'user/'. $s['uid'];
+          $show_node_info = (isset($object->type) ? theme_get_setting('toggle_node_info_' . $object->type) : TRUE);
+          $base = 'user/' . $s['uid'];
           $mailvars = array(
             '!site' => variable_get('site_name', 'drupal'),
             '!recipient_name' => $s['name'],
@@ -130,10 +130,10 @@ function _subscriptions_mail_cron() {
             '!sender_page' => ($show_node_info && $sender->uid ? url("user/$sender->uid", array('absolute' => TRUE)) : '!sender_page'),
             '!sender_contact_page' => ($show_node_info ? (empty($sender->contact) ? t('(disabled)') : url("user/$sender->uid/contact", array('absolute' => TRUE))) : '!sender_contact_page'),
             '!sender_has_contact_page' => ($show_node_info ? (empty($sender->contact) ? 0 : 1) : 0),
-            '!manage_url' => url($base .'/subscriptions', array('absolute' => TRUE)),
+            '!manage_url' => url($base . '/subscriptions', array('absolute' => TRUE)),
             '!name' => $s['name'],
             '!subs_type' => $fields[$langcode][$module][$field]['!subs_type'],
-            '!unsubscribe_url' => url("s/del/$module/$ori_field/$ori_value/". $s['author_uid'] .'/'. $s['uid'] .'/'. md5(drupal_get_private_key() . $module . $ori_field . $ori_value . $s['author_uid'] . $s['uid']), array('absolute' => TRUE)),
+            '!unsubscribe_url' => url("s/del/$module/$ori_field/$ori_value/" . $s['author_uid'] . '/' . $s['uid'] . '/' . md5(drupal_get_private_key() . $module . $ori_field . $ori_value . $s['author_uid'] . $s['uid']), array('absolute' => TRUE)),
           );
           if (function_exists('realname_make_name')) {
             $recipient = (object) array('uid' => $s['uid']);
@@ -145,12 +145,12 @@ function _subscriptions_mail_cron() {
           $mailvars_function($mailvars, $object, $field, $s);
           $mailvars += module_invoke_all('subscriptions_get_mailvars', $object);
           if ($digest && !empty($object->_subscriptions_comments) && module_exists('subscriptions_content')) {
-            $digest_comment_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+comment', $langcode, 'body', 'DITEMCMT');
+            $digest_comment_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY . '+comment', $langcode, 'body', 'DITEMCMT');
             $mailvars['!comments'] = _subscriptions_content_format_comments($object, $digest_comment_template, '');
           }
           $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
           if (variable_get('subscriptions_showmailkeys', 0)) {
-            $body .= t('| Mailkey: @mailkey/@langcode', array('@mailkey' => $mailkey, '@langcode' => $langcode)) ."\n";
+            $body .= t('| Mailkey: @mailkey/@langcode', array('@mailkey' => $mailkey, '@langcode' => $langcode)) . "\n";
           }
           if ($digest) {
             $digest_data['bodies'][] = $body;
@@ -170,23 +170,27 @@ function _subscriptions_mail_cron() {
           }
         }
       }
-      db_query("DELETE FROM {subscriptions_queue} WHERE load_function = '%s' AND load_args = '%s' AND uid = %d", $s['load_function'], $s['load_args'], $s['uid']);
+      db_delete('subscriptions_queue')
+        ->condition('load_function', $s['load_function'])
+        ->condition('load_args', $s['load_args'])
+        ->condition('uid', $s['uid'])
+        ->execute();
 
       if ($digest) {
         // Get next ready queue item for this user.
-        $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE uid = %d AND last_sent + send_interval < %d ORDER BY sqid', $user->uid, time(), 0, 1);
+        $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE uid = :uid AND last_sent + send_interval < :send_interval ORDER BY sqid', array(':uid' => $user->uid, ':send_interval' => time()));
         if (!($s = db_fetch_array($result))) {
           // No more ready queue items for this user, finish off this digest.
           $s = $digest_data['send'];
           $subject_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'subject', 'DSUBJ');
           $body_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'body', 'DBODY');
-          $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'subject', 'SEP');
+          $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY . '+item', $langcode, 'subject', 'SEP');
           $mailvars['!bodies'] = implode($separator, $digest_data['bodies']);
           $mailvars['!name'] = $s['!name'];
           $mailvars['!manage_url'] = $s['!manage_url'];
           $digest_data['mailvars'] = $mailvars;
           foreach (module_implements('subscriptions_digest_alter') as $module) {
-            $function = $module .'_subscriptions_digest_alter';
+            $function = $module . '_subscriptions_digest_alter';
             $function($digest_data);
             if (empty($digest_data)) {
               break;  // forget it
@@ -199,7 +203,7 @@ function _subscriptions_mail_cron() {
             _subscriptions_mail_send(SUBSCRIPTIONS_DIGEST_MAILKEY, $s['name'], $s['mail'], $subject, $body, $s['from'], $user->uid, $digest_data['send_intervals']);
             ++$digest_count;
           }
-          $digest = false;
+          $digest = FALSE;
         }
       }
     } while ( $digest );
@@ -217,8 +221,8 @@ function _subscriptions_mail_cron() {
       '!digest_count'      => $digest_count,
       '!used_seconds'      => round($current_seconds - $lost_seconds),
       '!total_seconds'     => $total_seconds,
-      '!remaining_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d AND suspended = 0", time())),
-      '!suspended_items'   => db_result(db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < %d AND suspended <> 0", time())),
+      '!remaining_items'   => db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < :send_interval AND suspended = 0", array(':send_interval' => REQUEST_TIME))->fetchField(),
+      '!suspended_items'   => db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < :send_interval AND suspended <> 0", array(':send_interval' => REQUEST_TIME))->fetchField(),
       '!remaining_seconds' => round($total_seconds - $current_seconds),
       '%varname'           => 'subscriptions_mail_trash_silently',
       '!cron'              => 'cron',
@@ -229,20 +233,20 @@ function _subscriptions_mail_cron() {
     else {
       $message = t('!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
     }
-    $message .= ' '. t('!remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other @cron client modules.', $variables);
+    $message .= ' ' . t('!remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other @cron client modules.', $variables);
     $watchdog = 'watchdog'; // keep potx from translating 'cron'
     $watchdog('cron', $message);
   }
 }
 
 /**
- * Implementation of hook_mail().
+ * Implements hook_mail().
  */
 function subscriptions_mail_mail($key, &$message, $params) {
   global $base_url;
 
   $url = parse_url($base_url);
-  $list_id = variable_get('site_name', '') .' '. t('Subscriptions') .' <subscriptions.'. $url['host'] .'>';
+  $list_id = variable_get('site_name', '') . ' ' . t('Subscriptions') . ' <subscriptions. ' . $url['host'] . '>';
 
   $message['subject'] = $params['context']['subject'];
   $message['body'] = $params['context']['message'];
@@ -271,15 +275,21 @@ function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, 
     ),
   ), $from, TRUE);
 
-  $watchdog_params = array('@name' => $name, '@to' => "<$to>");
+  $watchdog_params = array('@to' => "<$to>");
   if (!empty($mail_success['result'])) {
     if (variable_get('subscriptions_watchgood', 1)) {
-      watchdog('subscriptions', 'notification for @name at @to', $watchdog_params);
+      watchdog('subscriptions', 'Notification sent.', $watchdog_params);
     }
     foreach ($send_intervals as $send_interval) {
-      db_query("UPDATE {subscriptions_last_sent} SET last_sent = %d WHERE uid = %d AND send_interval = %d", time(), $uid, $send_interval);
+      db_update('subscriptions_last_sent')
+        ->fields(array(
+          'last_sent' => REQUEST_TIME,
+        ))
+        ->condition('uid', $uid)
+        ->condition('send_interval', $send_interval)
+        ->execute();
       if (!db_affected_rows()) {
-        @db_query("INSERT INTO {subscriptions_last_sent} (uid, send_interval, last_sent) VALUES(%d, %d, %d)", $uid, $send_interval, time());
+        @db_query("INSERT INTO {subscriptions_last_sent} (uid, send_interval, last_sent) VALUES(%d, %d, %d)", $uid, $send_interval, REQUEST_TIME);
       }
     }
   }
@@ -334,7 +344,7 @@ function subscriptions_mail_template_preprocess($template, $mailvars) {
 }
 
 /**
- * Implementation of hook_mail_alter().
+ * Implements hook_mail_alter().
  *
  * Remove any trailing spaces (must run after mail_edit_mail_alter()!).
  */

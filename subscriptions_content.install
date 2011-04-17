@@ -6,44 +6,34 @@
  */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function subscriptions_content_install() {
   // subscriptions_content.module needs to be heavier than taxonomy.module --
   // otherwise term_node record has not been written when subscriptions_queue() is called!
   // subscriptions_content_cron() will ensure this constraint at run-time.
-  $weight = 1 + db_result(db_query("SELECT weight FROM {system} WHERE name = 'taxonomy' AND type = 'module'"));
-  db_query("UPDATE {system} SET weight = %d WHERE name = 'subscriptions_content' AND type = 'module'", $weight);
+  $weight = 1 + db_select('system')
+    ->fields('system', array('weight'))
+    ->condition('name', 'taxonomy')
+    ->condition('type', 'module')
+    ->execute()
+    ->fetchField();
+  db_update('system')
+    ->fields(array('weight' => $weight))
+    ->condition('type', 'module')
+    ->condition('name', 'subscriptions_content')
+    ->execute();
 }
 
 /**
- * Database update function 1.
- * 
- * Remove content type subscriptions left over from deleted content types.
+ * Implements hook_update_last_removed().
  */
-function subscriptions_content_update_1() {
-  $result = db_query("SELECT s.value AS tid FROM {subscriptions_queue} s LEFT JOIN {node_type} t ON s.value = t.type WHERE s.module = 'node' AND s.field = 'type' AND t.type IS NULL");
-  while ($orphan = db_fetch_array($result)) {
-    $orphans[] = $orphan['tid'];
-    $placeholders[] = "'%s'";
-  }
-  if (isset($orphans)) {
-    db_query("DELETE FROM {subscriptions_queue} WHERE module = 'node' AND field = 'type' AND value IN (". implode(',', $placeholders) .")", $orphans);
-    $orphans = $placeholders = NULL;
-  }
-  $result = db_query("SELECT s.value AS tid FROM {subscriptions} s LEFT JOIN {node_type} t ON s.value = t.type WHERE s.module = 'node' AND s.field = 'type' AND t.type IS NULL");
-  while ($orphan = db_fetch_array($result)) {
-    $orphans[] = $orphan['tid'];
-    $placeholders[] = "'%s'";
-  }
-  if (isset($orphans)) {
-    db_query("DELETE FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value IN (". implode(',', $placeholders) .")", $orphans);
-  }
-  return array();
+function subscriptions_content_update_last_removed() {
+  return 1;
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function subscriptions_content_uninstall() {
 }

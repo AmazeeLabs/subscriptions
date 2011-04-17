@@ -7,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_subscriptions_tokens_list().
+ * Implements hook_subscriptions_tokens_list().
  *
  * Provide replacable tokens for mail_edit.
  *
@@ -16,7 +16,7 @@
 function subscriptions_cck_subscriptions_tokens_list($mailkey, $options = array()) {
   $tr = 't';
   $variables = array('%fieldname' => '<fieldname>', '!content_type', $tr('content type'));
-  $tokens = array (
+  $tokens = array(
     '!ccklabel_&lt;fieldname&gt;' => t('The label for the CCK field %fieldname, as defined for your !content_type.', $variables),
     '!cckvalue1_&lt;fieldname&gt;' => t('The value(s) of the CCK field %fieldname, as defined for your !content_type, comma-separated.', $variables),
     '!cckvalue2_&lt;fieldname&gt;' => t('The value(s) of the CCK field %fieldname, as defined for your !content_type, newline-separated.', $variables),
@@ -25,7 +25,7 @@ function subscriptions_cck_subscriptions_tokens_list($mailkey, $options = array(
 }
 
 /**
- * Implementation of hook_subscriptions_get_mailvars().
+ * Implements hook_subscriptions_get_mailvars().
  *
  * Add the !cck... variables.
  *
@@ -45,9 +45,9 @@ function subscriptions_cck_subscriptions_get_mailvars($node) {
           $formatted = drupal_html_to_text($formatted);
           $formatteds[] = $formatted;
         }
-        $mailvars['!ccklabel_'. $field_name] = $field_info['widget']['label'];
-        $mailvars['!cckvalue1_'. $field_name] = implode(', ', $formatteds);
-        $mailvars['!cckvalue2_'. $field_name] = implode("\n", $formatteds);
+        $mailvars['!ccklabel_' . $field_name] = $field_info['widget']['label'];
+        $mailvars['!cckvalue1_' . $field_name] = implode(', ', $formatteds);
+        $mailvars['!cckvalue2_' . $field_name] = implode("\n", $formatteds);
       }
     }
   }

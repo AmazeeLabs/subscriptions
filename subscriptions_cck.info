@@ -4,4 +4,4 @@ package = "Subscriptions"
 dependencies[] = subscriptions
 dependencies[] = subscriptions_content
 dependencies[] = content
-core = 6.x
+core = 7.x

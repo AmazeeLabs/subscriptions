@@ -3,4 +3,4 @@ description = Sends out mails with drupal_mail, customizable with the separate m
 package = "Subscriptions"
 ; dependencies[] = mail_edit
 dependencies[] = subscriptions
-core = 6.x
+core = 7.x

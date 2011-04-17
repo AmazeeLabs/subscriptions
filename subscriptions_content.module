@@ -13,7 +13,7 @@
  */
 
 /**
- * Implementation of hook_subscriptions().
+ * Implements hook_subscriptions().
  *
  * @ingroup hooks
  */
@@ -22,7 +22,7 @@ function subscriptions_content_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
     'node' => array('node', 'nid'),
     'type' => array('node', 'type'),
   );
-  $function = '_subscriptions_content_'. $op;
+  $function = '_subscriptions_content_' . $op;
   if (function_exists($function)) {
     return $function($arg0, $arg1, $arg2);
   }
@@ -88,7 +88,7 @@ function _subscriptions_content_node_options($account, $node) {
     $options['nid'][] = array(
       'name' => t('Subscribe to this page'),
       'params' => array('module' => 'node', 'field' => 'nid', 'value' => $node->nid),
-      'link' => 'node/'. $node->nid,
+      'link' => 'node/' . $node->nid,
     );
     $options['nid']['weight'] = -4;
   }
@@ -97,25 +97,25 @@ function _subscriptions_content_node_options($account, $node) {
     $unlisted_tag = '';
     if (in_array($node->type, $unlisteds)) {
       if (user_access('subscribe to all content types', $account)) {
-        $unlisted_tag = '&nbsp;'. SUBSCRIPTIONS_UNAVAILABLE;
+        $unlisted_tag = '&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE;
       }
       else {
         return $options;
       }
     }
     // Content type
-    $type_name = check_plain(node_get_types('name', $node->type));
+    $type_name = check_plain(node_type_get_name($node->type));
     if ($type_name) {
       $options['type'][] = array(
         'name' => t('To %type content', array('%type' => $type_name)) . $unlisted_tag,
         'params' => array('module' => 'node', 'field' => 'type', 'value' => $node->type),
-        'link' => 'type/'. $node->type,
+        'link' => 'type/' . $node->type,
       );
       // Content type and author
       $options['type'][] = array(
         'name' => t('To %type content by %name', array('%type' => $type_name, '%name' => ($node->uid ? check_plain($node->name) : variable_get('anonymous', '???')))) . $unlisted_tag,
         'params' => array('module' => 'node', 'field' => 'type', 'value' => $node->type, 'author_uid' => $node->uid),
-        'link' => 'type/'. $node->type .'/'. $node->uid,
+        'link' => 'type/' . $node->type . '/' . $node->uid,
       );
       $options['type']['weight'] = -2;
     }
@@ -130,7 +130,7 @@ function _subscriptions_content_node_options($account, $node) {
  */
 function _subscriptions_content_access($load_function, $load_args, $node) {
   ///global $user;  /// keep this for remote debugging
-  if (($load_function == 'subscriptions_content_node_load' || ($load_function == 'subscriptions_content_comment_load' && $node->_subscriptions_comments)) &&
+  if (($load_function == 'subscriptions_content_load_node' || ($load_function == 'subscriptions_content_load_comment' && $node->_subscriptions_comments)) &&
     ($node->status || user_access('administer nodes')) && node_access('view', $node)) {
     if (!empty($node->type) && subscriptions_content_type_is_blocked($node->type) && !user_access('subscribe to all content types')) {
       return FALSE;
@@ -143,7 +143,7 @@ function _subscriptions_content_access($load_function, $load_args, $node) {
 }
 
 /**
- * Implementation of hook_types(), subhook of hook_subscriptions().
+ * Implements _hook_types(), subhook of hook_subscriptions().
  *
  * This is called by subscriptions_types() in subscriptions.module.
  *
@@ -157,19 +157,31 @@ function _subscriptions_content_access($load_function, $load_args, $node) {
  */
 function _subscriptions_content_types() {
   $tr = 't';
-  $types['node'] = array(
-    'title' => 'Pages/Threads',
-    'access' => 'subscribe to content',
-    'page' => 'subscriptions_content_page_node',
-    'fields' => array('node', 'nid'),
-    'weight' => -4,
+  $types['all_types'] = array(
+    'title' => '',
+    'access' => array('subscribe to all content types' => array(
+      'title' => t('Subscribe to all content types'),
+      'description' => t('Make unlisted and blocked content types available for subscribing. This is typically used only for administrative roles.'),
+    )),
   );
   $types['type'] = array(
     'title' => 'Content types',
-    'access' => 'subscribe to content types',
+    'access' => array('subscribe to content types' => array(
+      'title' => t('Subscribe to content types'),
+    )),
     'page' => 'subscriptions_content_page_type',
     'fields' => array('node', 'type'),
-    'weight' => -2,
+    'weight' => -20,
+  );
+  $types['node'] = array(
+    'title' => 'Pages/Threads',
+    'access' => array('subscribe to content' => array(
+      'title' => t('Subscribe to content'),
+      'description' => t('Allow the role holder to subscribe to single pages/threads.'),
+    )),
+    'page' => 'subscriptions_content_page_node',
+    'fields' => array('node', 'nid'),
+    'weight' => -40,
   );
   return $types;
 
@@ -179,7 +191,7 @@ function _subscriptions_content_types() {
 }
 
 /**
- * Implementation of hook_nodeapi().
+ * Implements hook_nodeapi().
  *
  * Catch node inserts and updates and send them to the subscriptions queue;
  * catch node deletes and remove any associated thread subscriptions.
@@ -205,7 +217,7 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
       $event = array(
         'module' => 'node',
         'uid' => $node->uid,
-        'load_function' => 'subscriptions_content_node_load',
+        'load_function' => 'subscriptions_content_load_node',
         'load_args' => $node->nid,
         'type' => 'node',
         'action' => $op,
@@ -230,13 +242,17 @@ function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
       break;
 
     case 'delete':
-      db_query("DELETE FROM {subscriptions} WHERE module = 'node' AND field = 'nid' AND value = '%s'", $node->nid);
+      db_delete('subscriptions')
+        ->condition('module', 'node')
+        ->condition('field', 'nid')
+        ->condition('value', $node->nid)
+        ->execute();
       break;
   }
 }
 
 /**
- * Implementation of hook_comment().
+ * Implements hook_comment().
  *
  * Catch comment inserts and updates and send them to the subscriptions queue.
  */
@@ -244,21 +260,21 @@ function subscriptions_content_comment($comment, $op) {
   global $user;
   static $is_unpublished;
   static $inserted_cid = 0;
-  $comment = (array)$comment;  // $comment can be an object or an array.
+  $comment = (array) $comment;  // $comment can be an object or an array.
 
   if (!isset($comment['nomail']) && ($op == 'insert' || $op == 'update' || ($op == 'publish' && $comment['cid'] != $inserted_cid))) {
     if (!isset($comment['subscriptions_notify']) || $comment['subscriptions_notify']) {
       $node = node_load($comment['nid']);
       $event = array(
         'module' => 'node',
-        'load_function' => 'subscriptions_content_comment_load',
+        'load_function' => 'subscriptions_content_load_comment',
         'load_args' => $comment['cid'],
         'uid' => $comment['uid'],
         'type' => 'comment',
         'action' => $op,
         'is_new' => ($op != 'update' || $is_unpublished && $comment['status'] == COMMENT_PUBLISHED),
         'node' => $node,
-        'comment' => (object)$comment,
+        'comment' => (object) $comment,
       );
       subscriptions_queue($event);
       $inserted_cid = $comment['cid'];
@@ -268,7 +284,7 @@ function subscriptions_content_comment($comment, $op) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Add the Content Settings part to admin/settings/subscriptions,
  *
@@ -280,8 +296,8 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
 
   // General content settings
   $select = array();
-  $select[0] = '<'. t('none') .'>';
-  $nodetypes = node_get_types();
+  $select[0] = '<' . t('none') . '>';
+  $nodetypes = node_type_get_types();
   foreach ($nodetypes as $ntype => $nname) {
     $select[$ntype] = $nname->name;
   }
@@ -310,7 +326,7 @@ function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$
   $form['content']['subscriptions_blocked_content_types_note'] = array(
     '#type'          => 'item',
     '#title'         => t('Note'),
-    '#value'         => t("The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types and links will be marked with a '!symbol' symbol (and appear !red_ON like this !red_OFF in the case of blocked types).", array('%permission' => t('subscribe to all content types'), '!symbol' => SUBSCRIPTIONS_UNAVAILABLE, '!red_ON' => '<span class="error">', '!red_OFF' => '</span>')),
+    '#markup'        => t("The %permission permission grants normal access to unlisted and blocked content types; this is intended as an administrative function, and the content types and links will be marked with a '!symbol' symbol (and appear !red_ON like this !red_OFF in the case of blocked types).", array('%permission' => t('subscribe to all content types'), '!symbol' => SUBSCRIPTIONS_UNAVAILABLE, '!red_ON' => '<span class="error">', '!red_OFF' => '</span>')),
   );
   $form['content']['subscriptions_blocked_nodes'] = array(
     '#type'          => 'textfield',
@@ -371,7 +387,7 @@ function _subscriptions_content_validate_blocked_nodes($form, $form_state) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Add the 'Send subscriptions notifications' to the Workflow settings on
  * admin/content/types/CONTENT_TYPE,
@@ -394,8 +410,8 @@ function subscriptions_content_form_node_type_form_alter(&$form, &$form_state) {
       'c_pub' => t('Published comments (as update)'),
     ),
     '#multiple' => TRUE,
-    '#description' => t('Select all situations where generation of notifications should be ON.') .'<br />'.
-      t('Items that are created in unpublished state create notifications to administrators only; when they are later published, "new" notifications are generated.') .'<br />'.
+    '#description' => t('Select all situations where generation of notifications should be ON.') . '<br />' .
+      t('Items that are created in unpublished state create notifications to administrators only; when they are later published, "new" notifications are generated.') . '<br />' .
       t('Users with the %administer_nodes / %administer_comments permissions will be able to override these options.', array(
         '%administer_nodes' => $tr('administer nodes'),
         '%administer_comments' => $tr('administer comments'),
@@ -405,15 +421,15 @@ function subscriptions_content_form_node_type_form_alter(&$form, &$form_state) {
 }
 
 function subscriptions_content_get_default_workflow($content_type) {
-  return variable_get('subscriptions_default_workflow_'. $content_type, array('n_new', 'n_unpub', 'n_pub', 'c_new', 'c_unpub', 'c_pub'));
+  return variable_get('subscriptions_default_workflow_' . $content_type, array('n_new', 'n_unpub', 'n_pub', 'c_new', 'c_unpub', 'c_pub'));
 }
 
 function subscriptions_content_node_type_form_submit($form, &$form_state) {
-  variable_set('subscriptions_default_workflow_'. $form_state['values']['type'], $form_state['values']['subscriptions_workflow']);
+  variable_set('subscriptions_default_workflow_' . $form_state['values']['type'], $form_state['values']['subscriptions_workflow']);
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Add the Send Subscriptions Notifications checkbox to the Publishing Options
  * fieldset on the node edit form.
@@ -424,7 +440,7 @@ function subscriptions_content_node_type_form_submit($form, &$form_state) {
 function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
   global $user;
 
-  if (isset($form['type']['#value']) && $form['type']['#value'] .'_node_form' == $form_id) {
+  if (isset($form['type']['#value']) && $form['type']['#value'] . '_node_form' == $form_id) {
     if (isset($form['options'])) {
       $tr = 't';
       $form['options']['subscriptions_notify'] = array(
@@ -443,7 +459,7 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Add submit handler to catch bulk content operations and suppress
  * notifications by default.
@@ -455,14 +471,14 @@ function subscriptions_content_form_node_admin_content_alter(&$form, &$form_stat
   $form['admin']['options']['subscriptions_notify'] = array(
     '#type' => 'checkbox',
     '#title' => t('Send subscriptions notifications'),
-    '#description' => '<br />'. t('When publishing unpublished nodes, you probably want to turn this ON.'),
+    '#description' => '<br />' . t('When publishing unpublished nodes, you probably want to turn this ON.'),
     '#prefix' => '<br />',
   );
   array_unshift($form['admin']['options']['submit']['#submit'], 'subscriptions_content_node_admin_nodes_submit');
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Add submit handler to catch bulk content moderation submissions.
  *
@@ -474,7 +490,7 @@ function subscriptions_content_form_node_admin_nodes_alter(&$form, &$form_state)
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Add the Send Subscriptions Notifications checkbox to the Administration Options
  * fieldset on the comment edit form.
@@ -506,7 +522,7 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
     $node = node_load($form['nid']['#value']);
     $default_workflow = subscriptions_content_get_default_workflow($node->type);
     if ($is_update && $is_unpublished) {
-      $form['admin']['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out "new" notifications, unless you suppress this here.', array(
+      $form['admin']['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out "new" notifications, unless you suppress this here. ', array(
         '%administer_comments' => $tr('administer comments'),
         '!Status' => $tr('Status'),
         '%Published' => $tr('Published'),
@@ -569,8 +585,7 @@ function subscriptions_content_suppress_notifications($set = NULL) {
  * @param $context
  *   Parameter for subscriptions_autosubscribe().
  */
-function _subscriptions_content_autosubscribe($content_type, $module, $field, $value, $context)
-{
+function _subscriptions_content_autosubscribe($content_type, $module, $field, $value, $context) {
   if (subscriptions_content_type_is_blocked($content_type)) {
     return;
   }
@@ -582,8 +597,7 @@ function _subscriptions_content_autosubscribe($content_type, $module, $field, $v
  *
  * @param $content_type
  */
-function subscriptions_content_type_is_blocked($content_type)
-{
+function subscriptions_content_type_is_blocked($content_type) {
   $blockeds = variable_get('subscriptions_blocked_content_types', array());
   return in_array($content_type, $blockeds);
 }
@@ -604,9 +618,9 @@ function subscriptions_content_type_is_blocked($content_type)
  */
 function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   global $language;
-  include_once drupal_get_path('module', 'subscriptions_mail') .'/subscriptions_mail.templates.inc';
+  include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions_mail') . '/subscriptions_mail.templates.inc';
 
-  $mailvars['!url'] = url('node/'. $node->nid, array('absolute' => TRUE));
+  $mailvars['!url'] = url('node/' . $node->nid, array('absolute' => TRUE));
   $mailvars['!node_type'] = $node->type;
   $mailvars['!title'] = trim($node->title);
   $mailvars['!teaser'] = _subscriptions_content_format_text($node->teaser, $node->format);
@@ -615,19 +629,19 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   $mailvars['!full_node'] = (variable_get('subscriptions_generate_full_node', 0) ? _subscriptions_content_format_text(node_view($node, FALSE, TRUE, FALSE)) : '!full_node');
   $mailvars['!is_new'] = (integer) !empty($node->_subscriptions_is_new);
   $mailvars['!is_updated'] = (integer) !empty($node->_subscriptions_is_updated);
-  $mailvars['!is_old'] = (integer)(empty($node->_subscriptions_is_new) && empty($node->_subscriptions_is_updated));
+  $mailvars['!is_old'] = (integer) (empty($node->_subscriptions_is_new) && empty($node->_subscriptions_is_updated));
   $mailvars['!is_published'] = $node->status;
-  $mailvars['!has_new_comments'] = (integer)!empty($node->_subscriptions_comments);
+  $mailvars['!has_new_comments'] = (integer) !empty($node->_subscriptions_comments);
   if ($field == 'tid') {
-    $mailvars['!term_name'] = db_result(db_query('SELECT name FROM {term_data} WHERE tid = %d', $s['value']));
+    $mailvars['!term_name'] = db_query('SELECT name FROM {taxonomy_term_data} WHERE tid = :tid', array(':tid' => $s['value']))->fetchField();
   }
   elseif (!empty($node->tid)) {
-    $mailvars['!term_name'] = db_result(db_query('SELECT name FROM {term_data} WHERE tid = %d', $node->tid));
+    $mailvars['!term_name'] = db_query('SELECT name FROM {taxonomy_term_data} WHERE tid = :tid', array(':tid' => $node->tid))->fetchField();
   }
   else {
     unset($mailvars['!term_name']);
   }
-  if ($s['load_function'] == 'subscriptions_content_comment_load' || ($s['load_function'] == 'subscriptions_content_node_load' && isset($node->_subscriptions_comments))) {
+  if ($s['load_function'] == 'subscriptions_content_load_comment' || ($s['load_function'] == 'subscriptions_content_load_node' && isset($node->_subscriptions_comments))) {
     $comment_template = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $language->language, 'body', 'CITEM');
     $separator = subscriptions_mail_template_load(SUBSCRIPTIONS_COMMENT_MAILKEY, $language->language, 'subject', 'SEP');
     $mailvars['!comments'] = _subscriptions_content_format_comments($node, $comment_template, $separator);
@@ -637,14 +651,14 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   }
   $files = '';
   if (isset($node->files) && user_access('view uploaded files')) {
-    foreach($node->files as $file) {
-      $files .= file_create_url($file->filepath) ."\n";
+    foreach ($node->files as $file) {
+      $files .= file_create_url($file->filepath) . "\n";
     }
   }
   $mailvars['!has_files'] = empty($files) ? 0 : 1;
   $mailvars['!files'] = $files;
 
-  $account = subscriptions_user_load($node->revision_uid);
+  $account = user_load($node->revision_uid);
   $mailvars['!revision_name'] = $account->name;
   $mailvars['!revision_log'] = _subscriptions_content_format_text($node->log);
 }
@@ -667,7 +681,7 @@ function _subscriptions_content_format_text($text, $format = NULL) {
   }
 
   if (isset($format)) {
-    $text = check_markup($text, $format, FALSE);
+    $text = check_markup($text, $format, $langcode = '', FALSE);
   }
   $text = drupal_html_to_text($text);
   return trim($text);
@@ -687,9 +701,9 @@ function _subscriptions_content_format_comments($node, $comment_template, $separ
       '!comment_text' => _subscriptions_content_format_text($comment->comment, $comment->format),
       '!comment_cid' => $comment->cid,
       '!comment_nid' => $comment->nid,
-      '!comment_url' => url('node/'. $comment->nid, array('fragment' => 'comment-'. $comment->cid, 'absolute' => TRUE)),
-      '!comment_is_new' => (integer)$comment->_subscriptions_is_new,
-      '!comment_is_published' => (integer)($comment->status == COMMENT_PUBLISHED),
+      '!comment_url' => url('node/' . $comment->nid, array('fragment' => 'comment-' . $comment->cid, 'absolute' => TRUE)),
+      '!comment_is_new' => (integer) $comment->_subscriptions_is_new,
+      '!comment_is_published' => (integer) ($comment->status == COMMENT_PUBLISHED),
     );
     if (function_exists('realname_make_name')) {
       $mailvars += array(
@@ -719,7 +733,7 @@ function _subscriptions_content_format_comments($node, $comment_template, $separ
  *
  * @return node as array().
  */
-function subscriptions_content_node_load($nid, $sqid, $is_new) {
+function subscriptions_content_load_node($nid, $sqid, $is_new) {
   // Do not cache because for different users the node can be different,
   //  subscriptions_mail_cron caches per uid.
   $node = _subscriptions_content_load($nid, 0);
@@ -748,12 +762,12 @@ function subscriptions_content_node_load($nid, $sqid, $is_new) {
  *
  * @return node as array().
  */
-function subscriptions_content_comment_load($cid, $sqid) {
-  $nid = db_result(db_query('SELECT nid FROM {comments} WHERE cid = %d', $cid));
+function subscriptions_content_load_comment($cid, $sqid) {
+  $nid = db_query('SELECT nid FROM {comments} WHERE cid = :cid', array(':cid' => $cid))->fetchField();
   if (empty($nid)) {
     return;
   }
-  $item = db_fetch_array(db_query('SELECT sq.module, sq.field FROM {subscriptions_queue} sq WHERE sqid = %d', $sqid));
+  $item = db_fetch_array(db_query('SELECT sq.module, sq.field FROM {subscriptions_queue} sq WHERE sqid = :sqid', array(':sqid' => $sqid)));
   if ($item['module'] != 'node' || $item['field'] != 'nid') {
     // Only if we're processing a node/nid queue item should we cut off the comments at an update item, otherwise not:
     $sqid = NULL;
@@ -780,26 +794,25 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
 
   if (!empty($node) && module_exists('comment')) {
     $published_comments_only = $limit_sqids = '';
+    $query = db_select('comments', 'c');
+    $sq_alias = $query->join('subscriptions_queue', 'q', 'c.cid == q.load_args');
+    $query->fields('q', array('sqid' => '_subscriptions_sqid', 'is_new' => '_subscriptions_is_new'));
+    $query->fields('c');
+    $query->condition('q.uid', $user->uid);
+    $query->condition('q.load_function', 'subscriptions_content_load_comment');
+    $query->condition('c.nid', $nid);
     if (!user_access('administer comments')) {
-      $published_comments_only = 'AND c.status = '. COMMENT_PUBLISHED;
+      $query->condition('c.status', COMMENT_PUBLISHED);
     }
     if (!empty($comment_load_sqid)) {
       // check for a later queued update notification (don't send comments past that one because it will go out as node/type with its own comments later!)
-      if ($cutoff_sqid = db_result(db_query_range("SELECT sqid FROM {subscriptions_queue} WHERE module = 'node' AND field = 'nid' AND value = '%s' AND uid = %d AND load_function = 'subscriptions_content_node_load' AND sqid > %d", array($nid, $user->uid, $comment_load_sqid), 0, 1))) {
-        $limit_sqids = 'AND q.sqid < '. (integer) $cutoff_sqid;
+      if ($cutoff_sqid = db_query_range("SELECT sqid FROM {subscriptions_queue} WHERE module = 'node' AND field = 'nid' AND value = :value AND uid = :uid AND load_function = 'subscriptions_content_load_node' AND sqid > :sqid", array(':value' => $nid, ':uid' => $user->uid, ':squid' => $comment_load_sqid))->fetchField()) {
+        $query->condition('q.sqid', $cutoff_sqid, '<');
       }
     }
-    $sql = "
-      SELECT q.sqid AS _subscriptions_sqid, q.is_new AS _subscriptions_is_new, c.*
-      FROM {comments} c
-        INNER JOIN {subscriptions_queue} q ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                            ."c.cid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
-                                                 ." = q.load_args AND q.uid = %d AND q.load_function = '%s'
-      WHERE c.nid = %d ". $published_comments_only .' '. $limit_sqids;
-    $sql = db_rewrite_sql($sql, 'c', 'cid');
-    $result = db_query($sql, $user->uid, 'subscriptions_content_comment_load', $nid);
+    $query->addTag('comment_access');
     $sqids = array();
-    while ($comment = db_fetch_object($result)) {
+    foreach($query->execute() as $comment) {
       comment_invoke_comment($comment, 'view');
       if ($comment && user_access('access comments') && !isset($node->_subscriptions_comments[$comment->cid])) {
         $node->_subscriptions_comments[$comment->cid] = $comment;
@@ -807,7 +820,9 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
       $sqids[] = $comment->_subscriptions_sqid;
     }
     if ($sqids) {
-      db_query('DELETE FROM {subscriptions_queue} WHERE sqid IN ('. db_placeholders($sqids) .')', $sqids);
+      db_delete('subscriptions_queue')
+        ->condition('sqid', $sqids, 'IN')
+        ->execute();
     }
   }
   return (empty($node) ? NULL : $node);
@@ -825,7 +840,7 @@ function subscriptions_content_page_node($account, $form) {
  *
  * @ingroup form
  */
-function subscriptions_content_node_form(&$form_state, $account, $form) {
+function subscriptions_content_node_form($form, &$form_state, $account, $form) {
   $uid = $account->uid;
   $tr = 't';
   $subscriptions = array();
@@ -833,18 +848,18 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     SELECT n.nid, n.uid, s.send_interval, s.author_uid, s.send_comments, s.send_updates, n.title, n.status, n.changed, n.comment AS comment_count, ncs.last_comment_timestamp,
       IF(s.send_comments + s.send_updates = 0, n.created, IF(s.send_comments + s.send_updates = 2, IF(n.changed > ncs.last_comment_timestamp, n.changed, ncs.last_comment_timestamp), IF(s.send_comments = 1, ncs.last_comment_timestamp, n.changed))) AS latest_activity
     FROM {node} n
-    INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                  ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
-                                       ." = s.value
+    INNER JOIN {subscriptions} s ON " . ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+                                  . "n.nid" . ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
+                                       . " = s.value
     LEFT JOIN {node_comment_statistics} ncs ON n.nid = ncs.nid
     WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d
     ORDER BY latest_activity DESC");
   $sql_count = db_rewrite_sql("
     SELECT COUNT(n.nid)
     FROM {node} n
-    INNER JOIN {subscriptions} s ON ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                  ."n.nid". ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
-                                       ." = s.value
+    INNER JOIN {subscriptions} s ON " . ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
+                                  . "n.nid" . ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
+                                       . " = s.value
     WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d");
   $result = pager_query($sql, 50, 0, $sql_count, $uid);
   while ($s = db_fetch_array($result)) {
@@ -853,19 +868,20 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
 
   // check whether we've commented:
   $nids = array_keys($subscriptions);
-  $result = db_query("
-    SELECT nid FROM {comments}
-      WHERE
-        nid IN (
-          SELECT ". ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-               ."value". ($GLOBALS['db_type'] == 'pgsql' ? ' AS INTEGER)' : '')
-                    ." FROM {subscriptions} WHERE module = 'node' AND field = 'nid' AND recipient_uid = %d
-        )
-        AND uid = %d GROUP BY nid", $uid, $uid);
-  while ($c = db_fetch_array($result)) {
-    if (isset($subscriptions[$c['nid']])) {
-      foreach ($subscriptions[$c['nid']] as $author_uid => $subscription) {
-        $subscriptions[$c['nid']][$author_uid]['commented'] = TRUE;
+  $select = db_select('subscriptions', 's')
+    ->fields('value')
+    ->condition('module', 'node')
+    ->condition('field', 'nid')
+    ->condition('recipient_uid', $uid);
+  $result = db_select('comments', 'c')
+    ->condition('nid', $select, 'IN')
+    ->condition('uid', $uid)
+    ->groupBy('nid')
+    ->execute();
+  foreach($result as $c) {
+    if (isset($subscriptions[$c->nid])) {
+      foreach ($subscriptions[$c->nid] as $author_uid => $subscription) {
+        $subscriptions[$c->nid][$author_uid]['commented'] = TRUE;
       }
     }
   }
@@ -883,10 +899,10 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
       if ($title != $subscription['title']) {
         $title .= '...';
       }
-      $title = l($title, 'node/'. $subscription['nid']);
+      $title = l($title, 'node/' . $subscription['nid']);
       if (!$subscription['status']) {
         if (user_access('administer nodes')) {
-          $title = SUBSCRIPTIONS_UNAVAILABLE .'&nbsp;'. $title;
+          $title = SUBSCRIPTIONS_UNAVAILABLE . '&nbsp;' . $title;
         }
         else {
           continue;
@@ -916,15 +932,15 @@ function subscriptions_content_node_form(&$form_state, $account, $form) {
     $form['field'] = array('#type' => 'value', '#value' => 'nid');
     $form['submit'] = array('#type' => 'submit', '#value' => t('Save'), '#weight' => 10);
     $form['#submit'][] = 'subscriptions_page_form_submit';
-    $form['note'] = array('#type' => 'item', '#description' => '<div>'. t('Note: Deactivated subscriptions will be removed from the list.') .'</div>' );
-    $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
+    $form['note'] = array('#type' => 'item', '#description' => '<div>' . t('Note: Deactivated subscriptions will be removed from the list.') . '</div>' );
+    $form['pager'] = array('#value' => theme('pager', array('tags' => NULL, 'element' => 0, 'quantity' => 50)));
   }
   else {
     unset($form['header']);
     unset($form['footer']);
     $form['notice'] = array(
       '#type' => 'item',
-      '#value' => t('There are no subscribed pages.'),
+      '#value' => t('There are no subscribed pages. '),
       '#weight' => 10,
     );
   }
@@ -943,18 +959,23 @@ function subscriptions_content_page_type($account, $form) {
  *
  * @ingroup form
  */
-function subscriptions_content_type_form(&$form_state, $account, $form) {
+function subscriptions_content_type_form($form, &$form_state, $account, $form) {
   $uid = (isset($account) ? $account->uid : (is_numeric(arg(5)) ? -arg(5) : -DRUPAL_AUTHENTICATED_RID));
   $unlisteds = variable_get('subscriptions_unlisted_content_types', array());
   $blockeds = variable_get('subscriptions_blocked_content_types', array());
   $omits = array_merge($unlisteds, $blockeds);
-  $result = db_query(db_rewrite_sql("
-    SELECT s.value, s.send_interval, s.author_uid, s.send_comments, s.send_updates, nt.type, nt.name
-    FROM {subscriptions} s
-    INNER JOIN {node_type} nt ON s.value = nt.type
-    WHERE s.module = 'node' AND s.field = 'type' AND s.recipient_uid = %d
-    ORDER BY s.author_uid", 'nt', 'type'), $uid);
-  while ($s = db_fetch_array($result)) {
+  $query = sb_select('subscriptions', 's', PDO::FETCH_ASSOC);
+  $nt_alias = $query->join('node_type', 'nt', 's.value = nt.type');
+  $result = $query
+    ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
+    ->fields(nt_alias, array('type', 'name'))
+    ->condition('s.module', 'node')
+    ->condition('s.field', 'type')
+    ->condition('s.recipient_uid', $uid)
+    ->addTag('node_type_access')
+    ->orderBy('s.author_uid')
+    ->execute();
+  foreach ($result as $s) {
     $subscriptions[$s['value']][$s['author_uid']] = $s;
   }
   $form[0] = array(
@@ -964,16 +985,16 @@ function subscriptions_content_type_form(&$form_state, $account, $form) {
     '#theme' => 'subscriptions_form_table',
   );
   $intervals = _subscriptions_send_intervals();
-  foreach (node_get_types() as $type) {
+  foreach (node_type_get_types() as $type) {
     // add the active subscriptions
     $type_name = check_plain($type->name);
     if (in_array($type->type, $omits)) {
       if (user_access('subscribe to all content types') || user_access('administer site configuration')) {
         if (in_array($type->type, $blockeds)) {
-          $type_name = '<span class="error" title="'. t('This !content_type is blocked.', array('!content_type' => t('content type'))) .'">'. $type_name .'</span>&nbsp;'. SUBSCRIPTIONS_UNAVAILABLE;
+          $type_name = '<span class="error" title="' . t('This !content_type is blocked. ', array('!content_type' => t('content type'))) . '">' . $type_name . '</span>&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE;
         }
         else {
-          $type_name = $type_name .'&nbsp;'. SUBSCRIPTIONS_UNAVAILABLE;
+          $type_name = $type_name . '&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE;
         }
       }
       else {
@@ -1009,14 +1030,14 @@ function subscriptions_content_type_form(&$form_state, $account, $form) {
     $form['#submit'][] = 'subscriptions_page_form_submit';
   }
   else {
-    $form['header']['#value'] = t('There are no available !subs_types.', array('!subs_types' => t('content types')));
+    $form['header']['#value'] = t('There are no available !subs_types. ', array('!subs_types' => t('content types')));
     unset($form['footer']);
   }
   return $form;
 }
 
 /**
- * Implementation of hook_mailkeys().
+ * Implements hook_mailkeys().
  *
  * Provide mailkeys for mail_edit.
  *
@@ -1024,14 +1045,14 @@ function subscriptions_content_type_form(&$form_state, $account, $form) {
  */
 function subscriptions_content_mailkeys() {
   $mailkeys['node-nid'] = t('Notifications for %Pages (update/comment) subscriptions', array('%Pages' => t('Pages/Threads')));
-  foreach (array_keys(node_get_types()) as $type) {
-    $mailkeys['node-type-'. $type] = t('Notifications for %type !content_type subscriptions', array('%type' => $type, '!content_type' => t('content type')));
+  foreach (array_keys(node_type_get_types()) as $type) {
+    $mailkeys['node-type-' . $type] = t('Notifications for %type !content_type subscriptions', array('%type' => $type, '!content_type' => t('content type')));
   }
   return $mailkeys;
 }
 
 /**
- * Implementation of hook_mail_edit_tokens_list().
+ * Implements hook_mail_edit_tokens_list().
  *
  * Provide replacable tokens for mail_edit.
  *
@@ -1043,7 +1064,7 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
   switch ($mailkey) {
     case 'comments':
       $tokens += array(
-        '!comment_name'         => t('The name of the comment author.'),
+        '!comment_name'         => t('The name of the comment author. '),
       );
       if (module_exists('realname')) {
         $tokens += array(
@@ -1076,7 +1097,7 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         '!sender_page'         => t('The user page of the sender (if the sender is visible).'),
         '!sender_has_contact_page' => t("The sender's contact setting: 1 = contact form enabled, 0 = disabled."),
         '!sender_contact_page' => t('The contact page of the sender.'),
-        '!sender_uid'          => t('The ID of the sender (even if the sender is not visible!) (0 = %anonymous).', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+        '!sender_uid'          => t('The ID of the sender (even if the sender is not visible!) (0 = %anonymous). ', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
         '!subs_type'           => t("The type of the subscription, like '!thread' or '!category'.", array('!thread' => t('thread'), '!category' => $tr('category'))),
         '!node_type'           => t("The type of the node, like '!forum' or '!story'.", array('!forum' => 'forum', '!story' => 'story')),
         '!revision_name'       => t('The name of the user who made the last change to the node.'),
@@ -1093,7 +1114,7 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
       $tokens += module_invoke_all('subscriptions_tokens_list', $mailkey, array('tokens' => $tokens));
 
       if ($mailkey != 'digest') {
-        $tokens['!full_node']  =  t('The full node as it appears on the website (must be specifically enabled !here).', array('!here' => l(t('here'), 'admin/settings/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node'))));
+        $tokens['!full_node']  =  t('The full node as it appears on the website (must be specifically enabled !here). ', array('!here' => l(t('here'), 'admin/config/subscriptions', array('fragment' => 'edit-subscriptions-generate-full-node'))));
       }
       $tokens += array(
         '!url'                 => t('The URL of the item.'),
@@ -1104,21 +1125,21 @@ function subscriptions_content_mail_edit_tokens_list($mailkey, $options = array(
         '!has_files'           => t('The presence of attached files or img_assist images: 1 = files are available in !files, 0 = no files.'),
         '!files'               => t('The list of attached files, one per line, if any, otherwise empty.'),
         '!has_new_comments'    => t('The comments state: 1 = comments are available in !comments, 0 = no comments.'),
-        '!comments'            => t('One or more comments if available, otherwise empty.') .'<br />',
+        '!comments'            => t('One or more comments if available, otherwise empty.') . '<br />',
       );
       if ($mailkey == 'node-nid' || $mailkey == 'digest') {
         $tokens['!comments'] = $tokens['!comments'] . t('The rendering of the comments is defined by the template below.');
       }
       else {
         $tokens['!comments'] = $tokens['!comments'] . t('The rendering of the comments is defined by the !link.', array(
-                                                          '!link' => '<a href="../subscriptions_content_node-nid/'. check_plain(arg(4)) .'#edit-comment-body">'. t('comment templates') .'</a>'));
+                                                          '!link' => '<a href="../subscriptions_content_node-nid/' . check_plain(arg(4)) . '#edit-comment-body">' . t('comment templates') . '</a>'));
       }
   }
   return $tokens;
 }
 
 /**
- * Implementation of hook_mail_edit_text().
+ * Implements hook_mail_edit_text().
  *
  * Provide default template strings for mail_edit.
  *
@@ -1132,7 +1153,7 @@ function subscriptions_content_mail_edit_text($mailkey, $language) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Add the comment parts to the subscriptions_content_node-nid mail_edit page.
  *
@@ -1146,7 +1167,7 @@ function subscriptions_content_form_mail_edit_trans_alter(&$form, &$form_state) 
     $langcode = $form['language']['#value'];
 
     $form['mail']['note'] = array(
-      '#value' => '<div>'. t("Note: 'new' and 'update' notifications for %Pages subscriptions use the matching !content_type subscriptions template rather than this one, if allowed; this does not apply to 'comment'-only notifications.", array('%Pages' => t('Pages/Threads'), '!content_type' => t('content type'))) .'</div>',
+      '#value' => '<div>' . t("Note: 'new' and 'update' notifications for %Pages subscriptions use the matching !content_type subscriptions template rather than this one, if allowed; this does not apply to 'comment'-only notifications.", array('%Pages' => t('Pages/Threads'), '!content_type' => t('content type'))) . '</div>',
       '#weight' => -1,
     );
 
@@ -1164,8 +1185,8 @@ function subscriptions_content_form_mail_edit_trans_alter(&$form, &$form_state) 
     // Display the user documentation of placeholders supported by this module mailkey
     $doc = "<dl>\n";
     foreach ($placeholders as $name => $description) {
-      $doc .= '<dt>'. $name .'</dt>';
-      $doc .= '<dd>'. $description .'</dd>';
+      $doc .= '<dt>' . $name . '</dt>';
+      $doc .= '<dd>' . $description . '</dd>';
     }
     $doc .= "</dl>\n";
     $form['mail']['comment_token_help'] = array(
@@ -1207,11 +1228,14 @@ function subscriptions_content_form_mail_edit_trans_save($form, &$form_state) {
  * Delete handler for enhanced mail_edit page.
  */
 function subscriptions_content_form_mail_edit_trans_delete($form, &$form_state) {
-  db_query("DELETE FROM {mail_edit} WHERE id = '%s' AND language = '%s'", $form_state['values']['id'] .'+comment', $form_state['values']['language']);
+  db_delete('mail_edit')
+  ->condition('id', $form_state['values']['id'] . '+comment')
+  ->condition('language', $form_state['values']['language'])
+  ->execute();
 }
 
 /**
- * Implementation of hook_node_type().
+ * Implements hook_node_type().
  *
  * Remove node type subscriptions when the underlying node type is removed.
  *
@@ -1221,19 +1245,27 @@ function subscriptions_content_node_type($op, $info) {
   switch ($op) {
     case 'delete':
       $type = $info->type;
-      db_query("DELETE FROM {subscriptions_queue} WHERE module = 'node' AND field = 'type' AND value = '%s'", $type);
-      db_query("DELETE FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value = '%s'", $type);
+      db_delete('subscriptions_queue')
+        ->condition('module', 'node')
+        ->condition('field', 'type')
+        ->condition('value', $type)
+        ->execute();
+      db_delete('subscriptions')
+        ->condition('module', 'node')
+        ->condition('field', 'type')
+        ->condition('value', $type)
+        ->execute();
       foreach (array('blocked', 'unlisted') as $key) {
-        $array = variable_get('subscriptions_'. $key .'_content_types', array());
+        $array = variable_get('subscriptions_' . $key . '_content_types', array());
         unset($array[$type]);
-        variable_set('subscriptions_'. $key .'_content_types', $array);
+        variable_set('subscriptions_' . $key . '_content_types', $array);
       }
       break;
   }
 }
 
 /**
- * Implementation of hook_cron().
+ * Implements hook_cron().
  *
  * Ensure that we're heavier than the taxonomy.module.
  *
@@ -1241,22 +1273,30 @@ function subscriptions_content_node_type($op, $info) {
  */
 function subscriptions_content_cron() {
   $result = db_query("SELECT name, weight FROM {system} WHERE name IN ('taxonomy', 'subscriptions_content') AND type = 'module'");
-  while ($module = db_fetch_array($result)) {
-    $weights[$module['name']] = $module['weight'];
+  foreach ($result as $module) {
+    $weights[$module->name] = $module->weight;
   }
   if ($weights['subscriptions_content'] <= $weights['taxonomy']) {
-    db_query("UPDATE {system} SET weight = %d WHERE name = 'subscriptions_content' AND type = 'module'", $weights['taxonomy'] + 1);
+    db_update('system')
+      ->fields(array(
+          'weight' => $weights['taxonomy'] + 1,
+        ))
+      ->condition('name', 'subscriptions_content')
+      ->condition('type', 'module')
+      ->execute();
   }
 }
 
 /**
- * Implementation of hook_disable().
+ * Implements hook_disable().
  *
  * Remove our queue items.
  *
  * @ingroup hooks
  */
 function subscriptions_content_disable() {
-  db_query("DELETE FROM {subscriptions_queue} WHERE load_function LIKE 'subscriptions_content_%'");
+  db_delete('subscriptions_queue')
+    ->condition('load_function', 'subscriptions_content_%', 'LIKE')
+    ->execute();
 }
 

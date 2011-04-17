@@ -6,13 +6,13 @@
  */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function subscriptions_mail_install() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function subscriptions_mail_uninstall() {
   variable_del('subscriptions_mail_trash_silently');

@@ -6,12 +6,12 @@
  */
 
 /**
- * Implementation of hook_subscriptions().
+ * Implements hook_subscriptions().
  *
  * @ingroup hooks
  */
 function subscriptions_blog_ui_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $arg2 = NULL) {
-  $function = '_subscriptions_blog_ui_'. $op;
+  $function = '_subscriptions_blog_ui_' . $op;
   if (function_exists($function)) {
     return $function($arg0, $arg1, $arg2);
   }
@@ -37,7 +37,9 @@ function _subscriptions_blog_ui_types() {
   $tr = 't';
   $types['blog'] = array(
     'title' => $tr('Blogs'),
-    'access' => 'subscribe to blogs',
+    'access' => array('subscribe to blogs' => array(
+      'title' => t('Subscribe to blogs'),
+    )),
     'page' => 'subscriptions_blog_ui_page_blog',
     'fields' => array('blog', 'author_uid'),
     'weight' => -3,
@@ -54,18 +56,19 @@ function _subscriptions_blog_ui_types() {
 function subscriptions_blog_ui_page_blog($account, $form) {
   $blogs = array();
   // get the blogs
-  $sql = db_rewrite_sql("
-    SELECT u.uid, u.name
-    FROM {node} n
-    INNER JOIN {users} u ON n.uid = u.uid
-    WHERE n.type = 'blog' AND n.status = 1
-    GROUP BY u.uid, u.name
-    ORDER BY u.name");
-  $result = db_query($sql);
-  while ($usr = db_fetch_array($result)) {
-    $blogs[$usr['uid']] = array(
-      'uid' => $usr['uid'],
-      'name' => $usr['name'],
+  $query = db_select('node', 'n');
+  $user_alias = $query->join('user', 'u', 'n.uid = u.uid');
+  $result = $query
+    ->fields($user_alias, array('uid', 'name'))
+    ->condition('n.type', 'blog')
+    ->condition('n.status', 1)
+    ->groupBy(array('u.uid', 'u.name'))
+    ->orderBy(array('u.name'))
+    ->execute();
+  foreach ($result as $usr) {
+    $blogs[$usr->uid] = array(
+      'uid' => $usr->uid,
+      'name' => $usr->name,
       'has_blog' => TRUE,
     );
   }
@@ -97,7 +100,7 @@ function subscriptions_blog_ui_page_blog($account, $form) {
  *
  * @ingroup form
  */
-function subscriptions_blog_ui_blog_form(&$form_state, $blogs, $account, $form) {
+function subscriptions_blog_ui_blog_form($form, &$form_state, $blogs, $account, $form) {
   $uid = (isset($account) ? $account->uid : (is_numeric(arg(5)) ? -arg(5) : -DRUPAL_AUTHENTICATED_RID));
   $subscriptions = array();
   $result = db_query("
@@ -118,7 +121,7 @@ function subscriptions_blog_ui_blog_form(&$form_state, $blogs, $account, $form) 
 
   $intervals = _subscriptions_send_intervals();
   foreach ($blogs as $blog) {
-    $title = ($blog['has_blog'] ? l($blog['name'], 'blog/'. $blog['uid']) : $blog['name']);
+    $title = ($blog['has_blog'] ? l($blog['name'], 'blog/' . $blog['uid']) : $blog['name']);
     // add the active subscriptions
     if (!isset($subscriptions[$blog['uid']])) {
       // author-less item is missing -- add it here:
@@ -148,11 +151,11 @@ function subscriptions_blog_ui_blog_form(&$form_state, $blogs, $account, $form) 
 }
 
 /**
- * Implementation of hook_count_user_subscriptions().
+ * Implements hook_count_user_subscriptions().
  *
  * @ingroup hooks
  */
 function subscriptions_blog_ui_count_user_subscriptions($counts, $uid) {
-  $counts['blog']['author_uid'] = db_result(db_query("SELECT count(*) FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value = 'blog' AND recipient_uid = %d", $uid));
+  $counts['blog']['author_uid'] = db_query("SELECT count(*) FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value = 'blog' AND recipient_uid = :recipient_uid", array(':recipient_uid' => $uid))->fetchField();
   return $counts;
 }

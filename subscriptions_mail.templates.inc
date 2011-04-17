@@ -13,16 +13,16 @@ function subscriptions_mail_template_raw($key, $langcode) {
 
     case 'SEP':      return // SUBSCRIPTIONS_DEFAULT_SEPARATOR
 t('| --------------------------------------------------------------------
-', array(), $langcode);
+', array(), array('langcode' => $langcode));
 
     case 'SUBJ':     return // SUBSCRIPTIONS_DEFAULT_SUBJECT
-t('[!site] !subs_type subscription for !name: !title', array(), $langcode);
+t('[!site] !subs_type subscription for !name: !title', array(), array('langcode' => $langcode));
 
     case 'FOOT':     return // SUBSCRIPTIONS_DEFAULT_FOOTER
 t('| This is an automated message. Please do NOT reply to the sender address!
 | To manage your subscriptions go to
 | !manage_url
-', array(), $langcode);
+', array(), array('langcode' => $langcode));
 
     case 'BODY':     return // SUBSCRIPTIONS_DEFAULT_BODY
 t('| Greetings, !name.
@@ -43,7 +43,7 @@ t('| Greetings, !name.
 }}| Link: !url
 | Direct unsubscribe link (!subs_type):
 | !unsubscribe_url
-{{!has_new_comments==1?!SEPARATOR!comments:}}!SEPARATOR!FOOTER', array('!SEPARATOR' => subscriptions_mail_template_raw('SEP', $langcode), '!FOOTER' => subscriptions_mail_template_raw('FOOT', $langcode)), $langcode);
+{{!has_new_comments==1?!SEPARATOR!comments:}}!SEPARATOR!FOOTER', array('!SEPARATOR' => subscriptions_mail_template_raw('SEP', $langcode), '!FOOTER' => subscriptions_mail_template_raw('FOOT', $langcode)), array('langcode' => $langcode));
 
     case 'CITEM':    return // SUBSCRIPTIONS_DEFAULT_COMMENT_ITEM
 t('| {{!comment_is_new==1?New:Updated}} {{!comment_is_published==1?:UNPUBLISHED }}comment:
@@ -53,10 +53,10 @@ t('| {{!comment_is_new==1?New:Updated}} {{!comment_is_published==1?:UNPUBLISHED 
 !comment_text
 
 | Link: !comment_url
-', array(), $langcode);
+', array(), array('langcode' => $langcode));
 
     case 'DSUBJ':    return // SUBSCRIPTIONS_DEFAULT_DIGEST_SUBJECT
-t('[!site] Subscription Digest for !name', array(), $langcode);
+t('[!site] Subscription Digest for !name', array(), array('langcode' => $langcode));
 
     case 'DBODY':    return // SUBSCRIPTIONS_DEFAULT_DIGEST_BODY
 t('| Greetings, !name.
@@ -64,7 +64,7 @@ t('| Greetings, !name.
 | Your subscriptions on !site
 | notify you of the following changes since the previous digest:
 |
-!bodies!SEPARATOR!FOOTER', array('!SEPARATOR' => subscriptions_mail_template_raw('SEP', $langcode), '!FOOTER' => subscriptions_mail_template_raw('FOOT', $langcode)), $langcode);
+!bodies!SEPARATOR!FOOTER', array('!SEPARATOR' => subscriptions_mail_template_raw('SEP', $langcode), '!FOOTER' => subscriptions_mail_template_raw('FOOT', $langcode)), array('langcode' => $langcode));
 
     case 'DITEM':    return // SUBSCRIPTIONS_DEFAULT_DIGEST_ITEM_BODY
 t('{{!sender_name==!sender_name?:| Author: !sender_name
@@ -73,11 +73,11 @@ t('{{!sender_name==!sender_name?:| Author: !sender_name
 }}| Link: !url
 | Direct unsubscribe link (!subs_type):
 | !unsubscribe_url
-{{!has_new_comments!=1?:!comments}}', array(), $langcode);
+{{!has_new_comments!=1?:!comments}}', array(), array('langcode' => $langcode));
 
     case 'DITEMCMT': return // SUBSCRIPTIONS_DEFAULT_DIGEST_ITEM_BODY_COMMENT
 t('| Comment: !comment_title
-', array(), $langcode);
+', array(), array('langcode' => $langcode));
 
   }
 }
@@ -93,7 +93,7 @@ function subscriptions_mail_template($key, $langcode) {
 /**
  * Retrieve a mail template, either from the mail_edit table or take
  * our default template in this file, passing it through t().
- * 
+ *
  * @param string $mailkey
  *  the full mailkey, used as id in the mail_edit table
  * @param string $langcode
@@ -106,13 +106,11 @@ function subscriptions_mail_template($key, $langcode) {
  *  the key for calling subscriptions_mail_template() to retrieve the
  *  default template, if there's no match in the mail_edit table
  */
-function subscriptions_mail_template_load($mailkey, $langcode, $part, $key)
-{
+function subscriptions_mail_template_load($mailkey, $langcode, $part, $key) {
   if (module_exists('mail_edit')) {
     static $cache = array();
-    if (!isset($cache[$langcode][$mailkey]))
-    {
-      $cache[$langcode][$mailkey] = db_fetch_object(db_query("SELECT * FROM {mail_edit} WHERE id = '%s' and language = '%s'", $mailkey, $langcode));
+    if (!isset($cache[$langcode][$mailkey])) {
+      $cache[$langcode][$mailkey] = db_fetch_object(db_query("SELECT * FROM {mail_edit} WHERE id = :id and language = :language", array(':id' => $mailkey, ':language' => $langcode)));
     }
     if (isset($cache[$langcode][$mailkey]->$part)) {
       return $cache[$langcode][$mailkey]->$part;

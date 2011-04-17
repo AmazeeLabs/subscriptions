@@ -1,5 +1,5 @@
 
-README.txt for Subscriptions 6.x-1.x
+README.txt for Subscriptions 7.x-1.x
 
 
 
@@ -14,6 +14,7 @@ Acknowledgements
 Subscriptions 5.x-2.0 has been rewritten from scratch by chx and salvis.
 Ported to Drupal 6 and continuously enhanced by salvis.
 Doxygen documentation by develCuy, sponsored by www.transit.york.ac.uk.
+Ported to Drupal 7 by salvis.
 
 http://drupalcontrib.org/drupal-6-modules provides on-line developer documentation.
 
@@ -28,18 +29,6 @@ Initial Translations:
 - Brazilian Portuguese: Márcio Moreira
 - Hungarian:            muczy
 - Arabic:               N2H
-
-Contributed Modules:
--
-
-Known independent add-on modules:
-- subscriptions_author:  by develCuy, sponsored by www.transit.york.ac.uk.
-- subscriptions_og:      by develCuy, sponsored by www.transit.york.ac.uk.
-
-The Organic Groups Subscriptions module has been developed independently.
-Special care was taken to document the Subscriptions APIs that need to be
-implemented and used for a non-trivial add-on module. As such it is an
-example for building other add-on modules.
 
 
 
@@ -63,10 +52,18 @@ out emails, if your provider imposes limits on what you can do with PHP mail.
 
 
 
+Upgrading from 6.x-1.x
+----------------------
+
+Subscriptions D7 is designed to smoothly upgrade a 6.x-1.4 installation.
+
+
+
+
 Upgrading from 5.x-1.x
 ----------------------
 
-Subscriptions D6 is designed to smoothly upgrade and convert a 1.x 
+Subscriptions D6 is designed to smoothly upgrade and convert a 1.x
 installation. If you currently have 1.x installed, we recommend to put
 your site in maintenance mode, remove the 1.x files (if you only move
 them to a different directory under the web root, Drupal will still find

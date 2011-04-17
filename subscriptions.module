@@ -18,18 +18,18 @@
  */
 
 /**
- * Implementation of hook_init().
+ * Implements hook_init().
  *
  * @ingroup hooks
  * @ingroup init
  */
 function subscriptions_init() {
-  define('SUBSCRIPTIONS_UNAVAILABLE', '<span class="error" title="'. t('(unavailable to regular users)') .'">&curren;</span>');
+  define('SUBSCRIPTIONS_UNAVAILABLE', '<span class="error" title="' . t('(unavailable to regular users)') . '">&curren;</span>');
   if (arg(0) == 'subscriptions' || arg(2) == 'subscriptions') {
-    include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.admin.inc';  // TODO: do we need this?
+    include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.admin.inc'; // TODO: do we need this?
   }
   if (arg(0) == 's' && arg(1) == 'del') {
-    $router_item = menu_get_item('subscriptions/rem/'. substr($_GET['q'], 6));
+    $router_item = menu_get_item('subscriptions/rem/' . substr($_GET['q'], 6));
     if (isset($router_item) && $router_item['access']) {
       menu_set_item($_GET['q'], $router_item);
     }
@@ -37,7 +37,7 @@ function subscriptions_init() {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  *
  * @ingroup hooks
  * @ingroup menu
@@ -45,19 +45,19 @@ function subscriptions_init() {
 function subscriptions_menu() {
   global $user;  // we need the user to to build some urls
 
-  $items['admin/settings/subscriptions'] = array(
+  $items['admin/config/subscriptions'] = array(
     'title' => 'Subscriptions',
     'description' => 'Enables site settings for user subscriptions.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('subscriptions_settings_form'),
     'access arguments' => array('administer site configuration'),
   );
-  $items['admin/settings/subscriptions/settings'] = array(
+  $items['admin/config/subscriptions/settings'] = array(
     'title' => 'Site settings',
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/settings/subscriptions/userdefaults'] = array(
+  $items['admin/config/subscriptions/userdefaults'] = array(
     'title' => 'User defaults',
     'weight' => -5,
     'page callback' => 'subscriptions_page_user_overview',
@@ -65,12 +65,12 @@ function subscriptions_menu() {
     'type' => MENU_LOCAL_TASK,
     'access arguments' => array('administer site configuration'),
   );
-  $items['admin/settings/subscriptions/userdefaults/settings'] = array(
+  $items['admin/config/subscriptions/userdefaults/settings'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'title' => 'Overview',
     'weight' => -10,
   );
-  $items['admin/settings/subscriptions/intervals'] = array(
+  $items['admin/config/subscriptions/intervals'] = array(
     'title' => 'Interval',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('subscriptions_intervals'),
@@ -105,14 +105,14 @@ function subscriptions_menu() {
 
   foreach (subscriptions_types() as $stype => $data) {
     $weight = (isset($data['weight']) ? $data['weight'] : 0);
-    $items['subscriptions/add/'. $stype] = array(
+    $items['subscriptions/add/' . $stype] = array(
       'title' => 'Add subscription',
       'type' => MENU_CALLBACK,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('subscriptions_add_form', $stype),
       'access arguments' => array($data['access']),
     );
-    $items['subscriptions/del/'. $stype] = array(
+    $items['subscriptions/del/' . $stype] = array(
       'type' => MENU_CALLBACK,
       'page callback' => 'drupal_get_form',
       'page arguments' => array('subscriptions_del_form', $stype),
@@ -122,7 +122,7 @@ function subscriptions_menu() {
     if (empty($data['page'])) {
       continue;  // no page
     }
-    $items['user/%user/subscriptions/'. $stype] = array(
+    $items['user/%user/subscriptions/' . $stype] = array(
       'title' => $data['title'],
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',
@@ -135,8 +135,8 @@ function subscriptions_menu() {
 
     if ($hide_overview_page && $minimum_weight == $weight) {
       // Install the first subscription type page as the default task.
-      $items['user/%user/subscriptions/'. $stype]['type'] = MENU_DEFAULT_LOCAL_TASK;
-      $default_item = $items['user/%user/subscriptions/'. $stype];
+      $items['user/%user/subscriptions/' . $stype]['type'] = MENU_DEFAULT_LOCAL_TASK;
+      $default_item = $items['user/%user/subscriptions/' . $stype];
       $items['user/%user/subscriptions'] = array_merge($items['user/%user/subscriptions'], array(
         'file' => $default_item['file'],
         'page callback' => $default_item['page callback'],
@@ -150,7 +150,7 @@ function subscriptions_menu() {
     if ($stype == 'node') {
       continue;  // not in site settings
     }
-    $items['admin/settings/subscriptions/userdefaults/'. $stype] = array(
+    $items['admin/config/subscriptions/userdefaults/' . $stype] = array(
       'title' => $data['title'],
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',
@@ -195,48 +195,84 @@ function _subscriptions_access($account, $access = NULL) {
 }
 
 /**
- * Implementation of hook_perms().
+ * Implements hook_permission().
  *
  * @ingroup hooks
  */
-function subscriptions_perm() {
-  return array_merge(array('administer user subscriptions', 'subscribe to all content types'), subscriptions_types('access'));
-  t('administer user subscriptions');
-  t('subscribe to all content types');
+function subscriptions_permission() {
+  $placeholder_key = 'subscribe to all content types';
+  $return = array_merge(
+    array(
+      'administer user subscriptions' => array(
+        'title' => t('Administer user subscriptions'),
+        'description' => t('Administer the subscriptions of all other users.'),
+        'restrict access' => TRUE,
+      ),
+      $placeholder_key => array(),
+    ),
+    subscriptions_types('access')
+  );
+  if (!$return[$placeholder_key]) {
+    unset($return[$placeholder_key]);
+  }
+  return $return;
 }
 
 /**
- * Implementation of hook_user().
+ * Implements hook_user_insert().
  *
  * @ingroup hooks
  */
-function subscriptions_user($type, $edit, &$account, $category = NULL) {
-  static $new_uid = 0;
-  switch ($type) {
-    case 'insert':
-      db_query("INSERT INTO {subscriptions_user} (uid) VALUES(%d)", $account->uid);
-      // $account->roles isn't set yet, but we'll be called again with 'load'
-      $new_uid = $account->uid;
-      break;
+function subscriptions_user_insert($edit, &$account, $category) {
+  $new_uid = &drupal_static('subscriptions_user_insert', 0);
+  db_insert('subscriptions_user')
+    ->values(array(
+      'uid' => $account->uid,
+    ))
+    ->execute();
+  // $account->roles isn't set yet, but we'll be called again with 'load'
+  $new_uid = $account->uid;
+}
 
-    case 'load':
-      if ($new_uid && $account->uid == $new_uid) {
-        foreach (array_keys($account->roles) as $rid) {
-          $rids[] = -$rid;
-        }
-        db_query("INSERT INTO {subscriptions} (module, field, value, recipient_uid, send_interval, author_uid, send_updates, send_comments)
-                  SELECT module, field, value, %d, send_interval, author_uid, send_updates, send_comments FROM {subscriptions}
-                  WHERE recipient_uid IN (%s)", $account->uid, implode(',', $rids));
-        $new_uid = 0;
-      }
-      break;
-
-    case 'delete':
-      db_query("DELETE FROM {subscriptions_user} WHERE uid = %d", $account->uid);
-      db_query("DELETE FROM {subscriptions} WHERE recipient_uid = %d", $account->uid);
-      db_query("DELETE FROM {subscriptions_last_sent} WHERE uid = %d", $account->uid);
-      break;
+/**
+ * Implements hook_user_load().
+ *
+ * @ingroup hooks
+ */
+function subscriptions_user_load($users) {
+  $new_uid = &drupal_static('subscriptions_user_insert', 0);
+  if (isset($users[$new_uid])) {
+    foreach (array_keys($users[$new_uid]->roles) as $rid) {
+      $rids[] = -$rid;
+    }
+    $query = db_select('subscriptions', 's')
+      ->fields('s', array('module', 'field', 'value'));
+    $query->addExpression($new_uid);
+    $query
+      ->fields('s', array('send_interval', 'author_uid', 'send_updates', 'send_comments'))
+      ->condition('recipient_uid', $rids, 'IN');
+    db_insert('subscriptions')
+      ->values($query)
+      ->execute();
+    $new_uid = 0;
   }
+}
+
+/**
+ * Implements hook_user_delete().
+ *
+ * @ingroup hooks
+ */
+function subscriptions_user_delete($account) {
+  db_delete('subscriptions_user')
+    ->condition('uid', $account->uid)
+    ->execute();
+  db_delete('subscriptions')
+    ->condition('recipient_uid', $account->uid)
+    ->execute();
+  db_delete('subscriptions_last_sent')
+    ->condition('uid', $account->uid)
+    ->execute();
 }
 
 /**
@@ -261,7 +297,7 @@ function subscriptions_write($access_key, $module, $field, $value, $author_uid =
 function subscriptions_queue($event) {
   global $user;
 
-  if (isset($event['node']->nid) && strpos('  '. variable_get('subscriptions_blocked_nodes', '') .' ', ' '. $event['node']->nid .' ')) {
+  if (isset($event['node']->nid) && strpos('  ' . variable_get('subscriptions_blocked_nodes', '') . ' ', ' ' . $event['node']->nid . ' ')) {
     return;
   }
 
@@ -271,7 +307,7 @@ function subscriptions_queue($event) {
   );
 
   foreach (module_implements('subscriptions_queue_alter') as $module) {
-    $function = $module .'_subscriptions_queue_alter';
+    $function = $module . '_subscriptions_queue_alter';
     $function($event);
     if (empty($event)) {
       return;  // $event was cleared, forget it
@@ -283,7 +319,7 @@ function subscriptions_queue($event) {
   }
   if (!empty($event['noqueue_uids'])) {
     // Allow hook_subscriptions_queue_alter() modules to set uids that won't get any notifications queued:
-    $noqueue_uids_where = "s.recipient_uid NOT IN (". implode(', ', array_fill(0, count($event['noqueue_uids']), '%d')) .")";
+    $noqueue_uids_where = "s.recipient_uid NOT IN (" . implode(', ', array_fill(0, count($event['noqueue_uids']), '%d')) . ")";
   }
 
   foreach (module_implements('subscriptions') as $subs_module) {
@@ -293,26 +329,11 @@ function subscriptions_queue($event) {
     }
     foreach ($subs_module_query as $module => $module_query) {
       foreach ($module_query as $field => $query) {
+        //TODO: if any of $join, $where, $args are assigned, this doesn't work!
         $join = empty($query['join']) ? '' : $query['join'];
         $where = empty($query['where']) ? array() : array($query['where']);
-        $args = array($event['load_function'], $event['load_args'], $event['is_new'], $module, $field);
-        $groupby = empty($query['groupby']) ? '' : $query['groupby'];
-        // author-specific subscriptions trigger on comments, when the node author is subscribed to:
-        $args[] = ($module == 'node' && $event['type'] == 'comment' && isset($event['node']->uid) ? $event['node']->uid : $event['uid']);
-        if (!empty($query['value'])) {
-          $where[] = "s.value = '%s'";
-          $args[] = $query['value'];
-        }
         if (!empty($query['args'])) {
           $args = array_merge($args, $query['args']);
-        }
-        if ($user->uid && !_subscriptions_get_setting('send_self', $user)) {
-          $where[] = "s.recipient_uid != %d";
-          $args[] = $user->uid;
-        }
-        if (!empty($event['noqueue_uids'])) {
-          $where[] = $noqueue_uids_where;
-          $args = array_merge($args, $event['noqueue_uids']);
         }
         $conditions = implode(' AND ', $where);
         $sql = "
@@ -326,15 +347,50 @@ function subscriptions_queue($event) {
           WHERE
             s.module = '%s' AND
             s.field = '%s' AND
-            s.author_uid IN (%d, -1) AND $conditions
-          $groupby";
-        $result = db_query($sql, $args);
-        $affected_rows = db_affected_rows();
+            s.author_uid IN (%d, -1) AND $conditions";
+
+        $select = db_select('subscriptions', 's');
+        $su_alias = $select->innerJoin('subscriptions_user', 'su', 's.recipient_uid = su.uid');
+        $u_alias = $select->innerJoin('user', 'u', 'su.uid = u.uid');
+        $select
+          ->fields('u', array('uid', 'name', 'language'))
+          ->fields('s', array('module', 'field', 'value', 'author_uid', 'send_interval'))
+          ->fields('su', array('digest'));
+        $select->addExpression('COALESCE(sls.last_sent, 0)');
+        $select->addExpression($event['load_function']);
+        $select->addExpression($event['load_args']);
+        $select->addExpression((int) $event['is_new']);
+        $select->addExpression('suspended');
+        $select
+          ->condition('s.module', $module)
+          ->condition('s.field', $field)
+          // author-specific subscriptions trigger on comments, when the node author is subscribed to:
+          ->condition('s.author_uid', array(($module == 'node' && $event['type'] == 'comment' && isset($event['node']->uid) ? $event['node']->uid : $event['uid']) , -1), 'IN');
+
+        if (!empty($query['value'])) {
+          $select
+            ->condition('s.value', $query['value']);
+        }
+
+        if ($user->uid && !_subscriptions_get_setting('send_self', $user)) {
+          $select
+            ->condition('s.recipient_uid', $user->uid, '<>');
+        }
+        if (!empty($event['noqueue_uids'])) {
+          // Allow hook_subscriptions_queue_alter() modules to set uids that won't get any notifications queued:
+          $select
+            ->condition('s.recipient_uid', $event['noqueue_uids'], 'NOT IN');
+        }
+        if (!empty($query['groupby'])) {
+          $select
+            ->groupBy($query['groupby']);  //TODO
+        }
+        $insert = db_insert('subscriptions_queue')
+          ->fields(array('uid', 'name', 'language', 'module', 'field', 'value', 'author_uid', 'send_interval', 'digest', 'last_sent', 'load_function', 'load_args', 'is_new', 'suspended'))
+          ->values($select);
+        $count = $insert->execute();
         /*  for debugging:
-        $sql = db_prefix_tables($sql);
-        _db_query_callback($args, TRUE);
-        $sql = preg_replace_callback(DB_QUERY_REGEXP, '_db_query_callback', $sql);
-        drupal_set_message("$sql<br />". $affected_rows .' row(s) inserted.');
+        drupal_set_message($insert->to_string() . '<br />' . $count . ' row(s) inserted.');
         /**/
       }
     }
@@ -348,8 +404,13 @@ function subscriptions_get_subscription($uid, $module, $field, $value, $author_u
   static $subscriptions;
 
   if (!isset($subscriptions[$uid][$module][$field][$value][$author_uid])) {
-    $sql = "SELECT sid FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d";
-    $subscriptions[$uid][$module][$field][$value][$author_uid] = db_result(db_query($sql, $module, $field, $value, $author_uid, $uid));
+    $subscriptions[$uid][$module][$field][$value][$author_uid] = db_query("SELECT sid FROM {subscriptions} WHERE module = :module AND field = :field AND value = :value AND author_uid = :author_uid AND recipient_uid = :recipient_uid", array(
+      ':module' => $module,
+      ':field' => $field,
+      ':value' => $value,
+      ':author_uid' => $author_uid,
+      ':recipient_uid' => $uid
+    ))->fetchField();
   }
 
   return $subscriptions[$uid][$module][$field][$value][$author_uid];
@@ -360,14 +421,31 @@ function subscriptions_get_subscription($uid, $module, $field, $value, $author_u
  */
 function subscriptions_get_full_subscription($uid, $module, $field, $value, $author_uid = -1) {
   $sql = "SELECT * FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d";
-  return db_fetch_object(db_query($sql, $module, $field, $value, $author_uid, $uid));
+  return db_fetch_object(db_query("SELECT * FROM {subscriptions} WHERE module = :module AND field = :field AND value = :value AND author_uid = :author_uid AND recipient_uid = :recipient_uid", array(
+    ':module' => $module,
+    ':field' => $field,
+    ':value' => $value,
+    ':author_uid' => $author_uid,
+    ':recipient_uid' => $uid
+  )));
 }
 
 /**
  * Create a subscription.
  */
 function subscriptions_write_subscription($module, $field, $value, $author_uid, $recipient_uid, $send_interval = 1, $send_updates = 0, $send_comments = 0) {
-  db_query("UPDATE {subscriptions} SET send_interval = %d, send_updates = %d, send_comments = %d WHERE module = '%s' AND field ='%s' AND value='%s' AND recipient_uid = %d AND author_uid = %d", $send_interval, $send_updates, $send_comments, $module, $field, $value, $recipient_uid, $author_uid);
+  db_update('subscriptions')
+    ->fields(array(
+      'send_interval' => $send_interval,
+      'send_updates' => $send_updates,
+      'send_comments' => $send_comments,
+    ))
+    ->condition('module', $module)
+    ->condition('field', $field)
+    ->condition('value', $value)
+    ->condition('recipient_uid', $recipient_uid)
+    ->condition('author_uid', $author_uid)
+    ->execute();
   if (!db_affected_rows()) {
     @db_query("INSERT INTO {subscriptions} (module, field, value, author_uid, recipient_uid, send_interval, send_updates, send_comments)  VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d)", $module, $field, $value, $author_uid, $recipient_uid, $send_interval, $send_updates, $send_comments);
   }
@@ -395,7 +473,7 @@ function subscriptions_write_subscription($module, $field, $value, $author_uid, 
  * @ingroup forms
  * @see _subscriptions_menu()
  */
-function subscriptions_delete_form(&$form_state, $module, $field, $value, $author_uid, $recipient_uid) {
+function subscriptions_delete_form($form, &$form_state, $module, $field, $value, $author_uid, $recipient_uid) {
   $form['data'] = array('#type' => 'value', '#value' => array($module, $field, $value, $author_uid, $recipient_uid));
   // We might be called from subscriptions_del_form() and don't want to submit to subscriptions_del_form_submit():
   $form['#submit'][] = 'subscriptions_delete_form_submit';
@@ -406,7 +484,13 @@ function subscriptions_delete_form(&$form_state, $module, $field, $value, $autho
  * Delete Subscription form submit handler.
  */
 function subscriptions_delete_form_submit($form, &$form_state) {
-  db_query("DELETE FROM {subscriptions} WHERE module = '%s' AND field = '%s' AND value = '%s' AND author_uid = %d AND recipient_uid = %d", $form_state['values']['data']);
+  db_delete('subscriptions')
+    ->condition('module', $form_state['values']['data']['0'])
+    ->condition('field', $form_state['values']['data']['1'])
+    ->condition('value', $form_state['values']['data']['2'])
+    ->condition('author_uid', $form_state['values']['data']['3'])
+    ->condition('recipient_uid', $form_state['values']['data']['4'])
+    ->execute();
   drupal_set_message(t('Your subscription was deactivated.'));
   $form_state['redirect'] = '<front>';
 }
@@ -418,7 +502,7 @@ function subscriptions_delete_form_submit($form, &$form_state) {
 function subscriptions_autosubscribe($module, $field, $value, $context) {
   global $user;
   // if user has auto subscribe enabled and he's not already subscribed
-  if ($user->uid && _subscriptions_get_setting('autosub_'. $context, $user) && !subscriptions_get_subscription($user->uid, $module, $field, $value)) {
+  if ($user->uid && _subscriptions_get_setting('autosub_' . $context, $user) && !subscriptions_get_subscription($user->uid, $module, $field, $value)) {
     subscriptions_write_subscription($module, $field, $value, -1, $user->uid, _subscriptions_get_setting('send_interval', $user), 1, 1);
   }
 }
@@ -432,20 +516,13 @@ function subscriptions_autosubscribe($module, $field, $value, $context) {
  *   Array of subscriptions indexed by uid, module, field, value, author_uid.
  */
 function subscriptions_get($params) {
-  // Build query
-  foreach ($params as $field => $value) {
-    if (is_numeric($value)) {
-      $conditions[] = $field .' = %d';
-    }
-    else {
-      $conditions[] = "$field = '%s'";
-    }
-    $args[] = $value;
-  }
-  $sql = "SELECT * FROM {subscriptions} WHERE ". implode(' AND ', $conditions);
-  $result = db_query($sql, $args);
   $subscriptions = array();
-  while ($s = db_fetch_object($result)) {
+  // Build query
+  $query = db_select('subscriptions', 's');
+  foreach ($params as $field => $value) {
+    $query->condition($field, $value);
+  }
+  foreach ($query->execute() as $s) {
     $subscriptions[$s->recipient_uid][$s->module][$s->field][$s->value][$s->author_uid] = 1;
   }
   return $subscriptions;
@@ -477,7 +554,14 @@ function subscriptions_types($field = NULL, $type = NULL) {
   if ($type) {
     return isset($types[$type][$field]) ? $types[$type][$field] : NULL;
   }
-  else if ($field) {
+  elseif ($field) {
+    if ($field == 'access' && isset($list[$field]) && is_array($list[$field])) {
+      $result = array();
+      foreach ($list[$field] as $perms) {
+        $result += $perms;
+      }
+      return $result;
+    }
     return isset($list[$field]) ? $list[$field] : array();
   }
   else {
@@ -488,10 +572,10 @@ function subscriptions_types($field = NULL, $type = NULL) {
 /**
  * Check return values of hook_subscriptions().
  */
-function _subscriptions_validate_hook_result($stype, $data)
-{
+function _subscriptions_validate_hook_result($stype, $data) {
   if (isset($stype)) {
-    if (!is_numeric($stype) && is_array($data) && isset($data['title']) && isset($data['access']) && isset($data['page']) && isset($data['fields']) && is_array($data['fields'])) {
+    if (!is_numeric($stype) && is_array($data) && isset($data['title']) && isset($data['access']) &&
+      ($data['title'] === '' || isset($data['page']) && isset($data['fields']) && is_array($data['fields']))) {
       return TRUE;
     }
   }
@@ -500,27 +584,27 @@ function _subscriptions_validate_hook_result($stype, $data)
   if (!$already_reported) {
     $already_reported = TRUE;
     foreach (module_implements('subscriptions') as $module) {
-      $hook = $module .'_subscriptions';
+      $hook = $module . '_subscriptions';
       $types = $hook('types');
-      foreach($types as $stype => $data) {
+      foreach ($types as $stype => $data) {
         if (!_subscriptions_validate_hook_result($stype, $data)) {
           $modules[$module] = $module;
         }
       }
     }
-    drupal_set_message(t('The following modules return invalid data from %hook: !modules   Either they are buggy !Subscriptions add-ons, or they are unrelated to !Subscriptions and should not define %hook!', array('%hook' => 'hook_subscriptions()', '!modules' => '<ul><li>'. implode($modules, '</li><li>') .'</li></ul>', '!Subscriptions' => 'Subscriptions')), 'error', FALSE);
+    drupal_set_message(t('The following modules return invalid data from %hook: !modules   Either they are buggy !Subscriptions add-ons, or they are unrelated to !Subscriptions and should not define %hook!', array('%hook' => 'hook_subscriptions()', '!modules' => '<ul><li>' . implode($modules, '</li><li>') . '</li></ul>', '!Subscriptions' => 'Subscriptions')), 'error', FALSE);
   }
   return FALSE;
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function subscriptions_theme() {
   return array(
     'subscriptions_form_table' => array(
       'file' => 'subscriptions.admin.inc',
-      'arguments' => array('element' => NULL),
+      'render element' => 'element',
     )
   );
 }
@@ -529,7 +613,7 @@ function subscriptions_theme() {
  * Returns TRUE if the given $nid is blocked.
  */
 function subscriptions_node_is_blocked($nid) {
-  return strpos('  '. variable_get('subscriptions_blocked_nodes', '') .' ', ' '. $nid .' ');
+  return strpos('  ' . variable_get('subscriptions_blocked_nodes', '') . ' ', ' ' . $nid . ' ');
 }
 
 /**
@@ -571,8 +655,12 @@ function _subscriptions_get_setting($name, $account) {
 
   static $defaults = array();
   if (!isset($defaults[$uid][$name])) {
-    $result = db_query("SELECT uid, digest, send_interval, send_updates, send_comments, send_interval_visible, send_updates_visible, send_comments_visible, autosub_on_post, autosub_on_update, autosub_on_comment, send_self FROM {subscriptions_user} WHERE uid in (%d, %d) ORDER BY uid", -DRUPAL_AUTHENTICATED_RID, $uid);
-    while ($s = db_fetch_array($result)) {
+    $result = db_select('subscriptions_user', 'su')
+      ->fields('su', array('uid', 'digest', 'send_interval', 'send_updates', 'send_comments', 'send_interval_visible', 'send_updates_visible', 'send_comments_visible', 'autosub_on_post', 'autosub_on_update', 'autosub_on_comment', 'send_self'))
+      ->condition('uid', array(-DRUPAL_AUTHENTICATED_RID, $uid), 'IN')
+      ->orderBy('uid')
+      ->execute();
+    foreach ($result as $s) {
       $defaults[$s['uid']] = $s;
     }
     if (empty($defaults[$uid])) {
@@ -593,8 +681,8 @@ function _subscriptions_get_setting($name, $account) {
     }
     foreach (array('interval', 'updates', 'comments') as $parm ) {
       // Site overrides user values.
-      if ($defaults[-DRUPAL_AUTHENTICATED_RID]['send_'. $parm .'_visible'] == -2) {
-        $defaults[$uid]['send_'. $parm] = $defaults[-DRUPAL_AUTHENTICATED_RID]['send_'. $parm];
+      if ($defaults[-DRUPAL_AUTHENTICATED_RID]['send_' . $parm . '_visible'] == -2) {
+        $defaults[$uid]['send_' . $parm] = $defaults[-DRUPAL_AUTHENTICATED_RID]['send_' . $parm];
       }
     }
   }
@@ -602,34 +690,23 @@ function _subscriptions_get_setting($name, $account) {
 }
 
 /**
- * Load (and cache) a user.
- */
-function subscriptions_user_load($uid) {
-  static $users = array();
-
-  if (!isset($users[$uid])) {
-    $users[$uid] = user_load($uid);
-  }
-  return $users[$uid];
-}
-
-/**
  * Returns whether notifications are suspended for the given user,
  * and optionally alert the user if delivery is suspended.
  */
 function subscriptions_suspended($uid, $alert = FALSE) {
-  $result = db_result(db_query("SELECT suspended FROM {subscriptions_user} WHERE uid = %d", $uid));
+  $result = db_query("SELECT suspended FROM {subscriptions_user} WHERE uid = :uid", array(':uid' => $uid))->fetchField();
   if ($result && $alert && empty($_POST)) {
-    include_once drupal_get_path('module', 'subscriptions') .'/subscriptions.admin.inc';
+    include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.admin.inc';
     _subscriptions_suspended_alert($uid, $result);
   }
   return $result;
 }
 
 /**
- * Implementation of hook_form_alter() for the user/uid/edit form.
+ * Implements hook_form_alter().
  *
- * Display a message if subscriptions notifications are suspended.
+ * Display a message on user/uid/edit form if subscriptions notifications
+ * are suspended.
  *
  * @ingroup hooks
  */

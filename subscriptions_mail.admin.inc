@@ -34,13 +34,13 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
     '#type'          => 'textfield',
     '#title'         => t('E-mail address'),
     '#default_value' => _subscriptions_mail_site_mail(TRUE),
-    '#description'   => t('A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website.', $variables + array('%From' => 'From', '%Reply_To' => 'Reply-To')) .'<br />'. t('Clear this field to use the default site e-mail address.'),
+    '#description'   => t('A valid e-mail address to be used as the %From and %Reply_To address by the auto-mailer for !Module notifications.  To lessen the likelihood of e-mail being marked as spam, this e-mail address should use the same domain as the website.', $variables + array('%From' => 'From', '%Reply_To' => 'Reply-To')) . '<br />' . t('Clear this field to use the default site e-mail address.'),
   );
   $form['mail_settings']['subscriptions_site_mail_name'] = array(
     '#type'          => 'textfield',
     '#title'         => t('E-mail name'),
     '#default_value' => variable_get('subscriptions_site_mail_name', ''),
-    '#description'   => t('An optional name to go with the e-mail address above, no "double-quotes".') .'<br />'. t('Clear this field to use the e-mail address only &mdash; some e-mail clients will display only the portion of the address to the left of the @ sign.'),
+    '#description'   => t('An optional name to go with the e-mail address above, no "double-quotes".') . '<br />' . t('Clear this field to use the e-mail address only &mdash; some e-mail clients will display only the portion of the address to the left of the @ sign.'),
   );
   $form['mail_settings']['subscriptions_number_of_mails'] = array(
     '#type'          => 'textfield',
@@ -60,9 +60,9 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
     drupal_set_message(t('Warning: !message', array('!message' => $message)), 'error');
     $form['mail_settings']['subscriptions_cron_percent']['#attributes'] = array('class' => 'error');
   }
-  $result = db_query("SELECT COUNT(sqid) AS count, suspended FROM {subscriptions_queue} GROUP BY suspended");
+  $result = db_query("SELECT COUNT(sqid) AS count, suspended FROM {subscriptions_queue} GROUP BY suspended", array(), array('fetch' => PDO::FETCH_ASSOC));
   $active_count = $suspended_count = 0;
-  while ($record = db_fetch_array($result)) {
+  foreach ($result as $record) {
     if (!$record['suspended']) {
       $active_count = $record['count'];
     }
@@ -71,12 +71,11 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
     }
   }
   $form['mail_settings']['queue_length'] = array(
-    '#type'          => 'item',
     '#title'         => t('Queue'),
-    '#value'         => t('There are %active_count active and %suspended_count suspended items in the queue.', array('%active_count' => $active_count, '%suspended_count' => $suspended_count)) .' &nbsp; ',
+    '#markup'        => t('There are %active_count active and %suspended_count suspended items in the queue.', array('%active_count' => $active_count, '%suspended_count' => $suspended_count)) . ' &nbsp; ',
     '#description'   => t('Note: The number of generated e-mails is typically much lower than the number of queue items.'),
   );
-  $form['mail_settings']['queue_length']['purge_queue'] = array(
+  $form['mail_settings']['purge_queue'] = array(
     '#type'          => 'submit',
     '#name'          => 'op',
     '#value'         => t('Purge the queue'),
@@ -93,15 +92,15 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
     '#default_value' => variable_get('subscriptions_watchstats', 1),
     '#description'   => t('Logs the mailing counts, time spent, and size of the remaining queue to the watchdog log.  This is valuable information for estimating the load on the cron job and on your mail server.  Default is ON.'),
   );
-  $form['mail_settings']['subscriptions_showmailkeys'] = array(
-    '#type'          => 'checkbox',
-    '#title'         => t('Append the mailkey to every notification'),
-    '#default_value' => variable_get('subscriptions_showmailkeys', 0),
-    '#description'   => t('Appends the key of the !Mail_Editor_template that was used to create each e-mail, to assist with configuration and testing. Default is OFF.', array('!Mail_Editor_template' => l('Mail Editor template', (module_exists('mail_edit') ? 'admin/build/mail-edit' : 'http://drupal.org/project/mail_edit')))),
-  );
-  $handlers = array_reverse($form['#submit']);
-  $handlers[] = '_subscriptions_mail_submit_subscriptions_settings_form';
-  $form['#submit'] = array_reverse($handlers);   // put our handler in front
+  if (module_exists('mail_edit')) {
+    $form['mail_settings']['subscriptions_showmailkeys'] = array(
+      '#type'          => 'checkbox',
+      '#title'         => t('Append the mailkey to every notification'),
+      '#default_value' => variable_get('subscriptions_showmailkeys', 0),
+      '#description'   => t('Appends the key of the !Mail_Editor_template that was used to create each e-mail, to assist with configuration and testing. Default is OFF.', array('!Mail_Editor_template' => l('Mail Editor template', (module_exists('mail_edit') ? 'admin/structure/mail-edit' : 'http://drupal.org/project/mail_edit')))),
+    );
+  }
+  array_unshift($form['#submit'], '_subscriptions_mail_submit_subscriptions_settings_form');
 }
 
 /**
@@ -109,7 +108,7 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
  */
 function _subscriptions_mail_submit_subscriptions_settings_form($form, &$form_state) {
   if ($form_state['values']['op'] == $form_state['values']['purge_queue']) {
-    drupal_goto('admin/settings/subscriptions/purge-queue', drupal_get_destination());
+    drupal_goto('admin/config/subscriptions/purge-queue', array('query' => drupal_get_destination()));
   }
 }
 
@@ -131,9 +130,9 @@ function _subscriptions_mail_form_mail_edit_trans_alter(&$form, &$form_state) {
     $form['mail']['body']['#title'] = t('Digest body');
     $form['mail']['body']['#rows'] = 8;
 
-    $digest_item = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'body', 'DITEM');
-    $digest_item_separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+item', $langcode, 'subject', 'SEP');
-    $digest_item_comment = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY .'+comment', $langcode, 'body', 'DITEMCMT');
+    $digest_item = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY . '+item', $langcode, 'body', 'DITEM');
+    $digest_item_separator = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY . '+item', $langcode, 'subject', 'SEP');
+    $digest_item_comment = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY . '+comment', $langcode, 'body', 'DITEMCMT');
 
     $form['mail']['digest_item'] = array(
       '#title'      => t('Digest item'),
@@ -144,8 +143,8 @@ function _subscriptions_mail_form_mail_edit_trans_alter(&$form, &$form_state) {
     if ($placeholders = module_invoke('subscriptions_content', 'mail_edit_tokens_list', 'digest')) {
       $doc = "<dl>\n";
       foreach ($placeholders as $name => $description) {
-        $doc .= '<dt>'. $name .'</dt>';
-        $doc .= '<dd>'. $description .'</dd>';
+        $doc .= '<dt>' . $name . '</dt>';
+        $doc .= '<dd>' . $description . '</dd>';
       }
       $doc .= "</dl>\n";
       $form['mail']['digest_item_help'] = array(
@@ -168,8 +167,8 @@ function _subscriptions_mail_form_mail_edit_trans_alter(&$form, &$form_state) {
     if ($placeholders = module_invoke('subscriptions_content', 'mail_edit_tokens_list', 'comments')) {
       $doc = "<dl>\n";
       foreach ($placeholders as $name => $description) {
-        $doc .= '<dt>'. $name .'</dt>';
-        $doc .= '<dd>'. $description .'</dd>';
+        $doc .= '<dt>' . $name . '</dt>';
+        $doc .= '<dd>' . $description . '</dd>';
       }
       $doc .= "</dl>\n";
       $form['mail']['comment_token_help'] = array(
@@ -187,7 +186,7 @@ function _subscriptions_mail_form_mail_edit_trans_alter(&$form, &$form_state) {
       '#type'       => 'textarea',
       '#default_value' => $digest_item_separator,
       '#rows' => 2,
-      '#description' => t('The separator between digest items (if needed).'),
+      '#description' => t('The separator between digest items (if needed). '),
     );
 
     $form['op']['#submit'][] = 'subscriptions_mail_form_mail_edit_trans_save';
@@ -205,11 +204,11 @@ function subscriptions_mail_form_mail_edit_trans_save($form, &$form_state) {
   $form_state['values']['description'] = '';
   $form_state['values']['subject'] = $form_state['values']['digest_item_separator'];
   $form_state['values']['body'] = $form_state['values']['digest_item'];
-  $form_state['values']['id'] = $id .'+item';
+  $form_state['values']['id'] = $id . '+item';
   mail_edit_trans_save($form, $form_state);
   $form_state['values']['subject'] = '';
   $form_state['values']['body'] = $form_state['values']['digest_item_comment'];
-  $form_state['values']['id'] = $id .'+comment';
+  $form_state['values']['id'] = $id . '+comment';
   mail_edit_trans_save($form, $form_state);
 }
 
@@ -218,7 +217,10 @@ function subscriptions_mail_form_mail_edit_trans_save($form, &$form_state) {
  */
 function subscriptions_mail_form_mail_edit_trans_delete($form, &$form_state) {
   foreach (array('item', 'comment') as $key) {
-    db_query("DELETE FROM {mail_edit} WHERE id = '%s' AND language = '%s'", $form_state['values']['id'] ."+$key", $form_state['values']['language']);
+    db_delete('mail_edit')
+      ->condition('id', $form_state['values']['id'] . $key)
+      ->condition('language', $form_state['values']['language'])
+      ->execute();
   }
 }
 
