@@ -13,15 +13,15 @@
  * @ingroup hooks
  * @ingroup form
  */
-function subscriptions_ui_nodeapi(&$node, $op, $teaser) {
+function subscriptions_ui_node_view($node, $view_mode, $langcode) {
   global $user;
-  if ($op == 'view' && $node->nid && !$teaser && subscriptions_ui_can_subscribe()) {
+  if ($node->nid && $view_mode == 'full' && subscriptions_ui_can_subscribe()) {
     if (!variable_get('subscriptions_form_in_block', 0) &&
         (!variable_get('subscriptions_form_link_only', 0) && (!arg(2) || arg(2) == 'view') ||
           variable_get('subscriptions_form_link_only', 0) && arg(2) == 'subscribe' )) {
       if ($form = drupal_get_form('subscriptions_ui_node_form', $node)) {
         $node->content['subscriptions_ui'] = array(
-          '#value' => $form,
+          'subscriptions_ui_form' => $form,
           '#weight' => 100,
         );
       }
@@ -142,7 +142,6 @@ function subscriptions_ui_node_form($form, &$form_state, $node, $account = NULL)
     $is_blocked = TRUE;
   }
 
-  init_theme(); // just in case, before calling theme_get_setting()
   $show_node_info = theme_get_setting('toggle_node_info_' . $node->type);
   $node_options = module_invoke_all('subscriptions', 'node_options', $account, $node);
   if (!$node_options || !user_access('subscribe to content', $account)) {
@@ -156,14 +155,14 @@ function subscriptions_ui_node_form($form, &$form_state, $node, $account = NULL)
       ':field' => 'nid',
       ':value' => $node->nid,
       ':recipient_uid' => $account->uid
-    )),
+    ), array('fetch' => PDO::FETCH_ASSOC)),
     db_query("SELECT sid, module, field, value, author_uid, send_interval, send_updates, send_comments FROM {subscriptions} WHERE module = :module AND field <> :field AND recipient_uid = :recipient_uid", array(
       ':module' => 'node',
       ':field' => 'nid',
       ':recipient_uid' => $account->uid
-    )),
+    ), array('fetch' => PDO::FETCH_ASSOC)),
   ) as $result) {
-    while ($s = db_fetch_array($result)) {
+    foreach ($result as $s) {
       $subscriptions[$s['field']][$s['value']][$s['author_uid']] = $s;
     }
   }
@@ -259,7 +258,7 @@ function subscriptions_ui_node_form($form, &$form_state, $node, $account = NULL)
 function subscriptions_ui_theme() {
   return array(
     'subscriptions_ui_table' => array(
-      'arguments' => array('element'),
+      'render element' => 'element',
     )
   );
 }
@@ -277,6 +276,7 @@ function theme_subscriptions_ui_table($element) {
     array('data'  => t('On&nbsp;updates'), 'width' => '1*', 'style' => 'writing-mode: lr-tb'),
     array('data'  => t('On&nbsp;comments'))
   );
+  $element = $element['element'];
   foreach (element_children($element['subscriptions']) as $key) {
     $row = array();
     foreach (array('subscriptions', 'updates', 'comments') as $eli => $elv) {

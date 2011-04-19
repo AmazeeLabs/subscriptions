@@ -98,6 +98,7 @@ function subscriptions_settings_form($form, &$form_state) {
  * @ingroup themeable
  */
 function theme_subscriptions_form_table($variables) {
+//dpm($variables, "subscriptions_form_table");
   $element = $variables['element'];
   $output = '';
   $rows = array();
@@ -236,7 +237,7 @@ function subscriptions_page($account, $stype) {
     $form['header'] = array(
       '#type'          => 'fieldset',
       '#title'         => t('Admin Information'),
-      '#attributes'    => array('class' => 'error'),
+      '#attributes'    => array('class' => array('error')),
       '#collapsible'   => TRUE,
       '#collapsed'     => FALSE,
       '#weight'        => -2,
@@ -314,8 +315,8 @@ function subscriptions_page_user_overview($account) {
   // Build summary
   $uid = (isset($account) ? $account->uid : -DRUPAL_AUTHENTICATED_RID);
   $counts = array();
-  $result = db_query("SELECT module, field, count(1) as number FROM {subscriptions} WHERE recipient_uid = :recipient_uid GROUP BY module, field", array(':recipient_uid' => $uid));
-  while ($subs = db_fetch_object($result)) {
+  $result = db_query("SELECT module, field, COUNT(1) AS number FROM {subscriptions} WHERE recipient_uid = :recipient_uid GROUP BY module, field", array(':recipient_uid' => $uid));
+  foreach ($result->fetchAll() as $subs) {
     if (!empty($subs->module)) {
       $counts[$subs->module][$subs->field] = $subs->number;
     }
@@ -331,25 +332,31 @@ function subscriptions_page_user_overview($account) {
     unset($types['node']);
   }
   uasort($types, '_subscriptions_cmp_by_weight');
+  $rows = array();
   foreach ($types as $stype => $type) {
     $has_access = ($uid < 0 && user_access('administer site configuration')) || user_access($type['access'], $account);
-    if ($has_access || user_access('administer user subscriptions')) {
+    if (($has_access || user_access('administer user subscriptions')) && isset($type['fields'])) {
       $rows[] = array(
         ($has_access ? l($tr($type['title']), ($uid < 0 ? "admin/config/subscriptions/userdefaults/$stype" : "user/$account->uid/subscriptions/$stype")) : $type['title']),
         isset($counts[$type['fields'][0]][$type['fields'][1]]) ? $counts[$type['fields'][0]][$type['fields'][1]] : 0,
       );
     }
   }
-  $output  = theme('table', array('header' => $header, 'rows' => $rows));
-  // TODO Please change this theme call to use an associative array for the $variables parameter.
-  $output .= theme('item', array('#value' => '', '#description' => t('Note: The counts on this page may differ from the ones on the detail pages for various technical reasons.')));
-  $output .= '<br />';
-  if (isset($account)) {
-    $output .= drupal_get_form('subscriptions_user_suspend_form', $account);
-  }
-  $output .= drupal_get_form('subscriptions_user_settings_form', $account);
+  $form['overview']['table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+  $form['overview']['note'] = array(
+    '#type' => 'item',
+    '#value' => '',
+    '#description' => t('Note: The counts on this page may differ from the ones on the detail pages for various technical reasons.'),
+    '#suffix' => '<br />',
+  );
+  $form += drupal_get_form('subscriptions_user_suspend_form', $account);
+  $form += drupal_get_form('subscriptions_user_settings_form', $account);
   drupal_set_title($uid < 0 ? t('Subscriptions') : $account->name);
-  return $output;
+  return $form;
 }
 
 /**
@@ -479,15 +486,15 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
     '#weight'        => 5,
     '#collapsible'   => isset($account),
     '#collapsed'     => isset($account),
-    );
+  );
   if ($uid < 0) {
     $form['settings']['info'] = array(
       '#type'          => 'fieldset',
       '#title'         => $tr('Admin Information'),
-      '#attributes'    => array('class' => 'error'),
+      '#attributes'    => array('class' => array('error')),
       '#collapsible'   => TRUE,
       '#collapsed'     => FALSE,
-      );
+    );
     $form['settings']['info'][] = array(
       '#type'          => 'item',
       '#value'         => '<div>' . t("The subtabs here under %User_defaults mirror those found at !My_account_Subscriptions, except that the fieldsets here come up already expanded. Please go there now and familiarize yourself with what's there!",
@@ -601,7 +608,7 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
     $form['settings']['visibility']['info'] = array(
       '#type'          => 'fieldset',
       '#title'         => $tr('Admin Information'),
-      '#attributes'    => array('class' => 'error'),
+      '#attributes'    => array('class' => array('error')),
       '#collapsible'   => TRUE,
       '#collapsed'     => FALSE,
       );

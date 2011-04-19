@@ -763,7 +763,7 @@ function subscriptions_content_load_node($nid, $sqid, $is_new) {
  * @return node as array().
  */
 function subscriptions_content_load_comment($cid, $sqid) {
-  $nid = db_query('SELECT nid FROM {comments} WHERE cid = :cid', array(':cid' => $cid))->fetchField();
+  $nid = db_query('SELECT nid FROM {comment} WHERE cid = :cid', array(':cid' => $cid))->fetchField();
   if (empty($nid)) {
     return;
   }
@@ -794,7 +794,7 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
 
   if (!empty($node) && module_exists('comment')) {
     $published_comments_only = $limit_sqids = '';
-    $query = db_select('comments', 'c');
+    $query = db_select('comment', 'c');
     $sq_alias = $query->join('subscriptions_queue', 'q', 'c.cid == q.load_args');
     $query->fields('q', array('sqid' => '_subscriptions_sqid', 'is_new' => '_subscriptions_is_new'));
     $query->fields('c');
@@ -844,41 +844,43 @@ function subscriptions_content_node_form($form, &$form_state, $account, $form) {
   $uid = $account->uid;
   $tr = 't';
   $subscriptions = array();
-  $sql = db_rewrite_sql("
-    SELECT n.nid, n.uid, s.send_interval, s.author_uid, s.send_comments, s.send_updates, n.title, n.status, n.changed, n.comment AS comment_count, ncs.last_comment_timestamp,
-      IF(s.send_comments + s.send_updates = 0, n.created, IF(s.send_comments + s.send_updates = 2, IF(n.changed > ncs.last_comment_timestamp, n.changed, ncs.last_comment_timestamp), IF(s.send_comments = 1, ncs.last_comment_timestamp, n.changed))) AS latest_activity
-    FROM {node} n
-    INNER JOIN {subscriptions} s ON " . ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                  . "n.nid" . ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
-                                       . " = s.value
-    LEFT JOIN {node_comment_statistics} ncs ON n.nid = ncs.nid
-    WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d
-    ORDER BY latest_activity DESC");
-  $sql_count = db_rewrite_sql("
-    SELECT COUNT(n.nid)
-    FROM {node} n
-    INNER JOIN {subscriptions} s ON " . ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                  . "n.nid" . ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : '')
-                                       . " = s.value
-    WHERE s.module = 'node' AND s.field = 'nid' AND s.recipient_uid = %d");
-  $result = pager_query($sql, 50, 0, $sql_count, $uid);
-  while ($s = db_fetch_array($result)) {
+  $query = db_select('node', 'n', array('fetch' => PDO::FETCH_ASSOC))
+    ->extend('PagerDefault')
+    ->limit(50);
+  $query
+    ->fields('n', array('nid', 'uid', 'title', 'status', 'changed'))
+    ->join('subscriptions', 's', (db_driver() != 'pgsql' ? 'n.nid = s.value' : 'CAST(n.nid AS VARCHAR) = s.value'));
+  $query
+    ->fields('s', array('send_interval', 'author_uid', 'send_comments', 'send_updates'))
+    ->leftJoin('node_comment_statistics', 'ncs', 'n.nid = ncs.nid');
+  $query
+    ->fields('ncs', array('last_comment_timestamp'));
+  $query->addField('n', 'comment', 'comment_count');
+  $query->addExpression('IF(s.send_comments + s.send_updates = 0, n.created, IF(s.send_comments + s.send_updates = 2, IF(n.changed > ncs.last_comment_timestamp, n.changed, ncs.last_comment_timestamp), IF(s.send_comments = 1, ncs.last_comment_timestamp, n.changed)))', 'latest_activity');
+  $query
+    ->condition('s.module', 'node')
+    ->condition('s.field', 'nid')
+    ->condition('s.recipient_uid', $uid)
+    ->orderBy('latest_activity', 'desc')
+    ->addTag('node_access');
+  foreach ($query->execute() as $s) {
     $subscriptions[$s['nid']][$s['author_uid']] = $s;
   }
 
   // check whether we've commented:
   $nids = array_keys($subscriptions);
   $select = db_select('subscriptions', 's')
-    ->fields('value')
+    ->fields('s', array('value'))
     ->condition('module', 'node')
     ->condition('field', 'nid')
     ->condition('recipient_uid', $uid);
-  $result = db_select('comments', 'c')
-    ->condition('nid', $select, 'IN')
-    ->condition('uid', $uid)
-    ->groupBy('nid')
+  $result = db_select('comment', 'c')
+    ->fields('c')
+    ->condition('c.nid', $select, 'IN')
+    ->condition('c.uid', $uid)
+    ->groupBy('c.nid')
     ->execute();
-  foreach($result as $c) {
+  foreach ($result as $c) {
     if (isset($subscriptions[$c->nid])) {
       foreach ($subscriptions[$c->nid] as $author_uid => $subscription) {
         $subscriptions[$c->nid][$author_uid]['commented'] = TRUE;
@@ -964,11 +966,11 @@ function subscriptions_content_type_form($form, &$form_state, $account, $form) {
   $unlisteds = variable_get('subscriptions_unlisted_content_types', array());
   $blockeds = variable_get('subscriptions_blocked_content_types', array());
   $omits = array_merge($unlisteds, $blockeds);
-  $query = sb_select('subscriptions', 's', PDO::FETCH_ASSOC);
+  $query = db_select('subscriptions', 's', array('fetch' => PDO::FETCH_ASSOC));
   $nt_alias = $query->join('node_type', 'nt', 's.value = nt.type');
   $result = $query
     ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
-    ->fields(nt_alias, array('type', 'name'))
+    ->fields($nt_alias, array('type', 'name'))
     ->condition('s.module', 'node')
     ->condition('s.field', 'type')
     ->condition('s.recipient_uid', $uid)
@@ -1033,6 +1035,7 @@ function subscriptions_content_type_form($form, &$form_state, $account, $form) {
     $form['header']['#value'] = t('There are no available !subs_types. ', array('!subs_types' => t('content types')));
     unset($form['footer']);
   }
+//dpm($form);
   return $form;
 }
 

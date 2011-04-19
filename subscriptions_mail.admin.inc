@@ -58,7 +58,7 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
   if (empty($_POST) && $cron_percentage <= 0) {
     $message = t('!Module cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables + array('@link' => '#edit-subscriptions-cron-percent'));
     drupal_set_message(t('Warning: !message', array('!message' => $message)), 'error');
-    $form['mail_settings']['subscriptions_cron_percent']['#attributes'] = array('class' => 'error');
+    $form['mail_settings']['subscriptions_cron_percent']['#attributes'] = array('class' => array('error'));
   }
   $result = db_query("SELECT COUNT(sqid) AS count, suspended FROM {subscriptions_queue} GROUP BY suspended", array(), array('fetch' => PDO::FETCH_ASSOC));
   $active_count = $suspended_count = 0;

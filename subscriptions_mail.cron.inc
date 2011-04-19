@@ -54,7 +54,7 @@ function _subscriptions_mail_cron() {
 
   while ((empty($mails_allowed) || $single_count + $digest_count < $mails_allowed)
           && timer_read('page')/1000 < $lost_seconds + $usable_seconds) {
-    $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE suspended = 0 AND last_sent + send_interval < %d ORDER BY sqid', time(), 0, 1);
+    $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE suspended = 0 AND last_sent + send_interval < %d ORDER BY sqid', 0, 1, array(time()));
     if (!($s = db_fetch_array($result))) {
       break;  // No more ready queue items, terminate loop.
     }
@@ -281,16 +281,15 @@ function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, 
       watchdog('subscriptions', 'Notification sent.', $watchdog_params);
     }
     foreach ($send_intervals as $send_interval) {
-      db_update('subscriptions_last_sent')
-        ->fields(array(
-          'last_sent' => REQUEST_TIME,
+      db_merge('subscriptions_last_sent')
+        ->key(array(
+          'uid'           => $uid,
+          'send_interval' => $send_interval,
         ))
-        ->condition('uid', $uid)
-        ->condition('send_interval', $send_interval)
+        ->fields(array(
+          'last_sent'     => REQUEST_TIME,
+        ))
         ->execute();
-      if (!db_affected_rows()) {
-        @db_query("INSERT INTO {subscriptions_last_sent} (uid, send_interval, last_sent) VALUES(%d, %d, %d)", $uid, $send_interval, REQUEST_TIME);
-      }
     }
   }
   else {

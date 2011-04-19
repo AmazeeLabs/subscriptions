@@ -68,7 +68,7 @@ function subscriptions_menu() {
   $items['admin/config/subscriptions/userdefaults/settings'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'title' => 'Overview',
-    'weight' => -10,
+    'weight' => -100,
   );
   $items['admin/config/subscriptions/intervals'] = array(
     'title' => 'Interval',
@@ -91,7 +91,7 @@ function subscriptions_menu() {
     $items['user/%user/subscriptions/overview'] = array(
       'type' => MENU_DEFAULT_LOCAL_TASK,
       'title' => 'Overview',
-      'weight' => -10,
+      'weight' => -100,
     );
   }
   else {
@@ -221,6 +221,8 @@ function subscriptions_permission() {
 /**
  * Implements hook_user_insert().
  *
+ * Set up the Subscriptions defaults for the new user.
+ *
  * @ingroup hooks
  */
 function subscriptions_user_insert($edit, &$account, $category) {
@@ -230,29 +232,33 @@ function subscriptions_user_insert($edit, &$account, $category) {
       'uid' => $account->uid,
     ))
     ->execute();
-  // $account->roles isn't set yet, but we'll be called again with 'load'
+  // $account->roles isn't set yet, subscriptions_user_load() below will
+  // insert the role-specific initial subscriptions.
   $new_uid = $account->uid;
 }
 
 /**
  * Implements hook_user_load().
  *
+ * Set the role-specific initial subscriptions for new users (continued
+ * from subscriptions_user_insert() above).
+ *
  * @ingroup hooks
  */
 function subscriptions_user_load($users) {
   $new_uid = &drupal_static('subscriptions_user_insert', 0);
-  if (isset($users[$new_uid])) {
+  if ($new_uid && isset($users[$new_uid])) {
     foreach (array_keys($users[$new_uid]->roles) as $rid) {
       $rids[] = -$rid;
     }
     $query = db_select('subscriptions', 's')
       ->fields('s', array('module', 'field', 'value'));
-    $query->addExpression($new_uid);
+    $query->addExpression($new_uid, 'recipient_uid');
     $query
       ->fields('s', array('send_interval', 'author_uid', 'send_updates', 'send_comments'))
       ->condition('recipient_uid', $rids, 'IN');
     db_insert('subscriptions')
-      ->values($query)
+      ->from($query)
       ->execute();
     $new_uid = 0;
   }
@@ -434,21 +440,20 @@ function subscriptions_get_full_subscription($uid, $module, $field, $value, $aut
  * Create a subscription.
  */
 function subscriptions_write_subscription($module, $field, $value, $author_uid, $recipient_uid, $send_interval = 1, $send_updates = 0, $send_comments = 0) {
-  db_update('subscriptions')
+  db_merge('subscriptions')
+    ->key(array(
+      'module'        => $module,
+      'field'         => $field,
+      'value'         => $value,
+      'recipient_uid' => $recipient_uid,
+      'author_uid'    => $author_uid,
+    ))
     ->fields(array(
       'send_interval' => $send_interval,
-      'send_updates' => $send_updates,
+      'send_updates'  => $send_updates,
       'send_comments' => $send_comments,
     ))
-    ->condition('module', $module)
-    ->condition('field', $field)
-    ->condition('value', $value)
-    ->condition('recipient_uid', $recipient_uid)
-    ->condition('author_uid', $author_uid)
     ->execute();
-  if (!db_affected_rows()) {
-    @db_query("INSERT INTO {subscriptions} (module, field, value, author_uid, recipient_uid, send_interval, send_updates, send_comments)  VALUES ('%s', '%s', '%s', %d, %d, %d, %d, %d)", $module, $field, $value, $author_uid, $recipient_uid, $send_interval, $send_updates, $send_comments);
-  }
 }
 
 /**
@@ -655,7 +660,7 @@ function _subscriptions_get_setting($name, $account) {
 
   static $defaults = array();
   if (!isset($defaults[$uid][$name])) {
-    $result = db_select('subscriptions_user', 'su')
+    $result = db_select('subscriptions_user', 'su', array('fetch' => PDO::FETCH_ASSOC))
       ->fields('su', array('uid', 'digest', 'send_interval', 'send_updates', 'send_comments', 'send_interval_visible', 'send_updates_visible', 'send_comments_visible', 'autosub_on_post', 'autosub_on_update', 'autosub_on_comment', 'send_self'))
       ->condition('uid', array(-DRUPAL_AUTHENTICATED_RID, $uid), 'IN')
       ->orderBy('uid')

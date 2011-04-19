@@ -211,7 +211,7 @@ function subscriptions_taxonomy_page_taxa($account, $form) {
  */
 function subscriptions_taxonomy_taxa_form($form, &$form_state, $vocabularies, $account, $form) {
   $uid = (isset($account) ? $account->uid : (is_numeric(arg(5)) ? -arg(5) : -DRUPAL_AUTHENTICATED_RID));
-  $query = db_select('taxonomy_term_data', 't', PDO::FETCH_ASSOC);
+  $query = db_select('taxonomy_term_data', 't', array('fetch' => PDO::FETCH_ASSOC));
   $subscriptions_alias = $query->join('subscriptions', 's', ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(t.tid AS VARCHAR) = s.value' : 't.tid = s.value'));
   $result = $query
     ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
