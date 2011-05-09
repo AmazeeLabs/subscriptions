@@ -450,8 +450,8 @@ function subscriptions_write_subscription($module, $field, $value, $author_uid, 
     ))
     ->fields(array(
       'send_interval' => $send_interval,
-      'send_updates'  => $send_updates,
-      'send_comments' => $send_comments,
+      'send_updates'  => ($send_updates ? 1 : 0),
+      'send_comments' => ($send_comments ? 1 : 0),
     ))
     ->execute();
 }
@@ -669,12 +669,16 @@ function _subscriptions_get_setting($name, $account) {
       $defaults[$s['uid']] = $s;
     }
     if (empty($defaults[$uid])) {
-      // Note: This should not happen -- subscriptions_user() takes care of inserting/removing records as users are created/deleted.
-      // If it does happen, then users were created without calling the proper hooks, or they may have been created on another multi-site (#351753).
-      // Let's add the missing records, as if the user were being created just now, with the expected hook_user() invocations:
+      // Note: This should not happen -- subscriptions_user_insert() and
+      // subscriptions_user_delete() take care of inserting/removing records
+      // as users are created/deleted.
+      // If it does happen, then users were created without calling the proper
+      // hooks, or they may have been created on another multi-site (#351753).
+      // Let's add the missing records, as if the user were being created just
+      // now, with the expected hook_user() invocations:
       $account = user_load($uid);
-      subscriptions_user('insert', NULL, $account);
-      subscriptions_user('load', NULL, $account);
+      subscriptions_user_insert(NULL, $account, NULL);
+      subscriptions_user_load(array($account->uid => $account));
       return _subscriptions_get_setting($name, $account);
     }
     $defaults[$uid]['uses_defaults'] = FALSE;

@@ -941,8 +941,7 @@ function subscriptions_content_node_form($form, &$form_state, $account, $form) {
     unset($form['header']);
     unset($form['footer']);
     $form['notice'] = array(
-      '#type' => 'item',
-      '#value' => t('There are no subscribed pages. '),
+      '#markup' => t('There are no subscribed pages. '),
       '#weight' => 10,
     );
   }
@@ -981,9 +980,6 @@ function subscriptions_content_type_form($form, &$form_state, $account, $form) {
     $subscriptions[$s['value']][$s['author_uid']] = $s;
   }
   $form[0] = array(
-    '#type' => 'item',
-    '#title' => '',
-    '#tree' => TRUE,
     '#theme' => 'subscriptions_form_table',
   );
   $intervals = _subscriptions_send_intervals();
@@ -1035,7 +1031,6 @@ function subscriptions_content_type_form($form, &$form_state, $account, $form) {
     $form['header']['#value'] = t('There are no available !subs_types. ', array('!subs_types' => t('content types')));
     unset($form['footer']);
   }
-//dpm($form);
   return $form;
 }
 

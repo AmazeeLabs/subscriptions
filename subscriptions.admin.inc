@@ -98,7 +98,6 @@ function subscriptions_settings_form($form, &$form_state) {
  * @ingroup themeable
  */
 function theme_subscriptions_form_table($variables) {
-//dpm($variables, "subscriptions_form_table");
   $element = $variables['element'];
   $output = '';
   $rows = array();
@@ -136,11 +135,11 @@ function theme_subscriptions_form_table($variables) {
     foreach (element_children($element['checkboxes']) as $key) {
       foreach (element_children($element['checkboxes'][$key]) as $key1) {
         if (empty($element['checkboxes'][$key][$key1]['#disabled'])) {
-          $element['checkboxes'][$key][$key1]['#attributes']['class'] = 'select-row';
+          $element['checkboxes'][$key][$key1]['#attributes']['class'] = array('select-row');
         }
         $row = array();
-        foreach (array_keys($columns) as $colkey) {
-          $row[] = drupal_render_children($element[$colkey][$key][$key1]);
+        foreach ($column_keys as $colkey) {
+          $row[] = drupal_render($element[$colkey][$key][$key1]);
         }
         $rows[] = $row;
       }
@@ -243,9 +242,8 @@ function subscriptions_page($account, $stype) {
       '#weight'        => -2,
     );
     $form['header'][] = array(
-      '#type'          => 'item',
-      '#value'         => t('The selected subscriptions will be given to <b>newly created</b> users.'),
-      );
+      '#markup'        => '<div>' . t('The selected subscriptions will be given to <b>newly created</b> users.') . '</div>',
+    );
 
     $tr = 't';
     $form['header']['role'] = array(
@@ -253,12 +251,12 @@ function subscriptions_page($account, $stype) {
       '#title'       => $tr('Roles'),
       '#collapsible' => TRUE,
       '#collapsed'   => !is_numeric(arg(5)),
-      );
+    );
     $form['header']['role']['header'] = array(
       '#type'          => 'markup',
       '#value'         => '<div>' . t('If a user has one or more roles assigned at creation time, then she will receive the additional subscriptions defined for these roles.') . '</div>',
       '#weight'        => -5,
-      );
+    );
     $form['header']['role']['roles'] = array(
       '#type'          => 'select',
       '#title'         => t('Role(s)'),
@@ -266,11 +264,11 @@ function subscriptions_page($account, $stype) {
       '#options'       => user_roles(TRUE),
       '#description'   => t('Select the role to load or role(s) to save.'),
       '#multiple'      => TRUE,
-      );
+    );
     $form['header']['role']['load'] = array(
       '#type'          => 'submit',
       '#value'         => t('Load'),
-      );
+    );
   }
   else {
     subscriptions_suspended(arg(1), TRUE);
@@ -287,11 +285,11 @@ function subscriptions_page($account, $stype) {
   $form['footer'] = array(
     '#type' => 'item',
     '#description' => t('The master checkboxes on the left turn the given subscription on or off. Click and Shift-click to turn a range of subscriptions on or off.') . '<br />' . t('Depending on the setup of the site, you may have additional options for active subscriptions.'),
-    '#weight' => 10,
+    '#weight' => 4,
     );
 
   $callback = $stypes[$stype]['page'];
-  $output = function_exists($callback) ? $callback($account, $form) : '';
+  $form = function_exists($callback) ? $callback($account, $form) : NULL;
   //drupal_add_link(array(
   //  'rel' => 'alternate',
   //  'type' => 'application/rss+xml',
@@ -299,8 +297,7 @@ function subscriptions_page($account, $stype) {
   //  'href' => url('subscriptions/feed'),
   //));
   drupal_set_title(isset($account) ? $account->name : t('Subscriptions'));
-  // TODO Please change this theme call to use an associative array for the $variables parameter.
-  return theme('box', '', $output); // . theme('xml_icon', url('subscriptions/feed'));
+  return $form;
 }
 
 /**
@@ -353,7 +350,9 @@ function subscriptions_page_user_overview($account) {
     '#description' => t('Note: The counts on this page may differ from the ones on the detail pages for various technical reasons.'),
     '#suffix' => '<br />',
   );
-  $form += drupal_get_form('subscriptions_user_suspend_form', $account);
+  if ($uid > 0) {
+    $form += drupal_get_form('subscriptions_user_suspend_form', $account);
+  }
   $form += drupal_get_form('subscriptions_user_settings_form', $account);
   drupal_set_title($uid < 0 ? t('Subscriptions') : $account->name);
   return $form;
@@ -368,8 +367,11 @@ function subscriptions_page_user_overview($account) {
  * @ingroup form
  */
 function subscriptions_user_suspend_form($form, &$form_state, $account) {
+  if (!isset($account)) {
+    return NULL;
+  }
   $uid = $account->uid;
-  $suspended = subscriptions_suspended($account->uid, TRUE);
+  $suspended = subscriptions_suspended($uid, TRUE);
   $tr = 't';
   $form['suspend'] = array(
     '#type'          => 'fieldset',
@@ -496,8 +498,7 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
       '#collapsed'     => FALSE,
     );
     $form['settings']['info'][] = array(
-      '#type'          => 'item',
-      '#value'         => '<div>' . t("The subtabs here under %User_defaults mirror those found at !My_account_Subscriptions, except that the fieldsets here come up already expanded. Please go there now and familiarize yourself with what's there!",
+      '#markup'        => '<div>' . t("The subtabs here under %User_defaults mirror those found at !My_account_Subscriptions, except that the fieldsets here come up already expanded. Please go there now and familiarize yourself with what's there!",
         array(
           '%User_defaults' => $tr('User defaults'),
           '!My_account_Subscriptions' => l($tr('My account') . '|' . $tr('Subscriptions'), 'user/' . $user->uid . '/subscriptions'),
@@ -506,8 +507,7 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
       ) . '</div>',
     );
     $form['settings']['info'][] = array(
-      '#type'          => 'item',
-      '#value'         => '<div>' . t("The default settings that you define here are used for those users that haven't (yet) saved their own settings.",
+      '#markup'        => '<div>' . t("The default settings that you define here are used for those users that haven't (yet) saved their own settings.",
         array(
           '%User_defaults' => $tr('User defaults'),
           '!My_account_Subscriptions' => l($tr('My account') . '|' . $tr('Subscriptions'), 'user/' . $user->uid . '/subscriptions'),
@@ -613,8 +613,7 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
       '#collapsed'     => FALSE,
       );
     $form['settings']['visibility']['info'][] = array(
-      '#type'          => 'item',
-      '#value'         =>
+      '#markup'        =>
         t("Beyond defining the %Visible/%Hidden defaults for your users, you can",
           array(
             '%Visible' => $tr('Visible'),
@@ -768,6 +767,7 @@ function subscriptions_intervals_submit($form, &$form_state) {
     }
   }
   variable_set('subscriptions_send_intervals', $intervals);
+  drupal_set_message(t('The changes have been saved.'));
 }
 
 /**
@@ -911,8 +911,7 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
   }
 
   $form['labels'][$key][$author_uid] = array(
-    '#type' => 'item',
-    '#value' => $title,
+    '#markup' => $title,
   );
   $form['author'][$key][$author_uid] = array(
     '#value' => $author_value,

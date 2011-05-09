@@ -54,8 +54,8 @@ function _subscriptions_mail_cron() {
 
   while ((empty($mails_allowed) || $single_count + $digest_count < $mails_allowed)
           && timer_read('page')/1000 < $lost_seconds + $usable_seconds) {
-    $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE suspended = 0 AND last_sent + send_interval < %d ORDER BY sqid', 0, 1, array(time()));
-    if (!($s = db_fetch_array($result))) {
+    $result = db_query_range("SELECT * FROM {subscriptions_queue} WHERE suspended = 0 AND last_sent + send_interval < :time ORDER BY sqid", 0, 1, array(':time' => time()));
+    if (!($s = $result->fetchAssoc())) {
       break;  // No more ready queue items, terminate loop.
     }
 

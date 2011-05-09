@@ -17,8 +17,7 @@ function _subscriptions_mail_form_mail_edit_list_form_alter(&$form, $form_state)
       '#weight' => -5,
   );
   $form['subscriptions']['explain'] = array(
-    '#type'          => 'item',
-    '#value'         => t('You have !Subscriptions mail templates that were created under Drupal 5. Please import or remove these templates.', array('!Subscriptions' => 'Subscriptions')),
+    '#markup'        => t('You have !Subscriptions mail templates that were created under Drupal 5. Please import or remove these templates.', array('!Subscriptions' => 'Subscriptions')),
   );
   $lang_query = "SELECT DISTINCT(language) FROM {mail_edit} ORDER BY language ASC";
   $lang_result = db_query($lang_query);

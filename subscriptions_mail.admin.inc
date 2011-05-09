@@ -26,9 +26,10 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
 
   $variables = array('!Module' => 'Subscriptions');
   $form['mail_settings'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Mail settings'),
-      '#weight' => -3,
+      '#type'        => 'fieldset',
+      '#title'       => t('Mail settings'),
+      '#collapsible' => TRUE,
+      '#weight'      => -3,
   );
   $form['mail_settings']['subscriptions_site_mail'] = array(
     '#type'          => 'textfield',
