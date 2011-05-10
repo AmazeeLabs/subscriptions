@@ -37,9 +37,10 @@ function _subscriptions_blog_ui_types() {
   $tr = 't';
   $types['blog'] = array(
     'title' => $tr('Blogs'),
-    'access' => array('subscribe to blogs' => array(
+    'access' => 'subscribe to blogs',
+    'permission' => array(
       'title' => t('Subscribe to blogs'),
-    )),
+    ),
     'page' => 'subscriptions_blog_ui_page_blog',
     'fields' => array('blog', 'author_uid'),
     'weight' => -3,

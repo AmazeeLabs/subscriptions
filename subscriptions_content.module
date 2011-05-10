@@ -159,26 +159,29 @@ function _subscriptions_content_types() {
   $tr = 't';
   $types['all_types'] = array(
     'title' => '',
-    'access' => array('subscribe to all content types' => array(
+    'access' => 'subscribe to all content types',
+    'permission' => array(
       'title' => t('Subscribe to all content types'),
       'description' => t('Make unlisted and blocked content types available for subscribing. This is typically used only for administrative roles.'),
-    )),
+    ),
   );
   $types['type'] = array(
     'title' => 'Content types',
-    'access' => array('subscribe to content types' => array(
+    'access' => 'subscribe to content types',
+    'permission' => array(
       'title' => t('Subscribe to content types'),
-    )),
+    ),
     'page' => 'subscriptions_content_page_type',
     'fields' => array('node', 'type'),
     'weight' => -20,
   );
   $types['node'] = array(
     'title' => 'Pages/Threads',
-    'access' => array('subscribe to content' => array(
+    'access' => 'subscribe to content',
+    'permission' => array(
       'title' => t('Subscribe to content'),
       'description' => t('Allow the role holder to subscribe to single pages/threads.'),
-    )),
+    ),
     'page' => 'subscriptions_content_page_node',
     'fields' => array('node', 'nid'),
     'weight' => -40,

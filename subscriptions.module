@@ -210,7 +210,7 @@ function subscriptions_permission() {
       ),
       $placeholder_key => array(),
     ),
-    subscriptions_types('access')
+    subscriptions_types('permission')
   );
   if (!$return[$placeholder_key]) {
     unset($return[$placeholder_key]);
@@ -228,7 +228,7 @@ function subscriptions_permission() {
 function subscriptions_user_insert($edit, &$account, $category) {
   $new_uid = &drupal_static('subscriptions_user_insert', 0);
   db_insert('subscriptions_user')
-    ->values(array(
+    ->fields(array(
       'uid' => $account->uid,
     ))
     ->execute();
@@ -560,10 +560,12 @@ function subscriptions_types($field = NULL, $type = NULL) {
     return isset($types[$type][$field]) ? $types[$type][$field] : NULL;
   }
   elseif ($field) {
-    if ($field == 'access' && isset($list[$field]) && is_array($list[$field])) {
+    if ($field == 'permission' && isset($list['access']) && is_array($list['access'])) {
       $result = array();
-      foreach ($list[$field] as $perms) {
-        $result += $perms;
+      foreach ($list['access'] as $type => $access) {
+        if (isset($list['permission'][$type]) && is_array($list['permission'][$type])) {
+          $result[$access] = $list['permission'][$type];
+        }
       }
       return $result;
     }

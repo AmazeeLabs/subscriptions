@@ -118,9 +118,10 @@ function _subscriptions_taxonomy_types() {
   $tr = 't';
   $types['taxa'] = array(
     'title' => 'Categories',
-    'access' => array('subscribe to taxonomy terms' => array(
+    'access' => 'subscribe to taxonomy terms',
+    'permission' => array(
       'title' => t('Subscribe to taxonomy terms'),
-    )),
+    ),
     'page' => 'subscriptions_taxonomy_page_taxa',
     'fields' => array('node', 'tid'),
     'weight' => -10,
