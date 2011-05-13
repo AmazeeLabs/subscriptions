@@ -6,15 +6,17 @@
  */
 
 /**
- * Implements hook_nodeapi().
+ * Implements hook_node_view().
  *
- * Inject the node subform into node pages (depending on the Display Settings).
+ * Inject the node subform or a 'Subscribe' link into node pages
+ * (depending on the Display Settings).
  *
  * @ingroup hooks
  * @ingroup form
  */
 function subscriptions_ui_node_view($node, $view_mode, $langcode) {
   global $user;
+
   if ($node->nid && $view_mode == 'full' && subscriptions_ui_can_subscribe()) {
     if (!variable_get('subscriptions_form_in_block', 0) &&
         (!variable_get('subscriptions_form_link_only', 0) && (!arg(2) || arg(2) == 'view') ||
@@ -24,34 +26,56 @@ function subscriptions_ui_node_view($node, $view_mode, $langcode) {
           'subscriptions_ui_form' => $form,
           '#weight' => 100,
         );
+        return;
       }
+    }
+
+    subscriptions_suspended($user->uid, TRUE);
+    if (variable_get('subscriptions_form_link_only', 0) && arg(2) != 'subscribe' && (!variable_get('subscriptions_avoid_empty_subscribe_links', 0) || module_invoke_all('subscriptions', 'node_options', $user, $node))) {
+      $blocked_types = variable_get('subscriptions_blocked_content_types', array());
+      if (in_array($node->type, $blocked_types) && !user_access('subscribe to all content types')) {
+        return;
+      }
+      $node->content['links']['node']['#links']['subscriptions-subscribe'] = array(
+        'href' => $_GET['q'] . '/subscribe',
+        'title' => t('Subscribe') . (in_array($node->type, $blocked_types) ? SUBSCRIPTIONS_UNAVAILABLE : ''),
+        'html' => TRUE,
+        'fragment' => 'subscribe',
+        'attributes' => array('title' => t('Receive notifications about changes and/or comments to this page (and possibly similar pages).')),
+      );
     }
   }
 }
 
 /**
- * Implements hook_block().
+ * Implements hook_block_info().
+ *
+ * Tell Drupal about the Subscriptions Interface block.
+ *
+ * @ingroup hooks
+ */
+function subscriptions_ui_block_info() {
+  $blocks[0]['info'] = t('Subscriptions interface');
+  $blocks[0]['cache'] = DRUPAL_CACHE_PER_PAGE;
+  $blocks[0]['region'] = 'content';
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
  *
  * Define the Subscriptions Interface block for node pages (depending on the Display Settings).
  *
  * @ingroup hooks
  */
-function subscriptions_ui_block($op = 'list', $delta = 0) {
-  switch ($op) {
-    case 'list':
-      $blocks[0]['info'] = t('Subscriptions interface');
-      $blocks[0]['cache'] = BLOCK_CACHE_PER_PAGE;
-      $blocks[0]['region'] = 'content';
-      return $blocks;
-    case 'view':
-      if (subscriptions_ui_can_subscribe() && variable_get('subscriptions_form_in_block', 0) &&
-          (!variable_get('subscriptions_form_link_only', 0) && (!arg(2) || arg(2) == 'view') ||
-            variable_get('subscriptions_form_link_only', 0) && arg(2) == 'subscribe' )) {
-        return array(
-          'subject' => t('Subscriptions'),
-          'content' => drupal_get_form('subscriptions_ui_node_form', menu_get_object()),
-        );
-      }
+function subscriptions_ui_block_view($delta = 0) {
+  if (subscriptions_ui_can_subscribe() && variable_get('subscriptions_form_in_block', 0) &&
+      (!variable_get('subscriptions_form_link_only', 0) && (!arg(2) || arg(2) == 'view') ||
+        variable_get('subscriptions_form_link_only', 0) && arg(2) == 'subscribe' )) {
+    return array(
+      'subject' => t('Subscriptions'),
+      'content' => drupal_get_form('subscriptions_ui_node_form', menu_get_object()),
+    );
   }
 }
 
@@ -64,53 +88,6 @@ function subscriptions_ui_can_subscribe() {
   global $user;
 
   return ($user->uid && arg(0) == 'node' && is_numeric(arg(1)) && module_invoke('subscriptions_ui', 'get_permission_to_handle', arg(1), 'subscriptions_ui') !== FALSE);
-}
-
-/**
- * Implements hook_link().
- *
- * Add a Subscribe link to node pages (depending on the Display Settings).
- *
- * @ingroup hooks
- */
-function subscriptions_ui_link($type, $node = NULL, $teaser = NULL) {
-  global $user;
-
-  if ($type == 'node' && subscriptions_ui_can_subscribe() && empty($teaser)) {
-    subscriptions_suspended($user->uid, TRUE);
-    if (variable_get('subscriptions_form_link_only', 0) && arg(2) != 'subscribe' && (!variable_get('subscriptions_avoid_empty_subscribe_links', 0) || module_invoke_all('subscriptions', 'node_options', $user, $node))) {
-      $blocked_types = variable_get('subscriptions_blocked_content_types', array());
-      if (in_array($node->type, $blocked_types) && !user_access('subscribe to all content types')) {
-        return;
-      }
-      return array('subscriptions-subscribe' => array(
-        'href' => $_GET['q'] . '/subscribe',
-        'title' => t('Subscribe') . (in_array($node->type, $blocked_types) ? SUBSCRIPTIONS_UNAVAILABLE : ''),
-        'html' => TRUE,
-        'fragment' => 'subscribe',
-        'attributes' => array('title' => t('Receive notifications about changes and/or comments to this page (and possibly similar pages).')),
-      ));
-    }
-    elseif (variable_get('subscriptions_form_in_block', 0) && arg(2) == 'subscribe') {
-      // Make sure the block is visible
-      global $theme;
-      if (!isset($theme)) {
-        init_theme();
-      }
-      $regions = system_region_list($theme);
-      foreach (array_keys($regions) as $region) {
-        $blocks = block_list($region);
-        foreach (array_keys($blocks) as $block) {
-          if ($block == 'subscriptions_ui_0') {
-            $subscriptions_ui_block_visible = TRUE;
-          }
-        }
-      }
-      if (empty($subscriptions_ui_block_visible)) {
-        drupal_set_message(t('Enable the !module block <!link_tag_begin>here<!link_tag_end>!', array('!module' => 'Subscriptions', '!link_tag_begin' => 'a href="' . url('admin/structure/block') . '"', '!link_tag_end' => '/a')), 'error');
-      }
-    }
-  }
 }
 
 /**
@@ -420,21 +397,31 @@ function subscriptions_ui_subscriptions_ui($nid) {
 }
 
 /**
- * Implements hook_content_extra_fields().
+ * Implements hook_field_extra_fields().
  *
  * Enables CCK (admin/content/types/CONTENT_TYPE/fields) to configure the
  * position of the Subscribe fieldset within the node.
  *
  * @ingroup hooks
  */
-function subscriptions_ui_content_extra_fields($type_name) {
+function subscriptions_ui_field_extra_fields() {
   $extra = array();
-  if (!variable_get('subscriptions_form_in_block', 0)) {
-    $extra['subscriptions_ui'] = array(
-      'label' => t('Subscribe'),
-      'description' => t('!Subscriptions_UI module form.', array('!Subscriptions_UI' => 'Subscriptions UI')),
-      'weight' => 100,
-    );
+  if (variable_get('subscriptions_form_in_block', 0)) {
+    $result = db_query('SELECT module, delta, type FROM {block_node_type}');
+    $types = db_query("SELECT type FROM {block_node_type} WHERE module = :module AND delta = :delta", array(
+      ':module' => 'subscriptions_ui',
+      ':delta' => 0,
+    ))->fetchCol();
+    if (empty($types)) {
+      $types = array_keys(node_type_get_types());
+    }
+    foreach ($types as $type) {
+      $extra['node'][$type]['display']['subscriptions_ui'] = array(
+        'label' => t('Subscribe'),
+        'description' => t('!Subscriptions_UI module form.', array('!Subscriptions_UI' => 'Subscriptions UI')),
+        'weight' => 100,
+      );
+    }
   }
   return $extra;
 }
