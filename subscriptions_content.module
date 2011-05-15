@@ -187,71 +187,80 @@ function _subscriptions_content_types() {
     'weight' => -40,
   );
   return $types;
-
-  // help potx to pick up these strings:
-  t('subscribe to content');
-  t('subscribe to content types');
 }
 
 /**
- * Implements hook_nodeapi().
+ * Implements hook_node_load().
  *
  * Catch node inserts and updates and send them to the subscriptions queue;
  * catch node deletes and remove any associated thread subscriptions.
  */
-function subscriptions_content_nodeapi(&$node, $op, $arg = 0) {
+function subscriptions_content_node_load($nodes, $types) {
   global $user;
-  static $unpublished_nid;
-  switch ($op) {
-    case 'load':
-    case 'prepare':
-      $unpublished_nid = ($node->status ? NULL : $node->nid);
-      $node->subscriptions_notify = in_array((isset($node->nid) ? ($node->status ? 'n_pub' : 'n_unpub') : 'n_new'), subscriptions_content_get_default_workflow($node->type));
-      break;
-
-    case 'update':
-      if ($unpublished_nid == $node->nid && $node->status) {
-        // An unpublished node just became published -- treat this as an 'insert'!
-        $op = 'insert';
-      }
-      // fall through
-
-    case 'insert':
-      $event = array(
-        'module' => 'node',
-        'uid' => $node->uid,
-        'load_function' => 'subscriptions_content_load_node',
-        'load_args' => $node->nid,
-        'type' => 'node',
-        'action' => $op,
-        'is_new' => ($op == 'insert'),
-        'node' => $node,
-      );
-      $unpublished_nid = NULL;
-
-      // Check direct subscription and auto subscription
-      //if (isset($node->subscriptions_subscribe)) {
-      //  if ($node->subscriptions_subscribe) {
-      //    subscriptions_write_subscription('node', 'nid', $node->nid, -1, $user->uid);
-      //  }
-      //} else
-      if ($node->uid > 0 && !$arg) {
-        _subscriptions_content_autosubscribe($node->type, 'node', 'nid', $node->nid, ($op == 'insert' ? 'on_post' : 'on_update'));
-      }
-
-      if ((!isset($node->subscriptions_notify) || $node->subscriptions_notify) && !subscriptions_content_suppress_notifications()) {
-        subscriptions_queue($event);
-      }
-      break;
-
-    case 'delete':
-      db_delete('subscriptions')
-        ->condition('module', 'node')
-        ->condition('field', 'nid')
-        ->condition('value', $node->nid)
-        ->execute();
-      break;
+  $unpublished_nids = &drupal_static('subscriptions_content_unpublished_nids', array());
+  foreach ($nodes as $node) {
+    if (!$node->status) {
+      $unpublished_nids[] = $node->nid;
+    }
+    subscriptions_content_node_prepare($node);
   }
+}
+
+/**
+ * Implements hook_node_prepare().
+ */
+function subscriptions_content_node_prepare($node) {
+  $node->subscriptions_notify = in_array((isset($node->nid) ? ($node->status ? 'n_pub' : 'n_unpub') : 'n_new'), subscriptions_content_get_default_workflow($node->type));
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function subscriptions_content_node_update($node) {
+  $unpublished_nids = &drupal_static('subscriptions_content_unpublished_nids', array());
+  $inserted = FALSE;
+  if (array_search($node->nid, $unpublished_nids) !== FALSE && $node->status) {
+    // An unpublished node just became published -- treat this as an 'insert'!
+    $inserted = TRUE;
+  }
+  subscriptions_content_node_insert($node, $inserted);
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function subscriptions_content_node_insert($node, $inserted = TRUE) {
+  $event = array(
+    'module' => 'node',
+    'uid' => $node->uid,
+    'load_function' => 'subscriptions_content_load_node',
+    'load_args' => $node->nid,
+    'type' => 'node',
+    'action' => ($inserted ? 'insert' : 'update'),
+    'is_new' => $inserted,
+    'node' => $node,
+  );
+
+  if ($node->uid > 0) {
+    _subscriptions_content_autosubscribe($node->type, 'node', 'nid', $node->nid, ($inserted ? 'on_post' : 'on_update'));
+  }
+
+  if ((!isset($node->subscriptions_notify) || $node->subscriptions_notify) && !subscriptions_content_suppress_notifications()) {
+    subscriptions_queue($event);
+  }
+}
+
+/**
+ * Implements hook_node_delete().
+ *
+ * Catch node deletes and remove any associated thread subscriptions.
+ */
+function subscriptions_content_node_delete($node) {
+  db_delete('subscriptions')
+    ->condition('module', 'node')
+    ->condition('field', 'nid')
+    ->condition('value', $node->nid)
+    ->execute();
 }
 
 /**
@@ -447,15 +456,24 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
     if (isset($form['options'])) {
       $tr = 't';
       $form['options']['subscriptions_notify'] = array(
+        '#weight' => 50,
+      );
+      $form['options']['subscriptions_notify']['subscriptions_notify'] = array(
         '#type' => 'checkbox',
         '#title' => t('Send subscriptions notifications'),
-        '#description' => t('You may want to turn this OFF when you only change %Promoted_to_front_page or %Sticky_at_top_of_lists, otherwise Subscriptions will send out "update" notifications; this option is not saved.<br />Subscriptions does not send notifications for unpublished nodes (except to users who have the %administer_nodes permission), but when you set %Published to ON, Subscriptions will send out "new" notifications, unless you turn this off here.',
-                            array('%Promoted_to_front_page' => $tr('Promoted to front page'),
-                                  '%Sticky_at_top_of_lists' => $tr('Sticky at top of lists'),
-                                  '%administer_nodes' => $tr('administer nodes'),
-                                  '%Published' => $tr('Published'))),
-        '#weight' => 5,
         '#default_value' => (isset($form['#node']->subscriptions_notify) ? $form['#node']->subscriptions_notify : TRUE),
+        '#attached' => array(
+          'js' => array(drupal_get_path('module', 'subscriptions') . '/subscriptions_content.js'),
+        ),
+        '#attributes' => array('class' => array('subscriptions-notifications')),
+      );
+      $form['options']['subscriptions_notify']['note'] = array(
+        '#type' => 'item',
+        '#description' => t('You may want to turn %Send_subscriptions_notifications OFF when you only change %Publishing_options, otherwise Subscriptions will send out "update" notifications &mdash; this option is not saved.<br />Subscriptions does not send notifications for unpublished nodes (except to users who have the %administer_nodes permission), but when you set %Published to ON, Subscriptions will send out "new" notifications, unless you turn this off here.',
+                            array('%Send_subscriptions_notifications' => t('Send subscriptions notifications'),
+                                  '%Publishing_options' => $tr('Publishing options'),
+                                  '%administer_nodes' => $tr('Administer content'),
+                                  '%Published' => $tr('Published'))),
       );
     }
   }
@@ -550,9 +568,11 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
  */
 function subscriptions_content_node_admin_nodes_submit($form, &$form_state) {
   if (!$form_state['values']['subscriptions_notify']) {
+dpm("SUPPRESS");
     subscriptions_content_suppress_notifications(TRUE);
     return;
   }
+dpm("ALLOW");
   if ($form_state['values']['operation'] == 'publish') {
     foreach ($form_state['values']['nodes'] as $nid) {
       if ($nid != 0 && ($node = node_load($nid)) && !$node->status) {

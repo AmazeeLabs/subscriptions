@@ -356,17 +356,17 @@ function subscriptions_queue($event) {
             s.author_uid IN (%d, -1) AND $conditions";
 
         $select = db_select('subscriptions', 's');
-        $su_alias = $select->innerJoin('subscriptions_user', 'su', 's.recipient_uid = su.uid');
-        $u_alias = $select->innerJoin('user', 'u', 'su.uid = u.uid');
+        $select->innerJoin('subscriptions_user', 'su', 's.recipient_uid = su.uid');
+        $select->innerJoin('users', 'u', 'su.uid = u.uid');
+        $select->leftJoin('subscriptions_last_sent', 'sls', 'su.uid = sls.uid AND s.send_interval = sls.send_interval');
         $select
           ->fields('u', array('uid', 'name', 'language'))
           ->fields('s', array('module', 'field', 'value', 'author_uid', 'send_interval'))
-          ->fields('su', array('digest'));
-        $select->addExpression('COALESCE(sls.last_sent, 0)');
-        $select->addExpression($event['load_function']);
-        $select->addExpression($event['load_args']);
-        $select->addExpression((int) $event['is_new']);
-        $select->addExpression('suspended');
+          ->fields('su', array('digest', 'suspended'));
+        $select->addExpression('COALESCE(sls.last_sent, 0)', 'last_sent');
+        $select->addExpression("'" . $event['load_function'] . "'", 'load_function');
+        $select->addExpression("'" . $event['load_args'] . "'", 'load_args');
+        $select->addExpression((int) $event['is_new'], 'is_new');
         $select
           ->condition('s.module', $module)
           ->condition('s.field', $field)
@@ -392,11 +392,10 @@ function subscriptions_queue($event) {
             ->groupBy($query['groupby']);  //TODO
         }
         $insert = db_insert('subscriptions_queue')
-          ->fields(array('uid', 'name', 'language', 'module', 'field', 'value', 'author_uid', 'send_interval', 'digest', 'last_sent', 'load_function', 'load_args', 'is_new', 'suspended'))
-          ->values($select);
+          ->from($select);
         $count = $insert->execute();
         /*  for debugging:
-        drupal_set_message($insert->to_string() . '<br />' . $count . ' row(s) inserted.');
+        drupal_set_message($insert->__toString() . '<br />' . $count . ' row(s) inserted.');
         /**/
       }
     }
