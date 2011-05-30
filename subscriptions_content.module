@@ -34,10 +34,10 @@ function subscriptions_content_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
         $params['node']['nid']['value'] = $node->nid;
         $params['node']['type']['value'] = $node->type;
         if ($arg0['type'] == 'comment') {
-          $where = 's.send_comments = 1';
+          $where[] = array('s.send_comments', 1, '=');
         }
         elseif ($arg0['type'] == 'node' && $arg0['action'] == 'update') {
-          $where  = 's.send_updates = 1';
+          $where[] = array('s.send_updates', 1, '=');
         }
         if (isset($where)) {
           $params['node']['nid']['where'] = $where;
@@ -462,9 +462,6 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
         '#type' => 'checkbox',
         '#title' => t('Send subscriptions notifications'),
         '#default_value' => (isset($form['#node']->subscriptions_notify) ? $form['#node']->subscriptions_notify : TRUE),
-        '#attached' => array(
-          'js' => array(drupal_get_path('module', 'subscriptions') . '/subscriptions_content.js'),
-        ),
         '#attributes' => array('class' => array('subscriptions-notifications')),
       );
       $form['options']['subscriptions_notify']['note'] = array(
@@ -642,12 +639,24 @@ function subscriptions_content_type_is_blocked($content_type) {
 function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   global $language;
   include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions_mail') . '/subscriptions_mail.templates.inc';
+  include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.mail.inc';
 
+  //$langcode = $GLOBALS['language_content']->language;
+  $langcode = $node->language;
+  $body = $node->body[$langcode][0];
+  $format = $body['format'];
+//dpm($format);
+  $body = field_view_field('node', $node, 'body', 'full', $langcode);
+  $body = $body[0]['#markup'];
+  $teaser = field_view_field('node', $node, 'body', 'teaser', $langcode);
+//dpm($teaser);
+  $teaser = $teaser[0]['#markup'];
   $mailvars['!url'] = url('node/' . $node->nid, array('absolute' => TRUE));
   $mailvars['!node_type'] = $node->type;
   $mailvars['!title'] = trim($node->title);
-  $mailvars['!teaser'] = _subscriptions_content_format_text($node->teaser, $node->format);
-  $mailvars['!body'] = _subscriptions_content_format_text($node->body, $node->format);
+  $mailvars['!teaser'] = subscriptions_html_to_text($teaser);
+//dpm($mailvars['!teaser']);
+  $mailvars['!body'] = subscriptions_html_to_text($body);
   $mailvars['!nid'] = $node->nid;
   $mailvars['!full_node'] = (variable_get('subscriptions_generate_full_node', 0) ? _subscriptions_content_format_text(node_view($node, FALSE, TRUE, FALSE)) : '!full_node');
   $mailvars['!is_new'] = (integer) !empty($node->_subscriptions_is_new);
@@ -689,7 +698,7 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
 /**
  * Convert text with formatting into plain text.
  */
-function _subscriptions_content_format_text($text, $format = NULL) {
+function _subscriptions_content_format_text($text, $format = NULL, $langcode = '') {
   static $have_img_assist;
   if (!isset($have_img_assist)) {
     $have_img_assist = module_exists('img_assist');
@@ -703,10 +712,13 @@ function _subscriptions_content_format_text($text, $format = NULL) {
     }
   }
 
+//dpm($text, "_subscriptions_content_format_text IN");
   if (isset($format)) {
-    $text = check_markup($text, $format, $langcode = '', FALSE);
+    $text = check_markup($text, $format, $langcode, FALSE);
   }
-  $text = drupal_html_to_text($text);
+//dpm($text, "AFTER check_markup(\$text, '$format', '$langcode', FALSE)");
+  $text = subscriptions_html_to_text($text);
+//dpm($text, "AFTER subscriptions_html_to_text(\$text)");
   return trim($text);
 }
 
@@ -818,9 +830,10 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
   if (!empty($node) && module_exists('comment')) {
     $published_comments_only = $limit_sqids = '';
     $query = db_select('comment', 'c');
-    $sq_alias = $query->join('subscriptions_queue', 'q', 'c.cid == q.load_args');
-    $query->fields('q', array('sqid' => '_subscriptions_sqid', 'is_new' => '_subscriptions_is_new'));
+    $sq_alias = $query->join('subscriptions_queue', 'q', (db_driver() != 'pgsql' ? 'c.cid = q.load_args' : 'CAST(c.cid AS VARCHAR) = q.load_args'));
     $query->fields('c');
+    $query->addField('q', 'sqid', '_subscriptions_sqid');
+    $query->addField('q', 'is_new', '_subscriptions_is_new');
     $query->condition('q.uid', $user->uid);
     $query->condition('q.load_function', 'subscriptions_content_load_comment');
     $query->condition('c.nid', $nid);
@@ -835,7 +848,7 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
     }
     $query->addTag('comment_access');
     $sqids = array();
-    foreach($query->execute() as $comment) {
+    foreach ($query->execute() as $comment) {
       comment_invoke_comment($comment, 'view');
       if ($comment && user_access('access comments') && !isset($node->_subscriptions_comments[$comment->cid])) {
         $node->_subscriptions_comments[$comment->cid] = $comment;

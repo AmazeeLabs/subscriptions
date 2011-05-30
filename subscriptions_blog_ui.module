@@ -58,13 +58,14 @@ function subscriptions_blog_ui_page_blog($account, $form) {
   $blogs = array();
   // get the blogs
   $query = db_select('node', 'n');
-  $user_alias = $query->join('user', 'u', 'n.uid = u.uid');
+  $user_alias = $query->join('users', 'u', 'n.uid = u.uid');
   $result = $query
     ->fields($user_alias, array('uid', 'name'))
     ->condition('n.type', 'blog')
     ->condition('n.status', 1)
-    ->groupBy(array('u.uid', 'u.name'))
-    ->orderBy(array('u.name'))
+    ->groupBy('u.uid')
+    ->groupBy('u.name')
+    ->orderBy('u.name')
     ->execute();
   foreach ($result as $usr) {
     $blogs[$usr->uid] = array(
@@ -80,9 +81,9 @@ function subscriptions_blog_ui_page_blog($account, $form) {
       SELECT s.author_uid, u.name
       FROM {subscriptions} s
       INNER JOIN {users} u ON s.author_uid = u.uid
-      WHERE s.module = 'node' AND s.field = 'type' AND s.value = 'blog' AND s.recipient_uid = %d
-      ORDER BY u.name", $account->uid);
-    while ($usr = db_fetch_array($result)) {
+      WHERE s.module = 'node' AND s.field = 'type' AND s.value = 'blog' AND s.recipient_uid = :recipient_uid
+      ORDER BY u.name", array(':recipient_uid' => $account->uid), array('fetch' => PDO::FETCH_ASSOC));
+    foreach ($result as $usr) {
       $blogs[$usr['author_uid']]['uid'] = $usr['author_uid'];
       $blogs[$usr['author_uid']]['name'] = $usr['name'];
     }
@@ -108,9 +109,9 @@ function subscriptions_blog_ui_blog_form($form, &$form_state, $blogs, $account, 
     SELECT s.value, s.send_interval, s.author_uid, s.send_comments, s.send_updates, u.name
     FROM {subscriptions} s
     INNER JOIN {users} u ON s.author_uid = u.uid
-    WHERE s.module = 'node' AND s.field = 'type' AND s.value = 'blog' AND s.recipient_uid = %d
-    ORDER BY u.name", $uid);
-  while ($s = db_fetch_array($result)) {
+    WHERE s.module = 'node' AND s.field = 'type' AND s.value = 'blog' AND s.recipient_uid = :recipient_uid
+    ORDER BY u.name", array(':recipient_uid' => $uid), array('fetch' => PDO::FETCH_ASSOC));
+  foreach ($result as $s) {
     $subscriptions[$s['author_uid']] = $s;
   }
   $form[0] = array(

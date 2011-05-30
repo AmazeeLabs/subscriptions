@@ -336,29 +336,32 @@ function subscriptions_queue($event) {
     foreach ($subs_module_query as $module => $module_query) {
       foreach ($module_query as $field => $query) {
         //TODO: if any of $join, $where, $args are assigned, this doesn't work!
-        $join = empty($query['join']) ? '' : $query['join'];
-        $where = empty($query['where']) ? array() : array($query['where']);
-        if (!empty($query['args'])) {
-          $args = array_merge($args, $query['args']);
-        }
-        $conditions = implode(' AND ', $where);
-        $sql = "
-          INSERT INTO {subscriptions_queue} (uid, name, language, module, field, value, author_uid, send_interval, digest, last_sent, load_function, load_args, is_new, suspended)
-          SELECT u.uid, u.name, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, COALESCE(sls.last_sent, 0), '%s', '%s', '%d', suspended
-          FROM {subscriptions} s
-          INNER JOIN {subscriptions_user} su ON s.recipient_uid = su.uid
-          INNER JOIN {users} u ON su.uid = u.uid
-          $join
-          LEFT JOIN {subscriptions_last_sent} sls ON su.uid = sls.uid AND s.send_interval = sls.send_interval
-          WHERE
-            s.module = '%s' AND
-            s.field = '%s' AND
-            s.author_uid IN (%d, -1) AND $conditions";
+        //$join = empty($query['join']) ? '' : $query['join'];
+        //$where = empty($query['where']) ? array() : array($query['where']);
+        //if (!empty($query['args'])) {
+        //  $args = array_merge($args, $query['args']);
+        //}
+        //$conditions = implode(' AND ', $where);
+        //$sql = "
+        //  INSERT INTO {subscriptions_queue} (uid, name, language, module, field, value, author_uid, send_interval, digest, last_sent, load_function, load_args, is_new, suspended)
+        //  SELECT u.uid, u.name, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, COALESCE(sls.last_sent, 0), '%s', '%s', '%d', suspended
+        //  FROM {subscriptions} s
+        //  INNER JOIN {subscriptions_user} su ON s.recipient_uid = su.uid
+        //  INNER JOIN {users} u ON su.uid = u.uid
+        //  $join
+        //  LEFT JOIN {subscriptions_last_sent} sls ON su.uid = sls.uid AND s.send_interval = sls.send_interval
+        //  WHERE
+        //    s.module = '%s' AND
+        //    s.field = '%s' AND
+        //    s.author_uid IN (%d, -1) AND $conditions";
 
         $select = db_select('subscriptions', 's');
         $select->innerJoin('subscriptions_user', 'su', 's.recipient_uid = su.uid');
         $select->innerJoin('users', 'u', 'su.uid = u.uid');
         $select->leftJoin('subscriptions_last_sent', 'sls', 'su.uid = sls.uid AND s.send_interval = sls.send_interval');
+        if (!empty($query['join'])) {
+          $alias = $select->innerJoin($query['join']['table'], $query['join']['alias'], $query['join']['on']);
+        }
         $select
           ->fields('u', array('uid', 'name', 'language'))
           ->fields('s', array('module', 'field', 'value', 'author_uid', 'send_interval'))
@@ -371,7 +374,14 @@ function subscriptions_queue($event) {
           ->condition('s.module', $module)
           ->condition('s.field', $field)
           // author-specific subscriptions trigger on comments, when the node author is subscribed to:
-          ->condition('s.author_uid', array(($module == 'node' && $event['type'] == 'comment' && isset($event['node']->uid) ? $event['node']->uid : $event['uid']) , -1), 'IN');
+          ->condition('s.author_uid', array(($module == 'node' && $event['type'] == 'comment' && isset($event['node']->uid) ? $event['node']->uid : $event['uid']) , -1), 'IN')
+          ->groupBy('u.uid');
+
+        if (!empty($query['where'])) {
+          foreach ($query['where'] as $cond) {
+            $select->condition($cond[0], $cond[1], $cond[2]);
+          }
+        }
 
         if (!empty($query['value'])) {
           $select
@@ -389,13 +399,13 @@ function subscriptions_queue($event) {
         }
         if (!empty($query['groupby'])) {
           $select
-            ->groupBy($query['groupby']);  //TODO
+            ->groupBy($query['groupby']);
         }
         $insert = db_insert('subscriptions_queue')
           ->from($select);
-        $count = $insert->execute();
+        $sqid = $insert->execute();
         /*  for debugging:
-        drupal_set_message($insert->__toString() . '<br />' . $count . ' row(s) inserted.');
+        drupal_set_message($insert->__toString() . '<br />ID=' . $sqid . ' inserted.');
         /**/
       }
     }

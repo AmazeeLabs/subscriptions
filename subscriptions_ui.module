@@ -119,7 +119,7 @@ function subscriptions_ui_node_form($form, &$form_state, $node, $account = NULL)
     $is_blocked = TRUE;
   }
 
-  $show_node_info = theme_get_setting('toggle_node_info_' . $node->type);
+  $show_node_info = variable_get('node_submitted_' . $node->type, 1);
   $node_options = module_invoke_all('subscriptions', 'node_options', $account, $node);
   if (!$node_options || !user_access('subscribe to content', $account)) {
     return array();

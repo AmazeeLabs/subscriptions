@@ -28,20 +28,15 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
       if ($arg0['module'] == 'node') {
         $node = $arg0['node'];
         $params['node']['tid'] = array(
-          'join' => 'INNER JOIN {taxonomy_term_node} tn ON s.value = ' . ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(' : '')
-                                                          . 'tn.tid' . ($GLOBALS['db_type'] == 'pgsql' ? ' AS VARCHAR)' : ''),
-          'where' => 'tn.nid = %d',
-          'args' => array($node->nid),
-          'groupby' => 'GROUP BY u.uid, tn.nid',
+          'join' => array('table' => 'taxonomy_index', 'alias' => 'tn', 'on' => (db_driver() != 'pgsql' ? 's.value = tn.tid' : 's.value = CAST(tn.tid AS VARCHAR)')),
+          'where' => array(array('tn.nid', $node->nid, '=')),
+          'groupby' => 'tn.nid',
         );
         if ($arg0['type'] == 'comment') {
-          $where = ' AND s.send_comments = 1';
+          $params['node']['tid']['where'][] = array('s.send_comments', 1, '=');
         }
         elseif ($arg0['type'] == 'node' && $arg0['action'] == 'update') {
-          $where  = ' AND s.send_updates = 1';
-        }
-        if (isset($where)) {
-          $params['node']['tid']['where'] .= $where;
+          $params['node']['tid']['where'][] = array('s.send_updates', 1, '=');
         }
         return $params;
       }
@@ -76,27 +71,41 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
  * @see subscriptions_ui_node_form()
  */
 function _subscriptions_taxonomy_node_options($account, $node) {
-  if (!isset($node->taxonomy) || !is_array($node->taxonomy)) {
-    return;
-  }
   $options = array();
   $vids_to_omit = variable_get('subscriptions_omitted_taxa', array());
-  foreach ($node->taxonomy as $tid => $term) {
-    // Taxonomy term
-    if (in_array($term->vid, $vids_to_omit)) {
-      continue;
+  foreach ((array) $node as $field_key => $field_value) {
+    if (is_array($field_value)) {
+      foreach ($field_value as $lang_key => $field_lang_value) {
+        if (is_array($field_lang_value)) {
+          foreach ($field_lang_value as $item) {
+            if (is_array($item)) {
+              if (isset($item['taxonomy_term'])) {
+                $term = $item['taxonomy_term'];
+                if (!in_array($term->vid, $vids_to_omit)) {
+                  $tid = $term->tid;
+                  $options['tid'][] = array(
+                    'name' => t('To content in %term', array('%term' => $term->name)),
+                    'params' => array('module' => 'node', 'field' => 'tid', 'value' => $tid),
+                    'link' => 'taxa/' . $tid,
+                  );
+                  $options['tid'][] = array(
+                    'name' => t('To content in %term by %name', array('%term' => $term->name, '%name' => ($node->uid ? check_plain($node->name) : variable_get('anonymous', '???')))),
+                    'params' => array('module' => 'node', 'field' => 'tid', 'value' => $tid, 'author_uid' => $node->uid),
+                    'link' => 'taxa/' . $tid . '/' . $node->uid,
+                  );
+                  if ($field_key == 'taxonomy_forums') {
+                    // Move forum items to the top.
+                    array_unshift($options['tid'], array_pop($options['tid']));
+                    array_unshift($options['tid'], array_pop($options['tid']));
+                  }
+                  $options['tid']['weight'] = -1;
+                }
+              }
+            }
+          }
+        }
+      }
     }
-    $options['tid'][] = array(
-      'name' => t('To content in %term', array('%term' => $term->name)),
-      'params' => array('module' => 'node', 'field' => 'tid', 'value' => $tid),
-      'link' => 'taxa/' . $tid,
-    );
-    $options['tid'][] = array(
-      'name' => t('To content in %term by %name', array('%term' => $term->name, '%name' => ($node->uid ? check_plain($node->name) : variable_get('anonymous', '???')))),
-      'params' => array('module' => 'node', 'field' => 'tid', 'value' => $tid, 'author_uid' => $node->uid),
-      'link' => 'taxa/' . $tid . '/' . $node->uid,
-    );
-    $options['tid']['weight'] = -1;
   }
   return $options;
 }
@@ -213,7 +222,7 @@ function subscriptions_taxonomy_page_taxa($account, $form) {
 function subscriptions_taxonomy_taxa_form($form, &$form_state, $vocabularies, $account, $form) {
   $uid = (isset($account) ? $account->uid : (is_numeric(arg(5)) ? -arg(5) : -DRUPAL_AUTHENTICATED_RID));
   $query = db_select('taxonomy_term_data', 't', array('fetch' => PDO::FETCH_ASSOC));
-  $subscriptions_alias = $query->join('subscriptions', 's', ($GLOBALS['db_type'] == 'pgsql' ? 'CAST(t.tid AS VARCHAR) = s.value' : 't.tid = s.value'));
+  $subscriptions_alias = $query->join('subscriptions', 's', (db_driver() != 'pgsql' ? 't.tid = s.value' : 'CAST(t.tid AS VARCHAR) = s.value'));
   $result = $query
     ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
     ->fields('t', array('tid', 'vid', 'name'))

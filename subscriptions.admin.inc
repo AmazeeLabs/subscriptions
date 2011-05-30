@@ -914,7 +914,7 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
     '#markup' => $title,
   );
   $form['author'][$key][$author_uid] = array(
-    '#value' => $author_value,
+    '#markup' => $author_value,
   );
   $form['send_interval'][$key][$author_uid] = array(
     '#type' => 'select',

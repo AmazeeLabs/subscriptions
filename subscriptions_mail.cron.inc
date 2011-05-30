@@ -61,9 +61,8 @@ function _subscriptions_mail_cron() {
 
     $saved_user = $user;
     $saved_language = $language;
-    session_save_session(FALSE);
+    drupal_save_session(FALSE);
     $user = user_load($s['uid']);
-    drupal_init_language();
     $langcode = $language->language;
     $digest_data = array();
 
@@ -118,7 +117,6 @@ function _subscriptions_mail_cron() {
             $body_template = subscriptions_mail_template_load($mailkey, $langcode, 'body', 'BODY');
             $subject_template = subscriptions_mail_template_load($mailkey, $langcode, 'subject', 'SUBJ');
           }
-          init_theme();
           $show_node_info = (isset($object->type) ? theme_get_setting('toggle_node_info_' . $object->type) : TRUE);
           $base = 'user/' . $s['uid'];
           $mailvars = array(
@@ -148,7 +146,11 @@ function _subscriptions_mail_cron() {
             $digest_comment_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY . '+comment', $langcode, 'body', 'DITEMCMT');
             $mailvars['!comments'] = _subscriptions_content_format_comments($object, $digest_comment_template, '');
           }
+//kpr('[' . $body_template . ']');
+kpr('[' . $mailvars['!teaser'] . ']');
+//kpr('[' . subscriptions_mail_template_preprocess($body_template, $mailvars) . ']');
           $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
+//kpr($body);
           if (variable_get('subscriptions_showmailkeys', 0)) {
             $body .= t('| Mailkey: @mailkey/@langcode', array('@mailkey' => $mailkey, '@langcode' => $langcode)) . "\n";
           }
@@ -210,7 +212,7 @@ function _subscriptions_mail_cron() {
 
     $user = $saved_user;
     $language = $saved_language;
-    session_save_session(TRUE);
+    drupal_save_session(TRUE);
   }
 
   if ($single_count + $digest_count > 0) {
@@ -265,13 +267,13 @@ function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, 
     return;
   }
 
-  $mail_success = drupal_mail('subscriptions_mail', $mailkey, $to, user_preferred_language($user), array(
+  $mail_success = subscriptions_mail('subscriptions_mail', $mailkey, $to, user_preferred_language($user), array(
     'account' => $user,
     'object' => NULL,
     'context' => array(
       'recipient' => $to,
       'subject' => $subject,
-      'message' => $body,
+      'message' => array($body),
     ),
   ), $from, TRUE);
 
