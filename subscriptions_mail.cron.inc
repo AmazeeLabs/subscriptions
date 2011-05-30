@@ -147,7 +147,7 @@ function _subscriptions_mail_cron() {
             $mailvars['!comments'] = _subscriptions_content_format_comments($object, $digest_comment_template, '');
           }
 //kpr('[' . $body_template . ']');
-kpr('[' . $mailvars['!teaser'] . ']');
+//kpr('[' . $mailvars['!teaser'] . ']');
 //kpr('[' . subscriptions_mail_template_preprocess($body_template, $mailvars) . ']');
           $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
 //kpr($body);
