@@ -565,11 +565,11 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
  */
 function subscriptions_content_node_admin_nodes_submit($form, &$form_state) {
   if (!$form_state['values']['subscriptions_notify']) {
-dpm("SUPPRESS");
+//dpm("SUPPRESS");
     subscriptions_content_suppress_notifications(TRUE);
     return;
   }
-dpm("ALLOW");
+//dpm("ALLOW");
   if ($form_state['values']['operation'] == 'publish') {
     foreach ($form_state['values']['nodes'] as $nid) {
       if ($nid != 0 && ($node = node_load($nid)) && !$node->status) {

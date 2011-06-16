@@ -3,13 +3,14 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Remove left-over dpm() call, too.
 
 
 subscriptions 7.x-1.0-ALPHA2 (2011-05-31):
-   - #1172646: Remove left-over kpr() call.
+  - #1172646: Remove left-over kpr() call.
 
 
 subscriptions 7.x-1.0-ALPHA1 (2011-05-30):
-   - Various fixes.
-   - Initial port to D7 (pre-ALPHA quality).
-   - Copied Subscriptions 6.x-1.4.
+  - Various fixes.
+  - Initial port to D7 (pre-ALPHA quality).
+  - Copied Subscriptions 6.x-1.4.
