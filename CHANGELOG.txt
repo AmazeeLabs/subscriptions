@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1189366: Fix name of {users} core table.
   - Remove left-over dpm() call, too.
 
 

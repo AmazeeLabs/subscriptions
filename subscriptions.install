@@ -102,7 +102,7 @@ function subscriptions_install() {
       'send_self' => 1,
     ))
     ->execute();
-  $select = db_select('user', 'u')
+  $select = db_select('users', 'u')
     ->fields('u', array('uid'))
     ->condition('uid', 0, '>');
   db_insert('subscriptions_user')
