@@ -47,7 +47,7 @@ function subscriptions_menu() {
 
   $items['admin/config/subscriptions'] = array(
     'title' => 'Subscriptions',
-    'description' => 'Enables site settings for user subscriptions.',
+    'description' => 'Site and user default settings for Subscriptions.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('subscriptions_settings_form'),
     'access arguments' => array('administer site configuration'),
