@@ -254,7 +254,7 @@ function subscriptions_mail_mail($key, &$message, $params) {
   global $base_url;
 
   $url = parse_url($base_url);
-  $list_id = variable_get('site_name', '') . ' ' . t('Subscriptions') . ' <subscriptions. ' . $url['host'] . '>';
+  $list_id = variable_get('site_name', '') . ' ' . t('Subscriptions') . ' <subscriptions.' . $url['host'] . '>';
 
   $message['subject'] = $params['context']['subject'];
   $message['body'] = $params['context']['message'];
