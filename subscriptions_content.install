@@ -12,10 +12,10 @@ function subscriptions_content_install() {
   // subscriptions_content.module needs to be heavier than taxonomy.module --
   // otherwise term_node record has not been written when subscriptions_queue() is called!
   // subscriptions_content_cron() will ensure this constraint at run-time.
-  $weight = 1 + db_select('system')
-    ->fields('system', array('weight'))
-    ->condition('name', 'taxonomy')
-    ->condition('type', 'module')
+  $weight = 1 + db_select('system', 's')
+    ->fields('s', array('weight'))
+    ->condition('s.name', 'taxonomy')
+    ->condition('s.type', 'module')
     ->execute()
     ->fetchField();
   db_update('system')

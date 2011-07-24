@@ -104,7 +104,7 @@ function subscriptions_install() {
     ->execute();
   $select = db_select('users', 'u')
     ->fields('u', array('uid'))
-    ->condition('uid', 0, '>');
+    ->condition('u.uid', 0, '>');
   db_insert('subscriptions_user')
     ->from($select)
     ->execute();
@@ -205,7 +205,7 @@ function subscriptions_update_6101() {
     $select->addField('uid');
     $select->addExpression($send_interval);
     $select->addField('last_sent');
-    $select->condition('uid', 0, '>');
+    $select->condition('su.uid', 0, '>');
     db_insert('subscriptions_last_sent')
       ->from($select)
       ->execute();
