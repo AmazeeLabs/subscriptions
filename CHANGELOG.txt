@@ -1,5 +1,6 @@
 
 CHANGELOG for Subscriptions 1.x for Drupal 7
+  - #1236872: Fix notifications for new or updated comments.
 
 
 subscriptions 7.x-1.x-dev:
