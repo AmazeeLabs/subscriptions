@@ -1,9 +1,10 @@
 
 CHANGELOG for Subscriptions 1.x for Drupal 7
-  - #1236872: Fix notifications for new or updated comments.
 
 
 subscriptions 7.x-1.x-dev:
+  - #1241944: Remove hard-coded dependency on comment.module.
+  - #1236872: Fix notifications for new or updated comments.
   - #1228214: Fully qualify field parameter in SelectQuery::condition(), SelectQuery::orderBy() calls.
 
 
