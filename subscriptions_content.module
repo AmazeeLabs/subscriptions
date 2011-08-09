@@ -573,7 +573,6 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
       $form['author']['subscriptions_notify']['#default_value'] = in_array(($is_update ? 'c_pub' : 'c_new'), $default_workflow);
     }
   }
-  dpm($form);
 }
 
 /**
