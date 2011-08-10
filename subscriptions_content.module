@@ -533,21 +533,23 @@ function subscriptions_content_form_node_admin_nodes_alter(&$form, &$form_state)
  * @ingroup form
  */
 function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
-  $is_update = isset($form['admin']);
-  $is_unpublished = ($is_update ? $form['admin']['status']['#default_value'] : !user_access('post comments without approval'));
+  $is_update = isset($form['cid']['#value']);
+  $is_unpublished = ($is_update ? $form['author']['status']['#default_value'] : !user_access('post comments without approval'));
   if (user_access('administer comments')) {
     $tr = 't';
     // create the Administration fieldset if it doesn't exist:
-    if (!isset($form['author'])) {
-      $form['author'] = array(
-        '#type' => 'fieldset',
-        '#title' => $tr('Administration'),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-        '#weight' => -2,
-      );
-    }
-    $form['author']['subscriptions_notify'] = array(
+    //if (!isset($form['author'])) {
+    //  $form['author'] = array(
+    //    '#type' => 'fieldset',
+    //    '#title' => $tr('Administration'),
+    //    '#collapsible' => TRUE,
+    //    '#collapsed' => TRUE,
+    //    '#weight' => -2,
+    //  );
+    //}
+    $item =& $form['author']['subscriptions_notify'];
+    $item['#type'] = 'item';
+    $item['subscriptions_notify'] = array(
       '#type' => 'checkbox',
       '#title' => t('Send subscriptions notifications'),
     );
@@ -555,22 +557,22 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
     $node = node_load($form['nid']['#value']);
     $default_workflow = subscriptions_content_get_default_workflow($node->type);
     if ($is_update && $is_unpublished) {
-      $form['author']['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out "new" notifications, unless you suppress this here. ', array(
+      $item['#description'] = t('Subscriptions notifications are not sent for unpublished comments (except to users who have the %administer_comments permission), but when you change !Status to %Published, Subscriptions will send out "new" notifications, unless you suppress this here. ', array(
         '%administer_comments' => $tr('administer comments'),
         '!Status' => $tr('Status'),
         '%Published' => $tr('Published'),
       ));
-      $form['author']['subscriptions_notify']['#default_value'] = in_array('c_unpub', $default_workflow);
+      $item['subscriptions_notify']['#default_value'] = in_array('c_unpub', $default_workflow);
     }
     elseif ($is_unpublished) {
-      $form['author']['subscriptions_notify']['#description'] = t('Subscriptions notifications are not sent for unpublished comments, except to users who have the %administer_comments permission, and you can even suppress the latter here.', array(
+      $item['#description'] = t('Subscriptions notifications are not sent for unpublished comments, except to users who have the %administer_comments permission, and you can even suppress the latter here.', array(
         '%administer_comments' => $tr('administer comments'),
       ));
-      $form['author']['subscriptions_notify']['#default_value'] = in_array('c_new', $default_workflow);
+      $item['subscriptions_notify']['#default_value'] = in_array('c_new', $default_workflow);
     }
     else { // published, new or update
-      $form['author']['subscriptions_notify']['#description'] = t('You can suppress sending subscriptions notifications here; this option is not saved.');
-      $form['author']['subscriptions_notify']['#default_value'] = in_array(($is_update ? 'c_pub' : 'c_new'), $default_workflow);
+      $item['#description'] = t('You can suppress sending subscriptions notifications here; this option is not saved.');
+      $item['subscriptions_notify']['#default_value'] = in_array(($is_update ? 'c_pub' : 'c_new'), $default_workflow);
     }
   }
 }
@@ -657,6 +659,7 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.mail.inc';
 
   //$langcode = $GLOBALS['language_content']->language;
+  $node = (is_array($node) ? (object) $node : $node);
   $langcode = $node->language;
   $body = $node->body[$langcode][0];
   $format = $body['format'];
@@ -743,12 +746,13 @@ function _subscriptions_content_format_text($text, $format = NULL, $langcode = '
  */
 function _subscriptions_content_format_comments($node, $comment_template, $separator) {
   $comments = array();
-  foreach ($node->_subscriptions_comments as $comment) {
+  foreach (element_children($node->_subscriptions_comments) as $cid) {
+    $comment = $node->_subscriptions_comments[$cid]['#comment'];
     $mailvars = array(
       '!comment_name' => ($comment->uid == 0 ? variable_get('anonymous', '!comment_name') : $comment->name),
       '!comment_uid' => $comment->uid,
       '!comment_title' => trim($comment->subject),
-      '!comment_text' => _subscriptions_content_format_text($comment->comment, $comment->format),
+      '!comment_text' => $comment->comment_body[$comment->language][0]['safe_value'],
       '!comment_cid' => $comment->cid,
       '!comment_nid' => $comment->nid,
       '!comment_url' => url('node/' . $comment->nid, array('fragment' => 'comment-' . $comment->cid, 'absolute' => TRUE)),
@@ -817,7 +821,7 @@ function subscriptions_content_load_comment($cid, $sqid) {
   if (empty($nid)) {
     return;
   }
-  $item = db_fetch_array(db_query('SELECT sq.module, sq.field FROM {subscriptions_queue} sq WHERE sqid = :sqid', array(':sqid' => $sqid)));
+  $item = db_query('SELECT sq.module, sq.field FROM {subscriptions_queue} sq WHERE sqid = :sqid', array(':sqid' => $sqid))->fetchAssoc();
   if ($item['module'] != 'node' || $item['field'] != 'nid') {
     // Only if we're processing a node/nid queue item should we cut off the comments at an update item, otherwise not:
     $sqid = NULL;
@@ -844,36 +848,56 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
 
   if (!empty($node) && module_exists('comment')) {
     $published_comments_only = $limit_sqids = '';
+
+    // Load comments like comment_get_thread().
     $query = db_select('comment', 'c');
-    $sq_alias = $query->join('subscriptions_queue', 'q', (db_driver() != 'pgsql' ? 'c.cid = q.load_args' : 'CAST(c.cid AS VARCHAR) = q.load_args'));
-    $query->fields('c');
-    $query->addField('q', 'sqid', '_subscriptions_sqid');
-    $query->addField('q', 'is_new', '_subscriptions_is_new');
-    $query->condition('q.uid', $user->uid);
-    $query->condition('q.load_function', 'subscriptions_content_load_comment');
-    $query->condition('c.nid', $nid);
+    $query->addField('c', 'cid');
+    $query
+      ->condition('c.nid', $nid)
+      ->addTag('node_access')
+      ->addTag('comment_filter')
+      ->addMetaData('node', $node);
+
+    $query->join('subscriptions_queue', 'sq', (db_driver() != 'pgsql' ? 'c.cid = sq.load_args' : 'CAST(c.cid AS VARCHAR) = sq.load_args'));
+    $query->addField('sq', 'sqid', '_subscriptions_sqid');
+    $query->addField('sq', 'is_new', '_subscriptions_is_new');
+    $query->condition('sq.uid', $user->uid);
+    $query->condition('sq.load_function', 'subscriptions_content_load_comment');
+
     if (!user_access('administer comments')) {
       $query->condition('c.status', COMMENT_PUBLISHED);
     }
+    $query->orderBy('c.cid', 'ASC');
+
     if (!empty($comment_load_sqid)) {
       // check for a later queued update notification (don't send comments past that one because it will go out as node/type with its own comments later!)
       if ($cutoff_sqid = db_query_range("SELECT sqid FROM {subscriptions_queue} WHERE module = 'node' AND field = 'nid' AND value = :value AND uid = :uid AND load_function = 'subscriptions_content_load_node' AND sqid > :sqid", 0, 1, array(':value' => $nid, ':uid' => $user->uid, ':squid' => $comment_load_sqid))->fetchField()) {
         $query->condition('q.sqid', $cutoff_sqid, '<');
       }
     }
-    $query->addTag('comment_access');
-    $sqids = array();
-    foreach ($query->execute() as $comment) {
-      comment_invoke_comment($comment, 'view');
-      if ($comment && user_access('access comments') && !isset($node->_subscriptions_comments[$comment->cid])) {
-        $node->_subscriptions_comments[$comment->cid] = $comment;
+
+    $sqids = $cids = array();
+    foreach ($query->execute() as $comment_info) {
+      if ($comment_info && user_access('access comments') && !isset($comment_infos[$comment_info->cid])) {
+        $cids[] = $comment_info->cid;
+        $comment_infos[$comment_info->cid] = $comment_info;
       }
-      $sqids[] = $comment->_subscriptions_sqid;
+      $sqids[] = $comment_info->_subscriptions_sqid;
     }
     if ($sqids) {
       db_delete('subscriptions_queue')
         ->condition('sqid', $sqids, 'IN')
         ->execute();
+    }
+
+    if ($cids) {
+      $comments = comment_load_multiple($cids);
+      foreach ($comments as $cid => $comment) {
+        $comment->_subscriptions_sqid = $comment_infos[$cid]->_subscriptions_sqid;
+        $comment->_subscriptions_is_new = $comment_infos[$cid]->_subscriptions_is_new;
+        $comment->in_preview = TRUE;
+      }
+      $node->_subscriptions_comments = comment_view_multiple($comments, $node);
     }
   }
   return (empty($node) ? NULL : $node);

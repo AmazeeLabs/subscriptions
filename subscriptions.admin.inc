@@ -313,7 +313,7 @@ function subscriptions_page_user_overview($account) {
   $uid = (isset($account) ? $account->uid : -DRUPAL_AUTHENTICATED_RID);
   $counts = array();
   $result = db_query("SELECT module, field, COUNT(1) AS number FROM {subscriptions} WHERE recipient_uid = :recipient_uid GROUP BY module, field", array(':recipient_uid' => $uid));
-  foreach ($result->fetchAll() as $subs) {
+  foreach ($result as $subs) {
     if (!empty($subs->module)) {
       $counts[$subs->module][$subs->field] = $subs->number;
     }
@@ -868,7 +868,7 @@ function subscriptions_del_form($form, &$form_state, $stype, $sid, $author_uid =
 
   if ($a = module_invoke_all('subscriptions', 'stype', $stype, $sid, (isset($author_uid) ? $author_uid : -1))) {
     list($module, $field, $value, $author_uid) = $a;
-    return subscriptions_delete_form($form_state, $module, $field, $value, $author_uid, $user->uid);
+    return subscriptions_delete_form($form, $form_state, $module, $field, $value, $author_uid, $user->uid);
   }
   drupal_set_message(t('Your subscription could not be deactivated.'));
 }

@@ -184,8 +184,8 @@ function _subscriptions_mail_cron() {
 
       if ($digest) {
         // Get next ready queue item for this user.
-        $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE uid = :uid AND last_sent + send_interval < :send_interval ORDER BY sqid', array(':uid' => $user->uid, ':send_interval' => time()));
-        if (!($s = db_fetch_array($result))) {
+        $result = db_query_range('SELECT * FROM {subscriptions_queue} WHERE uid = :uid AND last_sent + send_interval < :send_interval ORDER BY sqid', 0, 1, array(':uid' => $user->uid, ':send_interval' => time()));
+        if (!($s = $result->fetchAssoc())) {
           // No more ready queue items for this user, finish off this digest.
           $s = $digest_data['send'];
           $subject_template = subscriptions_mail_template_load(SUBSCRIPTIONS_DIGEST_MAILKEY, $langcode, 'subject', 'DSUBJ');
