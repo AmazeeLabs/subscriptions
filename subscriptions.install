@@ -108,7 +108,6 @@ function subscriptions_install() {
   db_insert('subscriptions_user')
     ->from($select)
     ->execute();
-  subscriptions_update_9();  // remove 5.x-1.x-dev template variables if found
 
   include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.install.inc';
   _subscriptions_install_information();
