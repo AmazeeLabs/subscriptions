@@ -277,7 +277,7 @@ function subscriptions_page($account, $stype) {
     //  $form = subscriptions_user_suspend_form($dummy_form_state, $account);
     //}
     $form['header'][] = array(
-      '#value'         => t('Current subscriptions:'),
+      '#markup'        => t('Current subscriptions:'),
       '#weight'        => -2,
       );
   }
@@ -938,8 +938,7 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
   }
   if (isset($subscription['extra_info'])) {
     $form['extra_info'][$key][$author_uid] = array(
-      '#type' => 'item',
-      '#value' => $subscription['extra_info'],
+      '#markup' => $subscription['extra_info'],
     );
   }
 }
