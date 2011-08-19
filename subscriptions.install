@@ -86,6 +86,7 @@ function subscriptions_schema() {
  * Implements hook_install().
  */
 function subscriptions_install() {
+  $ret = array();
   db_insert('subscriptions_user')
     ->fields(array(
       'uid' => -DRUPAL_AUTHENTICATED_RID,
