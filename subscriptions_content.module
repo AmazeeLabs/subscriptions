@@ -873,7 +873,11 @@ function _subscriptions_content_load($nid, $comment_load_sqid) {
 
     if (!empty($comment_load_sqid)) {
       // check for a later queued update notification (don't send comments past that one because it will go out as node/type with its own comments later!)
-      if ($cutoff_sqid = db_query_range("SELECT sqid FROM {subscriptions_queue} WHERE module = 'node' AND field = 'nid' AND value = :value AND uid = :uid AND load_function = 'subscriptions_content_load_node' AND sqid > :sqid", 0, 1, array(':value' => $nid, ':uid' => $user->uid, ':squid' => $comment_load_sqid))->fetchField()) {
+      if ($cutoff_sqid = db_query_range("SELECT sqid FROM {subscriptions_queue} WHERE module = 'node' AND field = 'nid' AND value = :value AND uid = :uid AND load_function = 'subscriptions_content_load_node' AND sqid > :sqid", 0, 1, array(
+        ':value' => $nid,
+        ':uid' => $user->uid,
+        ':sqid' => $comment_load_sqid))->fetchField()
+      ) {
         $query->condition('q.sqid', $cutoff_sqid, '<');
       }
     }
