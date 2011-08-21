@@ -661,11 +661,13 @@ function _subscriptions_content_node_mailvars(&$mailvars, $node, $field, $s) {
   //$langcode = $GLOBALS['language_content']->language;
   $node = (is_array($node) ? (object) $node : $node);
   $langcode = $node->language;
-  $body = $node->body[$langcode][0];
-  $format = $body['format'];
-//dpm($format);
-  $body = field_view_field('node', $node, 'body', 'full', $langcode);
-  $body = $body[0]['#markup'];
+  $body = '';
+  if (isset($node->body)) {
+    $body = $node->body[$langcode][0];
+//  dpm($body['format']);
+    $body = field_view_field('node', $node, 'body', 'full', $langcode);
+    $body = $body[0]['#markup'];
+  }
   $teaser = field_view_field('node', $node, 'body', 'teaser', $langcode);
 //dpm($teaser);
   $teaser = $teaser[0]['#markup'];
