@@ -202,9 +202,9 @@ function subscriptions_update_6101() {
   include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.admin.inc';
   foreach (_subscriptions_send_intervals() as $send_interval => $text) {
     $select = db_select('subscriptions_user', 'su');
-    $select->addField('uid');
+    $select->addField('su', 'uid');
     $select->addExpression($send_interval);
-    $select->addField('last_sent');
+    $select->addField('su', 'last_sent');
     $select->condition('su.uid', 0, '>');
     db_insert('subscriptions_last_sent')
       ->from($select)
@@ -253,4 +253,20 @@ function subscriptions_update_7000() {
     ->fields(array('load_function' => 'subscriptions_content_load_comment'))
     ->condition('load_function', 'subscriptions_content_comment_load')
     ->execute();
+}
+
+/**
+ * Remove the bug-fix SubscriptionsMailSystem, we need Drupal 7.5+ from now.
+ */
+function subscriptions_update_7001() {
+  $mailsystem = variable_get('mail_system', array());
+  if (isset($mailsystem['default-system']) && $mailsystem['default-system'] == 'SubscriptionsMailSystem') {
+    unset($mailsystem['default-system']);
+    if (empty($mailsystem)) {
+      variable_del('mail_system');
+    }
+    else {
+      variable_set('mail_system', $mailsystem);
+    }
+  }
 }

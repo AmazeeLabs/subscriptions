@@ -14,10 +14,6 @@ function _subscriptions_mail_cron() {
 
   // set_time_limit(3600);  drupal_set_message('DON\'T FORGET TO REMOVE THE TIME LIMIT EXTENSION!!!');
 
-  $save_mail_system = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
-  include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.mail.inc';
-  variable_set('mail_system', array('default-system' => 'SubscriptionsMailSystem') + $save_mail_system);
-
   global $user, $language;
   drupal_language_initialize();
   include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions_mail') . '/subscriptions_mail.templates.inc';
@@ -243,8 +239,6 @@ function _subscriptions_mail_cron() {
     $watchdog = 'watchdog'; // keep potx from translating 'cron'
     $watchdog('cron', $message);
   }
-
-  variable_set('mail_system', $save_mail_system);
 }
 
 /**
