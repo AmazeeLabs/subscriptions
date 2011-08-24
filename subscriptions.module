@@ -241,33 +241,19 @@ function subscriptions_user_insert($edit, &$account, $category) {
   // $account->roles isn't set yet, subscriptions_user_load() below will
   // insert the role-specific initial subscriptions.
   $new_uid = $account->uid;
-}
 
-/**
- * Implements hook_user_load().
- *
- * Set the role-specific initial subscriptions for new users (continued
- * from subscriptions_user_insert() above).
- *
- * @ingroup hooks
- */
-function subscriptions_user_load($users) {
-  $new_uid = &drupal_static('subscriptions_user_insert', 0);
-  if ($new_uid && isset($users[$new_uid])) {
-    foreach (array_keys($users[$new_uid]->roles) as $rid) {
-      $rids[] = -$rid;
-    }
-    $query = db_select('subscriptions', 's')
-      ->fields('s', array('module', 'field', 'value'));
-    $query->addExpression($new_uid, 'recipient_uid');
-    $query
-      ->fields('s', array('send_interval', 'author_uid', 'send_updates', 'send_comments'))
-      ->condition('s.recipient_uid', $rids, 'IN');
-    db_insert('subscriptions')
-      ->from($query)
-      ->execute();
-    $new_uid = 0;
+  foreach (array_keys($account->roles) as $rid) {
+    $rids[] = -$rid;
   }
+  $query = db_select('subscriptions', 's')
+    ->fields('s', array('module', 'field', 'value'));
+  $query->addExpression($new_uid, 'recipient_uid');
+  $query
+    ->fields('s', array('send_interval', 'author_uid', 'send_updates', 'send_comments'))
+    ->condition('s.recipient_uid', $rids, 'IN');
+  db_insert('subscriptions')
+    ->from($query)
+    ->execute();
 }
 
 /**

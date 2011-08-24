@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1258698: Fix default subscriptions not being assigned to new users.
 
 
 subscriptions 7.x-1.0-alpha4 (2011-08-24):
