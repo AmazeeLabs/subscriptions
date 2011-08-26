@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1252786: Fix incorrect teaser handling.
   - #1259662: Fix completely broken subscriptions_tableselect.js.
   - #1258698: Fix default subscriptions not being assigned to new users.
 
