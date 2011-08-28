@@ -87,6 +87,25 @@ function subscriptions_schema() {
  */
 function subscriptions_install() {
   $ret = array();
+
+  // Remove old cruft if it's still around.
+  if (db_table_exists('subscriptions_mail_edit')) {
+    db_drop_table('subscriptions_mail_edit');      // old table from 5.x-2.x
+  }
+  if (db_table_exists('subscriptions_old')) {
+    db_drop_table('subscriptions_old');            // old backup from 5.x-1.x
+  }
+  if (db_table_exists('subscriptions_holding')) {
+    db_drop_table('subscriptions_holding');        // old left-over from 5.x-1.x
+  }
+  if (db_table_exists('subscriptions_holding_old')) {
+    db_drop_table('subscriptions_holding_old');    // old backup from 5.x-1.x
+  }
+  if (db_table_exists('subscriptions_sent')) {     // old left-over from first
+    db_drop_table('subscriptions_sent');           // incarnation of 5.x-2.0
+  }
+
+  // Create initial data.
   db_insert('subscriptions_user')
     ->fields(array(
       'uid' => -DRUPAL_AUTHENTICATED_RID,
@@ -119,22 +138,6 @@ function subscriptions_install() {
  * Implements hook_uninstall().
  */
 function subscriptions_uninstall() {
-  if (db_table_exists('subscriptions_mail_edit')) {
-    db_drop_table('subscriptions_mail_edit');      // old table from 5.x-2.x
-  }
-  if (db_table_exists('subscriptions_old')) {
-    db_drop_table('subscriptions_old');            // old backup from 5.x-1.x
-  }
-  if (db_table_exists('subscriptions_holding')) {
-    db_drop_table('subscriptions_holding');        // old left-over from 5.x-1.x
-  }
-  if (db_table_exists('subscriptions_holding_old')) {
-    db_drop_table('subscriptions_holding_old');    // old backup from 5.x-1.x
-  }
-  if (db_table_exists('subscriptions_sent')) {     // old left-over from first
-    db_drop_table('subscriptions_sent');           // incarnation of 5.x-2.0
-  }
-
   if (db_table_exists('mail_edit')) {
     db_delete('mail_edit')
       ->condition('id', 'subscriptions_%', 'LIKE')
