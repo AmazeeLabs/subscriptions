@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Make ready for Mail Editor.
   - Remove old D5 database tables, if they're still hanging around.
   - Tune diagnostics in case of mail failures.
   - #1252786: Fix incorrect teaser handling.

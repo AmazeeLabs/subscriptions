@@ -98,7 +98,7 @@ function _subscriptions_mail_form_subscriptions_settings_form_alter(&$form, &$fo
       '#type'          => 'checkbox',
       '#title'         => t('Append the mailkey to every notification'),
       '#default_value' => variable_get('subscriptions_showmailkeys', 0),
-      '#description'   => t('Appends the key of the !Mail_Editor_template that was used to create each e-mail, to assist with configuration and testing. Default is OFF.', array('!Mail_Editor_template' => l('Mail Editor template', (module_exists('mail_edit') ? 'admin/structure/mail-edit' : 'http://drupal.org/project/mail_edit')))),
+      '#description'   => t('Appends the key of the !Mail_Editor_template that was used to create each e-mail, to assist with configuration and testing. Default is OFF.', array('!Mail_Editor_template' => l('Mail Editor template', (module_exists('mail_edit') ? 'admin/config/system/mail-edit' : 'http://drupal.org/project/mail_edit')))),
     );
   }
   array_unshift($form['#submit'], '_subscriptions_mail_submit_subscriptions_settings_form');

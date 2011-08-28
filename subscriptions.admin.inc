@@ -28,7 +28,7 @@ function subscriptions_settings_form($form, &$form_state) {
   if (module_exists('subscriptions_mail')) {
     if (module_exists('mail_edit')) {
       $form['links'][] = array(
-        '#markup' => '<div>' . l($tr('Mail templates'), 'admin/structure/mail-edit') . '</div>',
+        '#markup' => '<div>' . l($tr('Mail templates'), 'admin/config/system/mail-edit') . '</div>',
         '#weight' => -10,
       );
     }

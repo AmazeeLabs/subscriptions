@@ -110,7 +110,11 @@ function subscriptions_mail_template_load($mailkey, $langcode, $part, $key) {
   if (module_exists('mail_edit')) {
     static $cache = array();
     if (!isset($cache[$langcode][$mailkey])) {
-      $cache[$langcode][$mailkey] = db_fetch_object(db_query("SELECT * FROM {mail_edit} WHERE id = :id and language = :language", array(':id' => $mailkey, ':language' => $langcode)));
+      $query = db_select('mail_edit', 'me')
+        ->fields('me')
+        ->condition('me.id', $mailkey)
+        ->condition('me.language', $langcode);
+      $cache[$langcode][$mailkey] = $query->execute()->fetchObject();
     }
     if (isset($cache[$langcode][$mailkey]->$part)) {
       return $cache[$langcode][$mailkey]->$part;

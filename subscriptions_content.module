@@ -1281,7 +1281,7 @@ function subscriptions_content_form_mail_edit_trans_alter(&$form, &$form_state) 
       '#collapsed' => TRUE,
     );
     $form['mail']['comment_token_help']['help'] = array(
-      '#value' => $doc,
+      '#markup' => $doc,
     );
     $form['mail']['comment_separator'] = array(
       '#title'      => t('Comment separator'),
