@@ -21,8 +21,7 @@ function _subscriptions_mail_cron() {
   $mails_allowed = variable_get('subscriptions_number_of_mails', 0);
   $from = _subscriptions_mail_site_mail();
   $old_uid = 0;
-  $single_count = 0;
-  $digest_count = 0;
+  $single_count = $single_failed = $digest_count = $digest_failed = 0;
   $loaded_objects = array();
   $fields = array();
 
@@ -167,8 +166,9 @@ function _subscriptions_mail_cron() {
           }
           else {
             $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
-            _subscriptions_mail_send('passthru', $s['name'], $s['mail'], $subject, $body, $from, $s['uid'], array($s['send_interval']));
-            ++$single_count;
+            (_subscriptions_mail_send('passthru', $s['name'], $s['mail'], $subject, $body, $from, $s['uid'], array($s['send_interval']))
+              ? ++$single_count
+              : ++$single_failed);
           }
         }
       }
@@ -202,8 +202,9 @@ function _subscriptions_mail_cron() {
             $mailvars = $digest_data['mailvars'];
             $subject = strtr(subscriptions_mail_template_preprocess($subject_template, $mailvars), $mailvars);
             $body = strtr(subscriptions_mail_template_preprocess($body_template, $mailvars), $mailvars);
-            _subscriptions_mail_send(SUBSCRIPTIONS_DIGEST_MAILKEY, $s['name'], $s['mail'], $subject, $body, $s['from'], $user->uid, $digest_data['send_intervals']);
-            ++$digest_count;
+            (_subscriptions_mail_send(SUBSCRIPTIONS_DIGEST_MAILKEY, $s['name'], $s['mail'], $subject, $body, $s['from'], $user->uid, $digest_data['send_intervals'])
+              ? ++$digest_count
+              : ++$digest_failed);
           }
           $digest = FALSE;
         }
@@ -215,12 +216,14 @@ function _subscriptions_mail_cron() {
     drupal_save_session(TRUE);
   }
 
-  if ($single_count + $digest_count > 0) {
+  if ($single_count + $digest_count + $single_failed + $digest_failed > 0) {
     $current_seconds = timer_read('page')/1000;
     $variables = array(
       '!Module'            => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,
+      '!single_failed'      => $single_failed,
+      '!digest_failed'      => $digest_failed,
       '!used_seconds'      => round($current_seconds - $lost_seconds),
       '!total_seconds'     => $total_seconds,
       '!remaining_items'   => db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < :send_interval AND suspended = 0", array(':send_interval' => REQUEST_TIME))->fetchField(),
@@ -231,6 +234,9 @@ function _subscriptions_mail_cron() {
     );
     if (variable_get('subscriptions_mail_trash_silently', 0)) {
       $message = t('!Module DISCARDED !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds, due to the %varname variable being set.', $variables);
+    }
+    elseif ($single_failed > 0 || $digest_failed > 0) {
+      $message = t('!Module FAILED !single_failed single and !digest_failed digest notifications, sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
     }
     else {
       $message = t('!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
@@ -277,10 +283,10 @@ function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, 
     ),
   ), $from, TRUE);
 
-  $watchdog_params = array('@to' => "<$to>");
+  $watchdog_params = array('%name' => $name, '!address' => "<a href='mailto:$to'>$to</a>");
   if (!empty($mail_success['result'])) {
     if (variable_get('subscriptions_watchgood', 1)) {
-      watchdog('subscriptions', 'Notification sent.', $watchdog_params);
+      watchdog('subscriptions', 'Notification sent to...', $watchdog_params);
     }
     foreach ($send_intervals as $send_interval) {
       db_merge('subscriptions_last_sent')
@@ -293,10 +299,10 @@ function _subscriptions_mail_send($mailkey, $name, $to, $subject, $body, $from, 
         ))
         ->execute();
     }
+    return TRUE;
   }
-  else {
-    watchdog('subscriptions', 'error mailing notification for @name at @to', $watchdog_params, WATCHDOG_ERROR);
-  }
+  watchdog('subscriptions', 'Error e-mailing notification to %name (!address).', $watchdog_params, WATCHDOG_ERROR, l('edit user', "user/$uid/edit"));
+  return FALSE;
 }
 
 /**
