@@ -502,13 +502,15 @@ function subscriptions_content_form_alter(&$form, &$form_state, $form_id) {
  * @ingroup form
  */
 function subscriptions_content_form_node_admin_content_alter(&$form, &$form_state) {
-  $form['admin']['options']['subscriptions_notify'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Send subscriptions notifications'),
-    '#description' => '<br />' . t('When publishing unpublished nodes, you probably want to turn this ON.'),
-    '#prefix' => '<br />',
-  );
-  array_unshift($form['admin']['options']['submit']['#submit'], 'subscriptions_content_node_admin_nodes_submit');
+  if (isset($form['admin']['options'])) {
+    $form['admin']['options']['subscriptions_notify'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Send subscriptions notifications'),
+      '#description' => '<br />' . t('When publishing unpublished nodes, this should probably be turned ON.'),
+      '#prefix' => '<br />',
+    );
+    array_unshift($form['admin']['options']['submit']['#submit'], 'subscriptions_content_node_admin_nodes_submit');
+  }
 }
 
 /**
