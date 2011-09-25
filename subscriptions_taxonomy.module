@@ -71,6 +71,9 @@ function subscriptions_taxonomy_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $
  * @see subscriptions_ui_node_form()
  */
 function _subscriptions_taxonomy_node_options($account, $node) {
+  if (!user_access('subscribe to taxonomy terms')) {
+    return;
+  }
   $options = array();
   $vids_to_omit = variable_get('subscriptions_omitted_taxa', array());
   foreach ((array) $node as $field_key => $field_value) {
