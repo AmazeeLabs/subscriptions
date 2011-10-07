@@ -3,6 +3,12 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - MAJOR OVERHAUL:
+    -- Switch proprietary !variables to [tokens].
+    -- Integrate with new Mail Editor, including preview.
+    -- Migrate conditional text processing to Mail Editor.
+    -- Reduce templates to content types only.
+  - #1286838 by mgriego: Check permission before presenting taxa subscribe options.
   - #1276182: Fix a warning in theme_subscriptions_ui_table().
   - #1280192: Fix form_alter() of content bulk processing.
   - Get ready for Mail Editor.
@@ -25,7 +31,6 @@ subscriptions 7.x-1.0-alpha4 (2011-08-24):
   - #1241944: Remove hard-coded dependency on comment.module.
   - #1236872: Fix notifications for new or updated comments.
   - #1228214: Fully qualify field parameter in SelectQuery::condition(), SelectQuery::orderBy() calls.
-
 
 subscriptions 7.x-1.0-alpha3 (2011-07-23):
   - Fix the List-Id header.

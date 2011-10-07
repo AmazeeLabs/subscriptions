@@ -73,7 +73,7 @@ function subscriptions_settings_form($form, &$form_state) {
         !module_exists('subscriptions_content') ||
         !module_exists('subscriptions_taxonomy'))) {
     if (empty($_POST)) {
-      include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.install.inc';
+      _subscriptions_module_load_include('subscriptions', 'install.inc');
       _subscriptions_install_information();
     }
     $form['subscriptions_show_install_info'] = array(
@@ -956,3 +956,4 @@ function subscriptions_form_column_filter(&$form_table, $uid) {
     }
   }
 }
+

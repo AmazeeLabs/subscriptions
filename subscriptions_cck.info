@@ -1,7 +1,0 @@
-name = CCK Fields
-description = Provides CCK field data as mail variables.
-package = "Subscriptions"
-dependencies[] = subscriptions
-dependencies[] = subscriptions_content
-dependencies[] = content
-core = 7.x

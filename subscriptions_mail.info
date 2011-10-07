@@ -1,6 +1,9 @@
 name = Subscriptions Mail
-description = Sends out mails with drupal_mail, customizable with the separate mail_edit module.
+description = Sends out mails with drupal_mail.
 package = "Subscriptions"
-; dependencies[] = mail_edit
+
 dependencies[] = subscriptions
+dependencies[] = mail_edit
+dependencies[] = token
+
 core = 7.x
