@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.0-alpha5 (2011-10-08):
   - MAJOR OVERHAUL:
     -- Switch proprietary !variables to [tokens].
     -- Integrate with new Mail Editor, including preview.
