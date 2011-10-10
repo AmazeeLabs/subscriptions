@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1304258: Fix deprecated call-time pass-by-reference typo.
 
 
 subscriptions 7.x-1.0-alpha5 (2011-10-08):

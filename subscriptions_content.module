@@ -346,7 +346,7 @@ function subscriptions_content_comment_update($comment) {
  */
 function subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$form_state) {
   _subscriptions_module_load_include('subscriptions_content', 'admin.inc');
-  _subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$form_state);
+  _subscriptions_content_form_subscriptions_settings_form_alter($form, $form_state);
 }
 
 /**
