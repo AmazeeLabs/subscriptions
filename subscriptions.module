@@ -60,8 +60,8 @@ function subscriptions_menu() {
     'title' => 'User defaults',
     'weight' => -5,
     'file' => 'subscriptions.admin.inc',
-    'page callback' => 'subscriptions_page_user_overview',
-    'page arguments' => array(NULL),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('subscriptions_page_user_overview'),
     'type' => MENU_LOCAL_TASK,
     'access arguments' => array('administer site configuration'),
   );
@@ -81,8 +81,8 @@ function subscriptions_menu() {
   $items['user/%user/subscriptions'] = array(
     'title' => 'Subscriptions',
     'file' => 'subscriptions.admin.inc',
-    'page callback' => 'subscriptions_page_user_overview',
-    'page arguments' => array(1),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('subscriptions_page_user_overview', 1),
     'type' => MENU_LOCAL_TASK,
     'access callback' => '_subscriptions_access',
     'access arguments' => array(1),

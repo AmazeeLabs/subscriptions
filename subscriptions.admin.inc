@@ -308,7 +308,7 @@ function subscriptions_page($account, $stype) {
  * @params $account
  *   Must be a valid user account from user_load() or NULL (for the admin form).
  */
-function subscriptions_page_user_overview($account) {
+function subscriptions_page_user_overview(array $form, array &$form_state, $account) {
   // Build summary
   $uid = (isset($account) ? $account->uid : -DRUPAL_AUTHENTICATED_RID);
   $counts = array();
@@ -346,14 +346,14 @@ function subscriptions_page_user_overview($account) {
   );
   $form['overview']['note'] = array(
     '#type' => 'item',
-    '#value' => '',
     '#description' => t('Note: The counts on this page may differ from the ones on the detail pages for various technical reasons.'),
     '#suffix' => '<br />',
   );
+  $form['#submit'] = array();
   if ($uid > 0) {
-    $form += drupal_get_form('subscriptions_user_suspend_form', $account);
+    $form = subscriptions_user_suspend_form($form, $form_state, $account);
   }
-  $form += drupal_get_form('subscriptions_user_settings_form', $account);
+  $form = subscriptions_user_settings_form($form, $form_state, $account);
   drupal_set_title($uid < 0 ? t('Subscriptions') : $account->name);
   return $form;
 }
@@ -415,10 +415,11 @@ function subscriptions_user_suspend_form($form, &$form_state, $account) {
     '#type'          => 'value',
     '#value'         => $uid,
   );
-  $form['suspend']['save'] = array(
+  $form['suspend']['save_notifications'] = array(
     '#type'          => 'submit',
-    '#value'         => t('Save'),
+    '#value'         => t('Save notifications'),
   );
+  $form['#submit'][] = '_subscriptions_user_suspend_form_submit';
   return $form;
 }
 
@@ -427,9 +428,9 @@ function subscriptions_user_suspend_form($form, &$form_state, $account) {
  *
  * @ingroup form
  */
-function subscriptions_user_suspend_form_submit($form, &$form_state) {
+function _subscriptions_user_suspend_form_submit($form, &$form_state) {
   $form_values = $form_state['values'];
-  if ($form_values['op'] == $form_values['save']) {
+  if ($form_values['op'] == $form_values['save_notifications']) {
     $uid = $form_values['uid'];
     $suspended = $form_values['state'];
     if ($suspended == -1) {
@@ -658,9 +659,9 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
       $form['settings']['preferences']['#access'] = TRUE;
     }
   }
-  $form['settings']['save'] = array(
+  $form['settings']['save_settings'] = array(
     '#type'          => 'submit',
-    '#value'         => t('Save'),
+    '#value'         => t('Save settings'),
   );
   if ($uid > 0 && !_subscriptions_get_setting('uses_defaults', $account)) {
     $form['settings']['reset'] = array(
@@ -668,6 +669,7 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
       '#value'       => t('Reset to site defaults'),
     );
   }
+  $form['#submit'][] = '_subscriptions_user_settings_form_submit';
   return $form;
 }
 
@@ -676,7 +678,7 @@ function subscriptions_user_settings_form($form, &$form_state, $account) {
  *
  * @ingroup form
  */
-function subscriptions_user_settings_form_submit($form, &$form_state) {
+function _subscriptions_user_settings_form_submit($form, &$form_state) {
   if (isset($form_state['values']['reset']) && $form_state['values']['op'] == $form_state['values']['reset']) {
     if (($uid = arg(1)) > 0) {
       db_update('subscriptions_user')
@@ -698,7 +700,7 @@ function subscriptions_user_settings_form_submit($form, &$form_state) {
       drupal_set_message(t('The site defaults were restored.'));
     }
   }
-  elseif ($form_state['values']['op'] == $form_state['values']['save']) {
+  elseif ($form_state['values']['op'] == $form_state['values']['save_settings']) {
     if (arg(0) == 'user') {
       $uid = arg(1);
     }

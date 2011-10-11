@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1305792: Fix inability to save user settings.
   - #1304258: Fix deprecated call-time pass-by-reference typo.
 
 
