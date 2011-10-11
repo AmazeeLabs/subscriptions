@@ -45,3 +45,13 @@ function subscriptions_mail_uninstall() {
   variable_del('subscriptions_watchstats');
 }
 
+/**
+ * Database update function 7000: Extend the {mail_edit} table.
+ */
+function subscriptions_mail_update_7000() {
+  if (db_table_exists('mail_edit') && !db_field_exists('mail_edit', 'subscriptions_comment_body')) {
+    // Add column to {mail_edit} table.
+    _subscriptions_content_extend_mail_edit();
+  }
+}
+
