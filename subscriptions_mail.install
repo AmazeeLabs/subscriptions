@@ -11,7 +11,7 @@
 function subscriptions_mail_install() {
   if (module_exists('mail_edit')) {
     // Add column to {mail_edit} table.
-    _subscriptions_content_extend_mail_edit();
+    _subscriptions_mail_extend_mail_edit();
   }
 }
 
@@ -51,7 +51,7 @@ function subscriptions_mail_uninstall() {
 function subscriptions_mail_update_7000() {
   if (db_table_exists('mail_edit') && !db_field_exists('mail_edit', 'subscriptions_comment_body')) {
     // Add column to {mail_edit} table.
-    _subscriptions_content_extend_mail_edit();
+    _subscriptions_mail_extend_mail_edit();
   }
 }
 
