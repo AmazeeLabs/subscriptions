@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Remove the installation-time installation reminder, because Mail Editor is not optional anymore.
   - #1309396: Fix inability to uninstall Subscriptions Mail.
   - #1305520: Fix the prior fix.
   - #1305520: Fix missing column in pre-existing {mail_edit} table.

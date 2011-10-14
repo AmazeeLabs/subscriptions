@@ -86,8 +86,6 @@ function subscriptions_schema() {
  * Implements hook_install().
  */
 function subscriptions_install() {
-  $ret = array();
-
   // Remove old cruft if it's still around.
   if (db_table_exists('subscriptions_mail_edit')) {
     db_drop_table('subscriptions_mail_edit');      // old table from 5.x-2.x
@@ -128,10 +126,6 @@ function subscriptions_install() {
   db_insert('subscriptions_user')
     ->from($select)
     ->execute();
-
-  require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'subscriptions') . '/subscriptions.install.inc';
-  _subscriptions_install_information();
-  return $ret;
 }
 
 /**

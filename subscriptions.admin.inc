@@ -73,8 +73,9 @@ function subscriptions_settings_form($form, &$form_state) {
         !module_exists('subscriptions_content') ||
         !module_exists('subscriptions_taxonomy'))) {
     if (empty($_POST)) {
-      _subscriptions_module_load_include('subscriptions', 'install.inc');
-      _subscriptions_install_information();
+      drupal_set_message(t('Note: For standard Subscriptions functionality you need to enable the following modules:')
+                         . '<ul><li>' . $tr('Subscriptions UI') . '</li><li>' . $tr('Subscriptions Mail ')
+                         . '</li><li>' . $tr('Content Subscriptions') . '</li><li>' . $tr('Taxonomy Subscriptions') . '</li></ul>', 'warning', FALSE);
     }
     $form['subscriptions_show_install_info'] = array(
       '#type'          => 'checkbox',
