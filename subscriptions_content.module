@@ -633,6 +633,7 @@ function subscriptions_content_load_comment(&$subs) {
       // the comments at an update item, otherwise not.
       $sqid = NULL;
     }
+    _subscriptions_module_load_include('subscriptions_content', 'notify.inc');
     if (($node = _subscriptions_content_load($nid, $sqid)) && !empty($node->_subscriptions_comments)) {
       $subs['object'] = $node;
       return TRUE;
