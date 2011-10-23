@@ -7,10 +7,17 @@
 
 /**
  * Implements hook_tokens().
+ *
+ * @param string $type
+ * @param array $tokens
+ * @param array $data
+ * @param array $options
+ *
+ * @return array
  */
 function subscriptions_content_tokens($type, array $tokens, array $data = array(), array $options = array()) {
-  //dpm($tokens, "subscriptions_content_tokens($type)");
-  //dpm($data, "subscriptions_content_tokens($type)");
+  //dpm($tokens, "subscriptions_content_tokens($type) - tokens");
+  //dpm($data, "subscriptions_content_tokens($type) - data");
   $sanitize = !empty($options['sanitize']);
 
   $replacements = array();
@@ -91,6 +98,19 @@ function subscriptions_content_tokens($type, array $tokens, array $data = array(
   return $replacements;
 }
 
+/**
+ * Helper function to resolve a field which is a files array.
+ *
+ * @param $type
+ * @param $tokens
+ * @param array $data
+ * @param array $options
+ * @param $data_type
+ * @param $token
+ * @param $token_type
+ *
+ * @return array
+ */
 function subscriptions_content_tokens_field_array($type, $tokens, array $data, array $options, $data_type, $token, $token_type)
 {
   $replacements = array();
@@ -146,8 +166,6 @@ function _subscriptions_content_load($nid, $comment_load_sqid = NULL) {
 
   if (!empty($node)) {
     if (module_exists('comment')) {
-      $published_comments_only = $limit_sqids = '';
-
       // Load comments like comment_get_thread().
       $query = db_select('comment', 'c');
       $query->addField('c', 'cid');

@@ -7,6 +7,11 @@
 
 define('SUBSCRIPTIONS_DIGEST_MAILKEY', 'subscriptions_mail_digest');
 
+/**
+ * @param $key
+ * @param $langcode
+ * @return array|null|string
+ */
 function subscriptions_mail_template_raw($key, $langcode) {
   switch ($key) {
 
@@ -86,6 +91,7 @@ t('| Comment: [comment:title]
 ', array(), array('langcode' => $langcode));
 
   }
+  return NULL;
 }
 
 function subscriptions_mail_template($key, $langcode) {
@@ -100,17 +106,20 @@ function subscriptions_mail_template($key, $langcode) {
  * Retrieve a mail template, either from the mail_edit table or take
  * our default template in this file, passing it through t().
  *
+ * @param string $mailmod
+ *  The module requesting the template (part of the full mailkey).
  * @param string $mailkey
- *  the full mailkey, used as id in the mail_edit table
+ *  The mailkey, used with $mailmod as id in the {mail_edit} table.
  * @param string $langcode
- *  the language code, used as language in the mail_edit table or for
- *  translating out default template
+ *  The language code, used as language in the {mail_edit} table or for
+ *  translating out default template.
  * @param string $part
- *  either 'subject' or 'body', used to indicate the column to retrieve
- *  from the mail_edit table
+ *  Either 'subject' or 'body', used to indicate the column to retrieve
+ *  from the {mail_edit} table.
  * @param string $key
- *  the key for calling subscriptions_mail_template() to retrieve the
- *  default template, if there's no match in the mail_edit table
+ *  The key for calling subscriptions_mail_template() to retrieve the
+ *  default template, if there's no match in the {mail_edit} table.
+ * @return
  */
 function subscriptions_mail_template_load($mailmod, $mailkey, $langcode, $part, $key) {
   if (module_exists('mail_edit')) {

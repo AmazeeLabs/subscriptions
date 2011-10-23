@@ -61,6 +61,7 @@ function _subscriptions_mail_cron() {
     do {  // once and repeat while adding to a digest
       if ($user->status && $user->access) {
         $subs['mail'] = $user->mail;
+        /** @var $load_function string */
         $load_function = $subs['load_function'];
         $load_args = $subs['load_args'];
         if (!isset($loaded_objects[$user->uid][$load_function][$load_args]) && $load_function($subs)) {
@@ -154,7 +155,7 @@ function _subscriptions_mail_cron() {
           $digest = FALSE;
         }
       }
-    } while ( $digest );
+    } while (!empty($digest));
 
     $user = $saved_user;
     $language = $saved_language;

@@ -7,9 +7,15 @@
 
 /**
  * Site Settings form at admin/settings/subscriptions.
+ *
  * Other submodules contribute additional parts to this form.
+ *
+ * @param array $form
+ * @param array $form_state
+ *
+ * @return array
  */
-function subscriptions_settings_form($form, &$form_state) {
+function subscriptions_settings_form(array $form, array &$form_state) {
   global $user;
   $form = array();
   $tr = 't';
@@ -96,9 +102,12 @@ function subscriptions_settings_form($form, &$form_state) {
 /**
  * Theme subscriptions page controls table.
  *
+ * @param array $variables
+ * @return string
+ *
  * @ingroup themeable
  */
-function theme_subscriptions_form_table($variables) {
+function theme_subscriptions_form_table(array $variables) {
   $element = $variables['element'];
   $output = '';
   $rows = array();
@@ -463,9 +472,12 @@ function subscriptions_user_suspend_form(array $form, array &$form_state, $accou
 /**
  * User suspend subform submit handler.
  *
+ * @param array $form
+ * @param array $form_state
+ *
  * @ingroup form
  */
-function _subscriptions_user_suspend_form_submit($form, &$form_state) {
+function _subscriptions_user_suspend_form_submit(array $form, array &$form_state) {
   $form_values = $form_state['values'];
   if ($form_values['op'] == $form_values['save_notifications']) {
     $uid = $form_values['uid'];
@@ -496,6 +508,9 @@ function _subscriptions_user_suspend_form_submit($form, &$form_state) {
 /**
  * Helper function to display a message to the user if notifications
  * are suspended.
+ *
+ * @param int $uid
+ * @param bool $suspended
  */
 function _subscriptions_suspended_alert($uid, $suspended) {
   $path2 = url("user/$uid/subscriptions/overview", array('fragment' => 'subscriptions-user-suspend-form'));
@@ -718,9 +733,12 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
 /**
  * User settings subform submit handler.
  *
+ * @param array $form
+ * @param array $form_state
+ *
  * @ingroup form
  */
-function _subscriptions_user_settings_form_submit($form, &$form_state) {
+function _subscriptions_user_settings_form_submit(array $form, array &$form_state) {
   if (isset($form_state['values']['reset']) && $form_state['values']['op'] == $form_state['values']['reset']) {
     if (($uid = arg(1)) > 0) {
       db_update('subscriptions_user')
@@ -781,11 +799,15 @@ function _subscriptions_user_settings_form_submit($form, &$form_state) {
  *
  * Called by _subscriptions_menu() in subscriptions.module.
  *
- * @ingroup form
+ * @param array $form
+ * @param array $form_state
  *
+ * @return array
+ *
+ * @ingroup form
  * @see _subscriptions_menu()
  */
-function subscriptions_intervals($form, &$form_state) {
+function subscriptions_intervals(array $form, array &$form_state) {
   $default = '';
   foreach (_subscriptions_send_intervals() as $interval => $text) {
     $default .= "$interval|$text\n";
@@ -809,9 +831,12 @@ function subscriptions_intervals($form, &$form_state) {
 /**
  * Sending intervals settings form submit handler.
  *
+ * @param array $form
+ * @param array $form_state
+ *
  * @ingroup form
  */
-function subscriptions_intervals_submit($form, &$form_state) {
+function subscriptions_intervals_submit(array $form, array &$form_state) {
   $intervals = array();
   foreach (explode("\n", $form_state['values']['intervals']) as $line) {
     if ($line) {
@@ -829,17 +854,21 @@ function subscriptions_intervals_submit($form, &$form_state) {
  *
  * Callback of _subscriptions_menu() in subscriptions.module.
  *
- * @param $stype
+ * @param array $form
+ * @param array $form_state
+ * @param string $stype
  *   Subscription type.
- * @param $sid
+ * @param mixed $sid
  *   Subscription parameter (depends on type).
- * @param $author_uid
+ * @param int|null $author_uid
  *   User ID for author-specific subscriptions or NULL/-1 for all authors.
+ *
+ * @return array
  *
  * @ingroup forms
  * @see _subscriptions_menu()
  */
-function subscriptions_add_form($form, &$form_state, $stype, $sid, $author_uid = NULL) {
+function subscriptions_add_form(array $form, array &$form_state, $stype, $sid, $author_uid = NULL) {
   global $user;
   $form['sid'] = array('#type' => 'value', '#value' => $sid);
   $form['uid'] = array('#type' => 'value', '#value' => $user->uid);
@@ -874,9 +903,12 @@ function subscriptions_add_form($form, &$form_state, $stype, $sid, $author_uid =
 /**
  * Add Subscription form submit handler.
  *
+ * @param array $form
+ * @param array $form_state
+ *
  * @ingroup form
  */
-function subscriptions_add_form_submit($form, &$form_state) {
+function subscriptions_add_form_submit(array $form, array &$form_state) {
   if ($a = module_invoke_all('subscriptions', 'stype', $form_state['values']['stype'], $form_state['values']['sid'], (isset($form_state['values']['author_uid']) ? $form_state['values']['author_uid'] : -1))) {
     list($module, $field, $value, $author_uid) = $a;
     $uid = $form_state['values']['uid'];
@@ -895,19 +927,22 @@ function subscriptions_add_form_submit($form, &$form_state) {
  *
  * Callback of _subscriptions_menu() in subscriptions.module.
  *
- * @param $form_state
+ * @param array $form
+ * @param array $form_state
  *   FAPI form state.
- * @param $stype
+ * @param string $stype
  *   Subscription type.
- * @param $sid
+ * @param mixed $sid
  *   Subscription parameter (depends on type).
- * @param $author_uid
+ * @param int|null $author_uid
  *   User ID for author-specific subscriptions or -1/NULL for all authors.
+ *
+ * @return array|null
  *
  * @ingroup forms
  * @see _subscriptions_menu()
  */
-function subscriptions_del_form($form, &$form_state, $stype, $sid, $author_uid = NULL) {
+function subscriptions_del_form(array $form, array &$form_state, $stype, $sid, $author_uid = NULL) {
   global $user;
 
   if ($a = module_invoke_all('subscriptions', 'stype', $stype, $sid, (isset($author_uid) ? $author_uid : -1))) {
@@ -915,10 +950,13 @@ function subscriptions_del_form($form, &$form_state, $stype, $sid, $author_uid =
     return subscriptions_delete_form($form, $form_state, $module, $field, $value, $author_uid, $user->uid);
   }
   drupal_set_message(t('Your subscription could not be deactivated.'));
+  return NULL;
 }
 
 /**
  * Returns a list of send intervals.
+ *
+ * @return array
  */
 function _subscriptions_send_intervals() {
   return variable_get('subscriptions_send_intervals',
@@ -936,9 +974,16 @@ function _subscriptions_send_intervals() {
  * Helper function for the submodules to build the table(s) on their
  * user/UID/subscriptions/... pages.
  *
+ * @param array $form
+ * @param array $defaults
+ * @param int $author_uid
+ * @param string $key
+ * @param string $title
+ * @param array $subscription
+ *
  * @ingroup form
  */
-function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title, $subscription) {
+function subscriptions_form_helper(array &$form, array &$defaults, $author_uid, $key, $title, array $subscription) {
   static $intervals;
   if (!isset($intervals)) {
     $intervals = _subscriptions_send_intervals();
@@ -991,9 +1036,12 @@ function subscriptions_form_helper(&$form, &$defaults, $author_uid, $key, $title
  * Helper function for the submodules to hide invisible or empty columns from
  * their page form table(s).
  *
+ * @param array $form_table
+ * @param int $uid
+ *
  * @ingroup form
  */
-function subscriptions_form_column_filter(&$form_table, $uid) {
+function subscriptions_form_column_filter(array &$form_table, $uid) {
   foreach (array('send_interval', 'send_comments', 'send_updates', 'author') as $key) {
     if (isset($form_table[$key])) {
       $form_table[$key]['#access'] = ($uid <= 0 || $key == 'author' || _subscriptions_get_setting($key . '_visible', $uid) > 0);

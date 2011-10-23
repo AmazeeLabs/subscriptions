@@ -1,5 +1,7 @@
 name = Subscriptions UI
 description = Provides a UI to Subscriptions.
 package = "Subscriptions"
+
 dependencies[] = subscriptions
+
 core = 7.x

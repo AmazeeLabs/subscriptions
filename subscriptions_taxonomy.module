@@ -92,6 +92,7 @@ function _subscriptions_taxonomy_node_options($account, $node) {
     return NULL;
   }
   $options = array();
+  /** @var $vids_to_omit array */
   $vids_to_omit = variable_get('subscriptions_omitted_taxa', array());
   foreach ((array) $node as $field_key => $field_value) {
     if (is_array($field_value)) {
@@ -144,7 +145,6 @@ function _subscriptions_taxonomy_node_options($account, $node) {
  * @see subscriptions_types()
  */
 function _subscriptions_taxonomy_types() {
-  $tr = 't';
   $types['taxa'] = array(
     'title' => 'Categories',
     'access' => 'subscribe to taxonomy terms',
@@ -170,7 +170,6 @@ function _subscriptions_taxonomy_types() {
  * @ingroup form
  */
 function subscriptions_taxonomy_form_subscriptions_settings_form_alter(array &$form, array &$form_state) {
-  global $user;
   $tr = 't';
 
   $form['taxonomy'] = array(
@@ -248,8 +247,8 @@ function subscriptions_taxonomy_page_taxa(array $form, $uid) {
  *
  * @param array $form
  * @param int $uid
- *   ID of a user if >0 or of a role if <0.
  * @param array $vocabularies
+ *   ID of a user if >0 or of a role if <0.
  *
  * @return array
  *
@@ -257,7 +256,7 @@ function subscriptions_taxonomy_page_taxa(array $form, $uid) {
  */
 function subscriptions_taxonomy_taxa_form(array $form, $uid, array $vocabularies) {
   $query = db_select('taxonomy_term_data', 't', array('fetch' => PDO::FETCH_ASSOC));
-  $subscriptions_alias = $query->join('subscriptions', 's', (db_driver() != 'pgsql' ? 't.tid = s.value' : 'CAST(t.tid AS VARCHAR) = s.value'));
+  $query->join('subscriptions', 's', (db_driver() != 'pgsql' ? 't.tid = s.value' : 'CAST(t.tid AS VARCHAR) = s.value'));
   $result = $query
     ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
     ->fields('t', array('tid', 'vid', 'name'))
@@ -284,6 +283,7 @@ function subscriptions_taxonomy_taxa_form(array $form, $uid, array $vocabularies
       '#theme' => 'subscriptions_form_table',
     );
     $subscriptions_vid = (isset($subscriptions[$vocab->vid]) ? $subscriptions[$vocab->vid] : NULL);
+    /** @var $vids_to_restrict array */
     $vids_to_restrict = variable_get('subscriptions_restricted_taxa', array());
     $tree = NULL;
     if (!in_array($vocab->vid, $vids_to_restrict)) {

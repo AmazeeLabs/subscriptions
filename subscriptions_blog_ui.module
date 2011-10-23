@@ -8,6 +8,13 @@
 /**
  * Implements hook_subscriptions().
  *
+ * @param $op
+ * @param mixed|null $arg0
+ * @param mixed|null $arg1
+ * @param mixed|null $arg2
+ *
+ * @return mixed
+ *
  * @ingroup hooks
  */
 function subscriptions_blog_ui_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $arg2 = NULL) {
@@ -18,6 +25,7 @@ function subscriptions_blog_ui_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
   if ($op == 'stype' && $arg0 == 'blog') {
     return array('node', 'type', 'blog', $arg1);
   }
+  return NULL;
 }
 
 /**
@@ -25,7 +33,7 @@ function subscriptions_blog_ui_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
  *
  * This is called by subscriptions_types() in subscriptions.module.
  *
- * @return
+ * @return array
  *   Returns information about types for the Subscriptions module interface.
  *
  * @ingroup form
@@ -133,6 +141,7 @@ function _subscriptions_blog_ui_blog_form(array $blogs, array $form, $uid) {
     '#theme' => 'subscriptions_form_table',
   );
 
+  $defaults = array();
   foreach ($blogs as $blog) {
     $title = ($blog['has_blog'] ? l($blog['name'], 'blog/' . $blog['uid']) : $blog['name']);
     // add the active subscriptions
@@ -160,9 +169,14 @@ function _subscriptions_blog_ui_blog_form(array $blogs, array $form, $uid) {
 /**
  * Implements hook_count_user_subscriptions().
  *
+ * @param array $counts
+ * @param int $uid
+ *
+ * @return array
+ *
  * @ingroup hooks
  */
-function subscriptions_blog_ui_count_user_subscriptions($counts, $uid) {
+function subscriptions_blog_ui_count_user_subscriptions(array $counts, $uid) {
   $counts['blog']['author_uid'] = db_query("SELECT count(*) FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value = 'blog' AND recipient_uid = :recipient_uid", array(':recipient_uid' => $uid))->fetchField();
   return $counts;
 }

@@ -11,10 +11,13 @@
  *
  * Add the Content Settings part to admin/settings/subscriptions.
  *
+ * @param array $form
+ * @param array $form_state
+ *
  * @ingroup hooks
  * @ingroup form
  */
-function _subscriptions_content_form_subscriptions_settings_form_alter(&$form, &$form_state) {
+function _subscriptions_content_form_subscriptions_settings_form_alter(array &$form, array &$form_state) {
   $tr = 't';
 
   // General content settings
@@ -93,9 +96,12 @@ function _subscriptions_content_form_subscriptions_settings_form_alter(&$form, &
 }
 
 /**
- * Validate the 'subscriptions_blocked_nodes' input.
+ * Validates the 'subscriptions_blocked_nodes' input.
+ *
+ * @param array $form
+ * @param array $form_state
  */
-function _subscriptions_content_validate_blocked_nodes($form, $form_state) {
+function _subscriptions_content_validate_blocked_nodes(array $form, array $form_state) {
   $form_values = $form_state['values'];
   $values = $form_values['subscriptions_blocked_nodes'];
   if (!empty($values)) {
@@ -241,6 +247,7 @@ function _subscriptions_content_node_form(array $form, $uid) {
  */
 function _subscriptions_content_type_form(array $form, $uid) {
   $unlisteds = variable_get('subscriptions_unlisted_content_types', array());
+  /** @var $blockeds array */
   $blockeds = variable_get('subscriptions_blocked_content_types', array());
   $omits = array_merge($unlisteds, $blockeds);
   $query = db_select('subscriptions', 's', array('fetch' => PDO::FETCH_ASSOC));
