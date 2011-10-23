@@ -216,7 +216,7 @@ function subscriptions_ui_node_form($form, &$form_state, $node, $account = NULL)
   }
   $form['wrapper']['footer'] = array(
     '#type' => 'item',
-    '#description' => t('The master checkboxes on the left turn the given subscription on or off. Depending on the setup of the site, you may have additional options for active subscriptions.'),
+    '#description' => t('The master checkboxes in the left-most column turn the given subscription on or off. Depending on the setup of the site, you may have additional options for active subscriptions.'),
     '#weight' => 9,
   );
   $form['wrapper']['submit'] = array(

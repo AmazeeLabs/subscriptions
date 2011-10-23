@@ -37,12 +37,12 @@ function subscriptions_init() {
 /**
  * Implements hook_menu().
  *
+ * @return array
+ *
  * @ingroup hooks
  * @ingroup menu
  */
 function subscriptions_menu() {
-  global $user;  // we need the user to to build some urls
-
   $items['admin/config/subscriptions'] = array(
     'title' => 'Subscriptions',
     'description' => 'Site and user default settings for Subscriptions.',
@@ -61,14 +61,14 @@ function subscriptions_menu() {
     'weight' => -5,
     'file' => 'subscriptions.admin.inc',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('subscriptions_page_user_overview'),
+    'page arguments' => array('subscriptions_page_user_overview', 5),
     'type' => MENU_LOCAL_TASK,
     'access arguments' => array('administer site configuration'),
+    'weight' => -100,
   );
   $items['admin/config/subscriptions/userdefaults/settings'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'title' => 'Overview',
-    'weight' => -100,
   );
   $items['admin/config/subscriptions/intervals'] = array(
     'title' => 'Interval',
@@ -89,6 +89,7 @@ function subscriptions_menu() {
   );
 
   $hide_overview_page = variable_get('subscriptions_hide_overview_page', 0);
+  $minimum_weight = 0;
   if (!$hide_overview_page) {
     $items['user/%user/subscriptions/overview'] = array(
       'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -97,7 +98,6 @@ function subscriptions_menu() {
     );
   }
   else {
-    $minimum_weight = 0;
     foreach (subscriptions_types() as $stype => $data) {
       if (isset($data['weight']) && $data['weight'] < $minimum_weight) {
         $minimum_weight = $data['weight'];
@@ -128,8 +128,8 @@ function subscriptions_menu() {
       'title' => $data['title'],
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',
-      'page callback' => 'subscriptions_page',
-      'page arguments' => array(1, $stype),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('subscriptions_page_form', 1, $stype),
       'access callback' => '_subscriptions_access',
       'access arguments' => array(1, $data['access']),
       'weight' => $weight,
@@ -156,8 +156,8 @@ function subscriptions_menu() {
       'title' => $data['title'],
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',
-      'page callback' => 'subscriptions_page',
-      'page arguments' => array(NULL, $stype),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('subscriptions_page_form', 5, $stype),
       'access arguments' => array('administer site configuration'),
       'weight' => $weight,
     );
@@ -641,12 +641,17 @@ function _subscriptions_cmp_by_weight($a, $b) {
  *   digest/send_interval/send_updates/send_comments/                   | -1 = use default
  *   send_interval_visible/send_updates_visible/send_comments_visible/  | 1, 0, -1 = only preference, -2 = always use site default
  *   uses_defaults values;
- * $account can be NULL/0 (for site default), a user object, or a uid.
+ *
+ * @param string $name
+ * @param object|int|null $account
+ *   NULL/0 (for site default), a user object, or a uid.
+ *
+ * @return
  */
 function _subscriptions_get_setting($name, $account) {
   global $user;
-  if (!isset($account) || is_object($account) && empty($account->uid) || is_numeric($account) && $account <= 0 ) {
-    $uid = -DRUPAL_AUTHENTICATED_RID;
+  $uid = -DRUPAL_AUTHENTICATED_RID;
+  if (empty($account) || is_object($account) && empty($account->uid) || is_numeric($account) && $account <= 0 ) {
     unset($account);
   }
   elseif (is_numeric($account)) {
@@ -683,7 +688,6 @@ function _subscriptions_get_setting($name, $account) {
       // now, with the expected hook_user() invocations:
       $account = user_load($uid);
       subscriptions_user_insert(NULL, $account, NULL);
-      subscriptions_user_load(array($account->uid => $account));
       return _subscriptions_get_setting($name, $account);
     }
     $defaults[$uid]['uses_defaults'] = FALSE;

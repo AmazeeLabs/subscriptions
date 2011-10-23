@@ -198,7 +198,7 @@ function _subscriptions_content_types() {
     ),
     'page' => 'subscriptions_content_page_type',
     'fields' => array('node', 'type'),
-    'weight' => -20,
+    'weight' => -30,
   );
   $types['node'] = array(
     'title' => 'Pages/Threads',
@@ -509,11 +509,9 @@ function subscriptions_content_form_comment_form_alter(&$form, &$form_state) {
  */
 function subscriptions_content_node_admin_nodes_submit($form, &$form_state) {
   if (!$form_state['values']['subscriptions_notify']) {
-//dpm("SUPPRESS");
     subscriptions_content_suppress_notifications(TRUE);
     return;
   }
-//dpm("ALLOW");
   if ($form_state['values']['operation'] == 'publish') {
     foreach ($form_state['values']['nodes'] as $nid) {
       if ($nid != 0 && ($node = node_load($nid)) && !$node->status) {
@@ -643,22 +641,31 @@ function subscriptions_content_load_comment(&$subs) {
 }
 
 /**
- * Subscriptions page callback: List thread subscriptions.
+ * Subscriptions page callback: Lists thread subscriptions.
+ *
+ * @param array $form
+ * @param int $uid
+ *
+ * @return array
  */
-function subscriptions_content_page_node($account, $form) {
+function subscriptions_content_page_node(array $form, $uid) {
   _subscriptions_module_load_include('subscriptions_content', 'admin.inc');
-  return drupal_get_form('_subscriptions_content_node_form', $account, $form);
+  return _subscriptions_content_node_form($form, $uid);
 }
 
 /**
- * Subscriptions page callback: List content types subscriptions.
+ * Subscriptions page callback: Lists content types subscriptions.
+ *
+ * @param array $form
+ * @param int $uid
+ *
+ * @return array
  */
-function subscriptions_content_page_type($account, $form) {
+function subscriptions_content_page_type(array $form, $uid) {
   _subscriptions_module_load_include('subscriptions_content', 'admin.inc');
-  return drupal_get_form('_subscriptions_content_type_form', $account, $form);
+  return _subscriptions_content_type_form($form, $uid);
 }
 
-/**
 /**
  * Implements hook_node_type().
  *
