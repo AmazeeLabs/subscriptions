@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Move the token hooks to *.tokens.inc files.
   - #1318454: Fix failure to find the proper template in cron.
   - Add proper docblocks and fix most PhpStorm issues.
   - Fix porting errors in the subscriptions pages.
