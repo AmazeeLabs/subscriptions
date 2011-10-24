@@ -81,8 +81,9 @@ function _subscriptions_mail_cron() {
           $data_function = $fields[$lang_code][$module][$field]['data_function'];
           $mailmod = (empty($fields[$lang_code][$module][$field]['mail_module']) ? 'subscriptions_mail' : $fields[$lang_code][$module][$field]['mail_module']);
           $mailkey = $fields[$lang_code][$module][$field]['mailkey'];
-          $mailkey = module_invoke_all('subscriptions', 'mailkey_alter', $mailkey, $object);
-          $mailkey = $mailkey[0];
+          if ($mailkey_altered = module_invoke_all('subscriptions', 'mailkey_alter', $mailkey, $object)) {
+            $mailkey = $mailkey_altered[0];
+          }
           $digest = $subs['digest'] > 0 || $subs['digest'] == -1 && _subscriptions_get_setting('digest', 0) > 0;
           //$show_node_info = (isset($object->type) ? variable_get('node_submitted_' . $object->type, TRUE) : TRUE);
 

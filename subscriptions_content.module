@@ -61,13 +61,13 @@ function subscriptions_content_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
             'data_function' => 'subscriptions_content_data',
             'subs_mod' => 'subscriptions_content',
             'subs_type' => t('thread'),
-            'mailkey' => 'node-type',
+            'mailkey' => 'node-type-',
           ),
           'type' => array(
             'data_function' => 'subscriptions_content_data',
             'subs_mod' => 'subscriptions_content',
             'subs_type' => t('content type'),
-            'mailkey' => 'node-type',
+            'mailkey' => 'node-type-',
           ),
         );
       }
@@ -119,6 +119,7 @@ function _subscriptions_content_node_options($account, $node) {
   // Default node, field are the first three indexes, but they can be overridden in params
   // Thread
   $options = array();
+  /** @var $statics array */
   $statics = variable_get('subscriptions_static_content_types', array());
   if (!in_array($node->type, $statics)) {
     $options['nid'][] = array(
