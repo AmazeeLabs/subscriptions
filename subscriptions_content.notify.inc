@@ -53,7 +53,7 @@ function _subscriptions_content_load($nid, $comment_load_sqid = NULL) {
           ':uid' => $user->uid,
           ':sqid' => $comment_load_sqid))->fetchField()
         ) {
-          $query->condition('q.sqid', $cutoff_sqid, '<');
+          $query->condition('sq.sqid', $cutoff_sqid, '<');
         }
       }
 
