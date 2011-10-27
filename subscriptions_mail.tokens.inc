@@ -42,13 +42,13 @@ function subscriptions_mail_tokens($type, $tokens, array $data = array(), array 
         case 'unsubscribe-url':
           $replacements[$original] = url($data['subs']['unsubscribe_path'], $url_options);
           break;
-        case 'module':
+        case 'subs-module':
           $replacements[$original] = $data['subs']['module'];
           break;
-        case 'field':
+        case 'subs-field':
           $replacements[$original] = $data['subs']['field'];
           break;
-        case 'value':
+        case 'subs-value':
           $replacements[$original] = $data['subs']['value'];
           break;
         case 'forum':

@@ -205,9 +205,9 @@ function _subscriptions_mail_preview_form(array $values) {
   $data['subs'] = array(
     'type'             => (isset($values['content_type']) ? t('content type') : t('thread')),
     'unsubscribe_path' => 's/del/...',
-    'module'           => 'module',
-    'field'            => 'field',
-    'value'            => 'value',
+    'subs-module'      => 'MODULE',
+    'subs-field'       => 'FIELD',
+    'subs-value'       => 'VALUE',
    );
   if (isset($node->forum_tid)) {
     $data['subs']['category'] = taxonomy_term_load($node->forum_tid);

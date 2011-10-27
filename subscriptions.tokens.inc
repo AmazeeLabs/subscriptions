@@ -65,16 +65,16 @@ function subscriptions_token_info() {
           'name' => t('Digest Items'),
           'description' => t('The array of formatted items to send to one recipient (for inclusion in a digest).'),
         ),
-        'module' => array(
-          'name' => t('Module'),
-          'description' => t('The module of the item.'),
+        'subs-module' => array(
+          'name' => t('Subscription module'),
+          'description' => t('The module of the item that triggered the notification.'),
         ),
-        'field' => array(
-          'name' => t('Field'),
-          'description' => t('The field of the item that triggered the notification.'),
+        'subs-field' => array(
+          'name' => t('Subscription field'),
+          'description' => t('The field (property) of the item that triggered the notification.'),
         ),
-        'value' => array(
-          'name' => t('Value'),
+        'subs-value' => array(
+          'name' => t('Subscription value'),
           'description' => t('The value of the field of the item that triggered the notification.'),
         ),
         'files:field_FILES' => array(
