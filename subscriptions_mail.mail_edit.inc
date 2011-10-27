@@ -201,10 +201,6 @@ function _subscriptions_mail_preview_form(array $values) {
     }
   }
 
-  if (isset($node->forum_tid)) {
-    $data['term'] = taxonomy_term_load($node->forum_tid);
-  }
-
   $data['user'] = user_load(!empty($node->revision_uid) ? $node->revision_uid : $node->uid);
   $data['subs'] = array(
     'type'             => (isset($values['content_type']) ? t('content type') : t('thread')),
@@ -213,6 +209,9 @@ function _subscriptions_mail_preview_form(array $values) {
     'field'            => 'field',
     'value'            => 'value',
    );
+  if (isset($node->forum_tid)) {
+    $data['subs']['category'] = taxonomy_term_load($node->forum_tid);
+  }
   $data['template'] = $values;
 
   $subject = mail_edit_format($values['subject'], $data, array('language' => $language));

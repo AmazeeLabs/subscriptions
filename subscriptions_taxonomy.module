@@ -354,7 +354,7 @@ function subscriptions_taxonomy_taxa_form(array $form, $uid, array $vocabularies
  * @param array $subs
  */
 function subscriptions_taxonomy_data(array &$data, $node, array $queue_item) {
-  $data['term'] = taxonomy_term_load($queue_item['value']);
+  $data['subs']['category'] = taxonomy_term_load($queue_item['value']);
   subscriptions_content_data($data, $node, $queue_item);
 }
 

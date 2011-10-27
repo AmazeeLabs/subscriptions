@@ -53,7 +53,7 @@ function subscriptions_token_info() {
         ),
         'forum' => array(
           'name' => t('Forum'),
-          'description' => t('The forum, if the item is in a forum.'),
+          'description' => t('The forum (taxonomy term), if the item is in a forum.'),
           'type' => 'term',
         ),
         'comments' => array(

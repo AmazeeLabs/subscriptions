@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Rename [subs:term] to [subs:category] and improve the cooperation with [subs:forum].
   - #1321384: Fix 'Column not found' SQL error.
   - Fix line endings of multiple files (no functional change).
   - Move the token hooks to *.tokens.inc files.

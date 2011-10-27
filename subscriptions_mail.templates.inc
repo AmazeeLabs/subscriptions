@@ -36,7 +36,8 @@ t('| Greetings, [current-user:name].
 }}{{[subs:is-old]#new comments:
 }}|
 {{![subs:is-published]#| ***** This post is unpublished! *****
-}}{{![term:name]?:| Category: [term:name]
+}}{{![subs:category:tid]?:{{[subs:category:tid]==[subs:forum:tid]?:| Category: [subs:category:name]
+}}}}{{![subs:forum:tid]?:| Forum: [subs:forum:name]
 }}{{![user:name]?:| Author: [user:name]
 }}| Title: [node:title]
 &nbsp;

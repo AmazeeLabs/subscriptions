@@ -11,7 +11,7 @@
  * @return array
  */
 function subscriptions_taxonomy_token_info() {
-  $subs['term'] = array(
+  $subs['category'] = array(
     'name' => t("Category"),
     'description' => t("The category (taxonomy term), if this notification was triggered by a %Category subscription.", array('%Category' => t('Category'))),
     'type' => 'term',
@@ -47,20 +47,20 @@ function subscriptions_taxonomy_tokens($type, $tokens, array $data = array(), ar
 
   $replacements = array();
 
-  if ($type == 'subs' && !empty($data['term'])) {
-    $term = $data['term'];
+  if ($type == 'subs' && !empty($data['subs']['category'])) {
+    $term = $data['subs']['category'];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
           // Default values for the chained tokens handled below.
-        case 'term':
+        case 'category':
           //$replacements[$original] = $sanitize ? filter_xss($term->name) : $term->name;
           $replacements[$original] = render(taxonomy_term_view($term, 'full', $language_code));
           break;
       }
     }
 
-    if ($term_tokens = token_find_with_prefix($tokens, 'term')) {
+    if ($term_tokens = token_find_with_prefix($tokens, 'category')) {
       $replacements += token_generate('term', $term_tokens, array('term' => $term), $options);
     }
   }
