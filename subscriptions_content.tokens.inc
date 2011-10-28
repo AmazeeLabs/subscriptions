@@ -58,6 +58,9 @@ function subscriptions_content_tokens($type, array $tokens, array $data = array(
     if (user_access('view uploaded files')) {
       $replacements += _subscriptions_content_tokens_field_array($type, $tokens, $data, $options, 'comment', 'files', 'list<file>');
     }
+
+    // terms:field_TERM
+    $replacements += _subscriptions_content_tokens_field_array($type, $tokens, $data, $options, 'comment', 'terms', 'list<term>');
   }
   elseif ($type == 'subs' && !empty($data['node'])) {
     $node = $data['node'];
@@ -93,6 +96,9 @@ function subscriptions_content_tokens($type, array $tokens, array $data = array(
     if (user_access('view uploaded files')) {
       $replacements += _subscriptions_content_tokens_field_array($type, $tokens, $data, $options, 'node', 'files', 'list<file>');
     }
+
+    // terms:field_TERM
+    $replacements += _subscriptions_content_tokens_field_array($type, $tokens, $data, $options, 'node', 'terms', 'list<term>');
   }
 
   return $replacements;
@@ -115,7 +121,7 @@ function _subscriptions_content_tokens_field_array($type, $tokens, array $data, 
 {
   $replacements = array();
 
-  if ($files_tokens = token_find_with_prefix($tokens, $token)) {
+  if ($field_tokens = token_find_with_prefix($tokens, $token)) {
 
     $url_options = array('absolute' => TRUE);
     if (isset($options['language'])) {
@@ -127,17 +133,29 @@ function _subscriptions_content_tokens_field_array($type, $tokens, array $data, 
     }
 
     $tokenss = array();
-    foreach ($files_tokens as $files_token => $original) {
-      $files_field = strtok($files_token, ':');
-      $tokenss[$files_field][substr($files_token, strlen($files_field) + 1)] = $original;
+    foreach ($field_tokens as $field_token => $original) {
+      $field_name = strtok($field_token, ':');
+      $tokenss[$field_name][substr($field_token, strlen($field_name) + 1)] = $original;
     }
-    foreach ($tokenss as $files_field => $tokens) {
-      if ($files = field_get_items($data_type, $data[$data_type], $files_field, $language_code)) {
-        foreach ($files as $key => $file) {
-          $file_objs[$key] = (object) $file;
+    foreach ($tokenss as $field_name => $tokens) {
+      if ($field_items = field_get_items($data_type, $data[$data_type], $field_name, $language_code)) {
+        $objs = array();
+        switch ($token) {
+          case 'terms':
+            // Terms are stored as tids only.
+            $tids = array();
+            foreach ($field_items as $term) {
+              $tids[] = $term['tid'];
+            }
+            $objs = taxonomy_term_load_multiple($tids);
+            break;
+          default:
+            foreach ($field_items as $key => $item) {
+              $objs[$key] = (object) $item;
+            }
         }
-        if (!empty($file_objs)) {
-          $replacements += token_generate($token_type, $tokens, array($token_type => $file_objs), $options);
+        if (!empty($objs)) {
+          $replacements += token_generate($token_type, $tokens, array($token_type => $objs), $options);
         }
       }
     }

@@ -83,7 +83,13 @@ function subscriptions_token_info() {
           'type' => 'list<file>',
           'dynamic' => TRUE,
         ),
-      ),
+        'terms' => array(
+           'name' => t('Terms'),
+           'description' => t('The array of taxonomy terms in the specified field.'),
+           'type' => 'list<term>',
+           'dynamic' => TRUE,
+         ),
+       ),
     ),
   );
   return $info;
@@ -167,6 +173,19 @@ function subscriptions_tokens($type, array $tokens, array $data = array(), array
     $keys = element_children($array, $sort);
 
     foreach ($tokens as $name => $original) {
+      if ($name === 0) {
+        // Plain [list<>] token.
+        switch ($element_type) {
+          case 'term':
+            foreach ($array as $term) {
+              $term_names[] = $sanitize ? check_plain($term->name) : $term->name;
+            }
+            $replacements[$original] = implode(', ', $term_names);
+            break;
+        }
+        continue;
+      }
+
       switch ($name) {
         case 'first':
           $value = $array[$keys[0]];

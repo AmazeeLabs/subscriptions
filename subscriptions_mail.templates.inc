@@ -40,7 +40,8 @@ t('| Greetings, [current-user:name].
 }}}}{{![subs:forum:tid]?:| Forum: [subs:forum:name]
 }}{{![user:name]?:| Author: [user:name]
 }}| Title: [node:title]
-&nbsp;
+{{![subs:terms:field_tags:count]?:| [subs:terms:field_tags:first:vocabulary:name]: {{[subs:terms:field_tags:count]#{{!!#0#, }}[subs:terms:field_tags:index:#0:name]}}
+}}&nbsp;
 {{[subs:is-old]?{{[node:summary]?[node:summary]:[node:body]}}:[node:body]}}
 | LINK: [node:url]
 {{!![subs:files:field_files:count]#| Attached files:
