@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Integrate the Token patch into Subscriptions, move the various token hooks where they belong, improve the rendering of the token tree.
   - Avoid calling drupal_language_initialize(), too.
   - #1323422: Avoid calling language_initialize().
   - Rename [subs:module/field/value] to avoid confusion with core fields.

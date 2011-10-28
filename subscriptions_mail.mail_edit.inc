@@ -54,6 +54,8 @@ function _subscriptions_mail_mail_edit_token_types($mailkey, $options = array())
   if (module_exists('token')) {
     //dpm(token_get_info(), "TRIGGER HACK");
     // Clear token.module's caches.
+    cache_clear_all('tree-rendered:', 'cache_token', TRUE);
+    cache_clear_all('tree:subs:', 'cache_token', TRUE);
     cache_clear_all("info:{$language->language}", 'cache_token');
     $token_get_info = &drupal_static('token_get_info');
     $token_get_info = NULL;
@@ -63,6 +65,7 @@ function _subscriptions_mail_mail_edit_token_types($mailkey, $options = array())
     $massage_tokens = TRUE;
     // Trigger a refresh of token.module's caches.
     token_get_info();
+    $massage_tokens = FALSE;
     //dpm(token_get_info(), "HACK DONE");
     // Clear the permanent cache, keeping token.module's static caches.
     cache_clear_all("info:{$language->language}", 'cache_token');

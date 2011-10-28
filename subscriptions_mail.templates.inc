@@ -44,7 +44,7 @@ t('| Greetings, [current-user:name].
 {{[subs:is-old]?{{[node:summary]?[node:summary]:[node:body]}}:[node:body]}}
 | LINK: [node:url]
 {{!![subs:files:field_files:count]#| Attached files:
-{{[subs:files:field_files:count]#| [subs:files:field_files:value:#0:url]
+{{[subs:files:field_files:count]#| [subs:files:field_files:index:#0:url]
 }}}}{{![subs:comments:count]?!SEPARATOR
 :|
 | Comments: [subs:comments:count]
@@ -63,7 +63,7 @@ t('| {{[subs:is-new]?New:Updated}} {{[subs:is-published]?:UNPUBLISHED }}comment:
 [comment:body]
 | LINK: [comment:url]
 {{!![subs:files:field_files:count]#| Attached files:
-{{[subs:files:field_files:count]#| [subs:files:field_files:value:#0:url]
+{{[subs:files:field_files:count]#| [subs:files:field_files:index:#0:url]
 }}}}!SEPARATOR', array('!SEPARATOR' => subscriptions_mail_template_raw('SEP', $langcode)), array('langcode' => $langcode));
 
     case 'DSUBJ':    return // SUBSCRIPTIONS_DEFAULT_DIGEST_SUBJECT
