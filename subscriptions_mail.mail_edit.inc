@@ -175,7 +175,8 @@ function _subscriptions_mail_preview(array $form, array &$form_state) {
  * @return array
  */
 function _subscriptions_mail_preview_form(array $values) {
-  $language = language_initialize($values['language']);
+  $language_list = language_list();
+  $language = $language_list[$values['language']];
   $data = array();
   $query = db_select('node', 'n')
     ->fields('n', array('nid'));
