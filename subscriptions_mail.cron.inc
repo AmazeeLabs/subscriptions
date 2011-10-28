@@ -13,7 +13,6 @@
 function _subscriptions_mail_cron() {
 
   global $user, $language;
-  drupal_language_initialize();
   _subscriptions_mail_module_load_include('templates.inc');
 
   $mails_allowed = variable_get('subscriptions_number_of_mails', 0);
