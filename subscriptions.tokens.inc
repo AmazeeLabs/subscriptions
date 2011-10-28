@@ -156,7 +156,7 @@ function subscriptions_tokens($type, array $tokens, array $data = array(), array
     if ($url_tokens = token_find_with_prefix($tokens, 'unsubscribe-url')) {
       $replacements += token_generate('url', $url_tokens, array('path' => $data['subs']['unsubscribe_path']), $options);
     }
-    if ($forum_tokens = token_find_with_prefix($tokens, 'forum')) {
+    if (isset($data['node']->forum_tid) && ($forum_tokens = token_find_with_prefix($tokens, 'forum'))) {
       $replacements += token_generate('term', $forum_tokens, array('term' => taxonomy_term_load($data['node']->forum_tid)), $options);
     }
   }
