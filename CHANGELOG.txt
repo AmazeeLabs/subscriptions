@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.0-alpha6 (2011-10-30):
   - Fix [subs:forum] token.
   - Add support for term fields/tokens.
   - Integrate the Token patch into Subscriptions, move the various token hooks where they belong, improve the rendering of the token tree.
@@ -40,7 +43,6 @@ subscriptions 7.x-1.0-alpha5 (2011-10-08):
   - #1252786: Fix incorrect teaser handling.
   - #1259662: Fix completely broken subscriptions_tableselect.js.
   - #1258698: Fix default subscriptions not being assigned to new users.
-
 
 subscriptions 7.x-1.0-alpha4 (2011-08-24):
   - #1253788, 1253790: Remove the temporary SubscriptionsMailSystem (needs 7.5 now!).
