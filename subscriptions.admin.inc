@@ -185,7 +185,7 @@ function subscriptions_page_form_submit(array $form, array &$form_state) {
     $field = $form_values['field'];
     $access_key = (isset($form_values['access_key']) ? $form_values['access_key'] : $module);
     foreach ($form_values as $element_values) {
-      if (isset($element_values[0])) {
+      if (is_array($element_values) && isset($element_values[0])) {
         $element_values = $element_values[0];
       }
       if (isset($element_values['defaults']['send_interval'])) {
