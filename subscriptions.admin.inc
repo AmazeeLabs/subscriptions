@@ -326,6 +326,14 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
   $callback = $stypes[$stype]['page'];
   if (!empty($callback) && function_exists($callback)) {
     $form = $callback($form, $uid);
+    if (is_string($form)) {
+      $form = array(
+        'message' => array(
+          '#type' => 'item',
+          '#markup' => '<br /><br />' . $form,
+        ),
+      );
+    }
   }
   //$form = function_exists($callback) ? $callback($account, $form) : NULL;
   //drupal_add_link(array(
