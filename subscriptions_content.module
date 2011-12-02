@@ -142,7 +142,7 @@ function _subscriptions_content_node_options($account, $node) {
       }
     }
     // Content type
-    $type_name = check_plain(node_type_get_name($node->type));
+    $type_name = node_type_get_name($node->type);
     if ($type_name) {
       $options['type'][] = array(
         'name' => t('To %type content', array('%type' => $type_name)) . $unlisted_tag,

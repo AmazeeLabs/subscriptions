@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1358634 by rbayliss: Fix double-escaped node type in node subscribe form.
   - Fix inability to save blog subscriptions.
   - Fix crash caused by empty user subscriptions form.
   - #1331670: Fix suspend subscription sub-form.
