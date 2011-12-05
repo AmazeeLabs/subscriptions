@@ -106,7 +106,7 @@ function subscriptions_mail_mailkeys() {
       $mailkeys += $result;
     }
   }
-  //$mailkeys['digest'] = t('Digest subscriptions notifications');
+  $mailkeys['digest'] = t('Digest subscriptions notifications');
   return $mailkeys;
 }
 
