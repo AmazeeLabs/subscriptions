@@ -3,4 +3,4 @@ description = The basic Subscriptions framework.
 package = "Subscriptions"
 core = 7.x
 
-configure = admin/config/subscriptions
+configure = admin/config/system/subscriptions

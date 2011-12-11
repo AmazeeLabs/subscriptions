@@ -18,6 +18,11 @@
  */
 
 /**
+ * The path of Subscriptions's main configuration page.
+ */
+define('SUBSCRIPTIONS_CONFIG_PATH', 'admin/config/system/subscriptions');
+
+/**
  * Implements hook_init().
  *
  * @ingroup hooks
@@ -43,7 +48,7 @@ function subscriptions_init() {
  * @ingroup menu
  */
 function subscriptions_menu() {
-  $items['admin/config/subscriptions'] = array(
+  $items[SUBSCRIPTIONS_CONFIG_PATH] = array(
     'title' => 'Subscriptions',
     'description' => 'Site and user default settings for Subscriptions.',
     'page callback' => 'drupal_get_form',
@@ -51,12 +56,12 @@ function subscriptions_menu() {
     'page arguments' => array('subscriptions_settings_form'),
     'access arguments' => array('administer site configuration'),
   );
-  $items['admin/config/subscriptions/settings'] = array(
+  $items[SUBSCRIPTIONS_CONFIG_PATH . '/settings'] = array(
     'title' => 'Site settings',
     'weight' => -10,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/config/subscriptions/userdefaults'] = array(
+  $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults'] = array(
     'title' => 'User defaults',
     'weight' => -5,
     'file' => 'subscriptions.admin.inc',
@@ -64,13 +69,12 @@ function subscriptions_menu() {
     'page arguments' => array('subscriptions_page_user_overview', 5),
     'type' => MENU_LOCAL_TASK,
     'access arguments' => array('administer site configuration'),
-    'weight' => -100,
   );
-  $items['admin/config/subscriptions/userdefaults/settings'] = array(
+  $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/settings'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'title' => 'Overview',
   );
-  $items['admin/config/subscriptions/intervals'] = array(
+  $items[SUBSCRIPTIONS_CONFIG_PATH . '/intervals'] = array(
     'title' => 'Interval',
     'page callback' => 'drupal_get_form',
     'file' => 'subscriptions.admin.inc',
@@ -152,7 +156,7 @@ function subscriptions_menu() {
     if ($stype == 'node') {
       continue;  // not in site settings
     }
-    $items['admin/config/subscriptions/userdefaults/' . $stype] = array(
+    $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/' . $stype] = array(
       'title' => $data['title'],
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',

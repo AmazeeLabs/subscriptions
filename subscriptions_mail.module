@@ -13,7 +13,7 @@
  * @return array
  */
 function subscriptions_mail_menu() {
-  $items['admin/config/subscriptions/purge-queue'] = array(
+  $items[SUBSCRIPTIONS_CONFIG_PATH + '/purge-queue'] = array(
     'file' => 'subscriptions_mail.admin.inc',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('_subscriptions_mail_purge_queue_form'),

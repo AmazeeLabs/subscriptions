@@ -231,7 +231,7 @@ function subscriptions_page_form_submit(array $form, array &$form_state) {
     }
   }
   if (!empty($rid0)) {
-    $form_state['redirect'] = 'admin/config/subscriptions/userdefaults/' . arg(4);
+    $form_state['redirect'] = SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/' . arg(4);
     if ($rid0 != DRUPAL_AUTHENTICATED_RID) {
       $form_state['redirect'] .= '/' . $rid0;
     }
@@ -384,7 +384,7 @@ function subscriptions_page_user_overview(array $form, array &$form_state, $acco
     $has_access = ($uid < 0 && user_access('administer site configuration')) || user_access($type['access'], $account);
     if (($has_access || user_access('administer user subscriptions')) && isset($type['fields'])) {
       $rows[] = array(
-        ($has_access ? l($tr($type['title']), ($uid < 0 ? "admin/config/subscriptions/userdefaults/$stype" : "user/$uid/subscriptions/$stype")) : $type['title']),
+        ($has_access ? l($tr($type['title']), ($uid < 0 ? SUBSCRIPTIONS_CONFIG_PATH . "/userdefaults/$stype" : "user/$uid/subscriptions/$stype")) : $type['title']),
         isset($counts[$type['fields'][0]][$type['fields'][1]]) ? $counts[$type['fields'][0]][$type['fields'][1]] : 0,
       );
     }

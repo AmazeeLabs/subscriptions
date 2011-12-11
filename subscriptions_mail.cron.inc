@@ -32,7 +32,7 @@ function _subscriptions_mail_cron() {
   if ($usable_seconds <= 0) {
     $variables = array(
       '!Module' => 'Subscriptions',
-      '@link'   => url('admin/config/subscriptions', array('fragment' => 'edit-subscriptions-cron-percent')),
+      '@link'   => url(SUBSCRIPTIONS_CONFIG_PATH, array('fragment' => 'edit-subscriptions-cron-percent')),
     );
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
     if ($usable_seconds == 0) {
