@@ -256,7 +256,7 @@ function subscriptions_permission() {
  *
  * Set up the Subscriptions defaults for the new user.
  *
- * @param array|null $edit
+ * @param array $edit
  * @param object $account
  * @param null $category
  *
@@ -762,7 +762,7 @@ function _subscriptions_get_setting($name, $account) {
       // Let's add the missing records, as if the user were being created just
       // now, with the expected hook_user() invocations:
       $account = user_load($uid);
-      subscriptions_user_insert(NULL, $account, NULL);
+      subscriptions_user_insert(array(), $account, NULL);
       return _subscriptions_get_setting($name, $account);
     }
     $defaults[$uid]['uses_defaults'] = FALSE;
