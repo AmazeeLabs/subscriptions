@@ -3,9 +3,6 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
-
-
-subscriptions 7.x-1.0-beta1 (2011-12-11):
   - #1327376: Implement digest mode.
   - Use content type names rather than machine names for the template descriptions.
   - #1358634 by rbayliss: Fix double-escaped node type in node subscribe form.
