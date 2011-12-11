@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.0-beta1 (2011-12-11):
   - #1327376: Implement digest mode.
   - Use content type names rather than machine names for the template descriptions.
   - #1358634 by rbayliss: Fix double-escaped node type in node subscribe form.
@@ -32,7 +35,6 @@ subscriptions 7.x-1.0-alpha6 (2011-10-30):
   - #1305520: Fix missing column in pre-existing {mail_edit} table.
   - #1305792: Fix inability to save user settings.
   - #1304258: Fix deprecated call-time pass-by-reference typo.
-
 
 subscriptions 7.x-1.0-alpha5 (2011-10-08):
   - MAJOR OVERHAUL:
