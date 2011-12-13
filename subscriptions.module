@@ -73,6 +73,7 @@ function subscriptions_menu() {
   $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/settings'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'title' => 'Overview',
+    'weight' => -100,
   );
   $items[SUBSCRIPTIONS_CONFIG_PATH . '/intervals'] = array(
     'title' => 'Interval',
