@@ -231,7 +231,9 @@ function subscriptions_page_form_submit(array $form, array &$form_state) {
     }
   }
   if (!empty($rid0)) {
-    $form_state['redirect'] = SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/' . arg(4);
+    $menu_item = menu_get_item();
+    $subs_type = $menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 1];
+    $form_state['redirect'] = SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/' . $subs_type;
     if ($rid0 != DRUPAL_AUTHENTICATED_RID) {
       $form_state['redirect'] .= '/' . $rid0;
     }
@@ -258,7 +260,8 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
     return NULL;
   }
 
-  if (arg(0) == 'admin') {
+  $menu_item = menu_get_item();
+  if ($menu_item['map'][0] == 'admin') {
     $form['header'] = array(
       '#type'          => 'fieldset',
       '#title'         => t('Admin Information'),
@@ -272,21 +275,23 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
     );
 
     $tr = 't';
+    $rid = (isset($menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2]) ? $menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2] : NULL);
     $form['header']['role'] = array(
       '#type'        => 'fieldset',
       '#title'       => $tr('Roles'),
       '#collapsible' => TRUE,
-      '#collapsed'   => !is_numeric(arg(5)),
+      '#collapsed'   => !is_numeric($rid),
     );
     $form['header']['role']['header'] = array(
       '#type'          => 'markup',
       '#value'         => '<div>' . t('If a user has one or more roles assigned at creation time, then she will receive the additional subscriptions defined for these roles.') . '</div>',
       '#weight'        => -5,
     );
+    $rid = (is_numeric($rid) ? $rid : DRUPAL_AUTHENTICATED_RID);
     $form['header']['role']['roles'] = array(
       '#type'          => 'select',
       '#title'         => t('Role(s)'),
-      '#default_value' => array((is_numeric(arg(5)) ? arg(5) : DRUPAL_AUTHENTICATED_RID)),
+      '#default_value' => array($rid),
       '#options'       => user_roles(TRUE),
       '#description'   => t('Select the role to load or role(s) to save.'),
       '#multiple'      => TRUE,

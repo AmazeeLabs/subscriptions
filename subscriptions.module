@@ -21,6 +21,7 @@
  * The path of Subscriptions's main configuration page.
  */
 define('SUBSCRIPTIONS_CONFIG_PATH', 'admin/config/system/subscriptions');
+define('SUBSCRIPTIONS_CONFIG_PATH_LEVEL', count(explode('/', SUBSCRIPTIONS_CONFIG_PATH)));
 
 /**
  * Implements hook_init().
@@ -66,7 +67,7 @@ function subscriptions_menu() {
     'weight' => -5,
     'file' => 'subscriptions.admin.inc',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('subscriptions_page_user_overview', 5),
+    'page arguments' => array('subscriptions_page_user_overview', SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2),
     'type' => MENU_LOCAL_TASK,
     'access arguments' => array('administer site configuration'),
   );
@@ -162,7 +163,7 @@ function subscriptions_menu() {
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('subscriptions_page_form', 5, $stype),
+      'page arguments' => array('subscriptions_page_form', SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2, $stype),
       'access arguments' => array('administer site configuration'),
       'weight' => $weight,
     );
@@ -720,7 +721,7 @@ function _subscriptions_cmp_by_weight(array $a, array $b) {
  *
  * @param string $name
  * @param object|int|null $account
- *    NULL/0 (for site default), a user object, or a uid.
+ *    NULL/0 (for site default), a user object, a uid (if >0) or a -rid (if <0).
  *
  * @return
  */
@@ -762,9 +763,18 @@ function _subscriptions_get_setting($name, $account) {
       // hooks, or they may have been created on another multi-site (#351753).
       // Let's add the missing records, as if the user were being created just
       // now, with the expected hook_user() invocations:
-      $account = user_load($uid);
-      subscriptions_user_insert(array(), $account, NULL);
-      return _subscriptions_get_setting($name, $account);
+      if ($uid > 0) {
+        $account = user_load($uid);
+        subscriptions_user_insert(array(), $account, NULL);
+      }
+      else {
+        db_insert('subscriptions_user')
+          ->fields(array(
+            'uid' => $uid,
+          ))
+          ->execute();
+      }
+      return _subscriptions_get_setting($name, $uid);
     }
     $defaults[$uid]['uses_defaults'] = FALSE;
     foreach ($defaults[$uid] as $key => $value) {
