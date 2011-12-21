@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1378692: Fix direct unsubscribe link not working.
   - #1370820: Fix path element offsets that were broken by #1253846.
   - Move the 'Overview' subtab into the first position on the 'User defaults' tab.
   - #1369146: Fix the [Purge the queue] button.
