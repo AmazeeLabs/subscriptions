@@ -158,7 +158,7 @@ function _subscriptions_mail_cron() {
     else {
       $message = t('!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
     }
-    $message .= ' ' . t('!remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other @cron client modules.', $variables);
+    $message .= ' ' . t('!remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other !cron client modules.', $variables);
     $watchdog = 'watchdog'; // keep potx from translating 'cron'
     $watchdog('cron', $message);
   }
