@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.0-beta2 (2012-01-07):
   - Fix minor string error.
   - #1378692: Fix direct unsubscribe link not working.
   - #1370820: Fix path element offsets that were broken by #1253846.
@@ -19,7 +22,6 @@ subscriptions 7.x-1.0-beta1 (2011-12-11):
   - Fix inability to save blog subscriptions.
   - Fix crash caused by empty user subscriptions form.
   - #1331670: Fix suspend subscription sub-form.
-
 
 subscriptions 7.x-1.0-alpha6 (2011-10-30):
   - Fix [subs:forum] token.
