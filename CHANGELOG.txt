@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Avoid possible error when installing Mail Editor and Subscriptions Mail at the same time.
   - #1422880, by DamienMcKenna: Allow other modules to alter the node options.
 
 
