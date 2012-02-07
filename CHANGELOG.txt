@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1431850: Fix crash when previewing a template when running without comment.module.
   - Hide references to comments from the Pages/Threads page when running without comment.module.
   - #1431864: Fix exception on Pages/Threads page when running without comment.module.
   - Avoid possible error when installing Mail Editor and Subscriptions Mail at the same time.
