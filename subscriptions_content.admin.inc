@@ -165,23 +165,25 @@ function _subscriptions_content_node_form(array $form, $uid) {
     $subscriptions[$s['nid']][$s['author_uid']] = $s;
   }
 
-  // check whether we've commented:
-  $nids = array_keys($subscriptions);
-  $select = db_select('subscriptions', 's')
-    ->fields('s', array('value'))
-    ->condition('s.module', 'node')
-    ->condition('s.field', 'nid')
-    ->condition('s.recipient_uid', $uid);
-  $result = db_select('comment', 'c')
-    ->fields('c')
-    ->condition('c.nid', $select, 'IN')
-    ->condition('c.uid', $uid)
-    ->groupBy('c.nid')
-    ->execute();
-  foreach ($result as $c) {
-    if (isset($subscriptions[$c->nid])) {
-      foreach ($subscriptions[$c->nid] as $author_uid => $subscription) {
-        $subscriptions[$c->nid][$author_uid]['commented'] = TRUE;
+  if (module_exists('comment')) {
+    // check whether we've commented:
+    $nids = array_keys($subscriptions);
+    $select = db_select('subscriptions', 's')
+      ->fields('s', array('value'))
+      ->condition('s.module', 'node')
+      ->condition('s.field', 'nid')
+      ->condition('s.recipient_uid', $uid);
+    $result = db_select('comment', 'c')
+      ->fields('c')
+      ->condition('c.nid', $select, 'IN')
+      ->condition('c.uid', $uid)
+      ->groupBy('c.nid')
+      ->execute();
+    foreach ($result as $c) {
+      if (isset($subscriptions[$c->nid])) {
+        foreach ($subscriptions[$c->nid] as $author_uid => $subscription) {
+          $subscriptions[$c->nid][$author_uid]['commented'] = TRUE;
+        }
       }
     }
   }

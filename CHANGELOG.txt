@@ -3,8 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1431864: Fix exception on Pages/Threads page when running without comment.module.
   - Avoid possible error when installing Mail Editor and Subscriptions Mail at the same time.
-  - #1422880, by DamienMcKenna: Allow other modules to alter the node options.
+  - #1422880 by DamienMcKenna: Allow other modules to alter the node options.
 
 
 subscriptions 7.x-1.0-beta2 (2012-01-07):
