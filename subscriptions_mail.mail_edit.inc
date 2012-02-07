@@ -105,7 +105,7 @@ function _subscriptions_mail_mail_edit_form_extra(array &$form, array &$form_sta
     ));
     if (isset($template['subscriptions_comment_body'])) {
       $form['mail']['subscriptions_comment_body'] = array(
-        '#title'         => t('Comment'),
+        '#title'         => module_exists('comment') ? t('Comment') : t('@Comment (unused because @Comment module is disabled on this site)', array('@Comment' => t('Comment'))),
         '#type'          => 'textarea',
         '#default_value' => $template['subscriptions_comment_body'],
         '#rows'          => 5,
