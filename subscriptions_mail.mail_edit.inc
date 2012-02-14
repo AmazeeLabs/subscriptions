@@ -274,6 +274,13 @@ function _subscriptions_mail_preview_form(array $values) {
   if ($is_digest) {
     $data = $digest_data;
   }
+  if (empty($data)) {
+    $form['note'] = array(
+      '#markup' => '<span class="error">' . t('No displayable content found!') . '</span>',
+    );
+    return $form;
+  }
+
   $subject = mail_edit_format($values['subject'], $data, array('language' => $language));
   $body = $values['body'];
   if ($preview_mode == 'html-rendered-nl') {
