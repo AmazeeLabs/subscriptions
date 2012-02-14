@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1438432: Fix unincluded subscriptions_add_form() and _del_form().
   - Add a note to the template page when running without comment.module.
   - #1431850: Fix crash when previewing a template when running without comment.module.
   - Hide references to comments from the Pages/Threads page when running without comment.module.
