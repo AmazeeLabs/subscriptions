@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1438302 by Dmitriy.trt: Fix errors about missing tables on upgrade from D6.
   - Fix crash when trying to preview a template and there is no suitable content.
   - #1438432: Fix unincluded subscriptions_add_form() and _del_form().
   - Add a note to the template page when running without comment.module.
