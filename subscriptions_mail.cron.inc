@@ -66,6 +66,9 @@ function _subscriptions_mail_cron() {
         if (!isset($loaded_objects[$user->uid][$load_function][$load_args]) && $load_function($queue_item)) {
           $object = $queue_item['object'];
           $access = module_invoke_all('subscriptions', 'access', $load_function, $load_args, $object);
+          // Allow other modules to alter the data.
+          drupal_alter('subscriptions_access', $access);
+
           // One FALSE vote is enough to deny. Also, we need a non-empty array.
           $allow = !empty($access) && array_search(FALSE, $access) === FALSE;
           $loaded_objects[$user->uid][$load_function][$load_args] = $allow ? $object : FALSE;

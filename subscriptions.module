@@ -365,6 +365,9 @@ function subscriptions_queue(array $event) {
 
   foreach (module_implements('subscriptions') as $subs_module) {
     $subs_module_query = module_invoke($subs_module, 'subscriptions', 'queue', $event);
+    // Allow other modules to alter the data.
+    drupal_alter('subscriptions_queue_query', $subs_module_query);
+
     if (!isset($subs_module_query)) {
       continue;
     }
@@ -611,6 +614,9 @@ function subscriptions_types($field = NULL, $type = NULL) {
 
   if (!isset($types)) {
     $types = module_invoke_all('subscriptions', 'types');
+    // Allow other modules to alter the data.
+    drupal_alter('subscriptions_types', $types);
+
     foreach ($types as $stype => $data) {
       if (!_subscriptions_validate_hook_result($stype, $data)) {
         continue;

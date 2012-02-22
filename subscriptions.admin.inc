@@ -920,6 +920,9 @@ function subscriptions_add_form(array $form, array &$form_state, $stype, $sid, $
  */
 function subscriptions_add_form_submit(array $form, array &$form_state) {
   if ($a = module_invoke_all('subscriptions', 'stype', $form_state['values']['stype'], $form_state['values']['sid'], (isset($form_state['values']['author_uid']) ? $form_state['values']['author_uid'] : -1))) {
+    // Allow other modules to alter the data.
+    drupal_alter('subscriptions_stype', $a);
+
     list($module, $field, $value, $author_uid) = $a;
     $uid = $form_state['values']['uid'];
     subscriptions_write_subscription($module, $field, $value, $author_uid, $uid, $form_state['values']['send_interval'], $form_state['values']['updates'], $form_state['values']['comments']);
@@ -956,6 +959,9 @@ function subscriptions_del_form(array $form, array &$form_state, $stype, $sid, $
   global $user;
 
   if ($a = module_invoke_all('subscriptions', 'stype', $stype, $sid, (isset($author_uid) ? $author_uid : -1))) {
+    // Allow other modules to alter the data.
+    drupal_alter('subscriptions_stype', $a);
+
     list($module, $field, $value, $author_uid) = $a;
     return subscriptions_delete_form($form, $form_state, $module, $field, $value, $author_uid, $user->uid);
   }
