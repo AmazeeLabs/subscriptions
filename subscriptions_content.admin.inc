@@ -142,15 +142,11 @@ function _subscriptions_content_node_form(array $form, $uid) {
       ->leftJoin('node_comment_statistics', 'ncs', 'n.nid = ncs.nid');
     $query
       ->fields('ncs', array('last_comment_timestamp'));
-    $query->addExpression('IF(s.send_comments + s.send_updates = 0,
-                              n.created,
-                              IF(s.send_comments + s.send_updates = 2,
-                                 IF(n.changed > ncs.last_comment_timestamp,
-                                    n.changed,
-                                    ncs.last_comment_timestamp),
-                                 IF(s.send_comments = 1,
-                                    ncs.last_comment_timestamp,
-                                    n.changed)))', 'latest_activity');
+    $query->addExpression('CASE WHEN s.send_comments + s.send_updates = 0 THEN n.created
+                                WHEN s.send_comments + s.send_updates = 2 THEN 
+                                     CASE WHEN n.changed > ncs.last_comment_timestamp THEN n.changed ELSE ncs.last_comment_timestamp END
+                                WHEN s.send_comments = 1 THEN ncs.last_comment_timestamp
+                                ELSE n.changed END', 'latest_activity');
   }
   else {
     $query->addExpression('IF(s.send_updates = 0, n.created, n.changed)', 'latest_activity');
