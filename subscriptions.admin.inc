@@ -288,14 +288,13 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
       $tr = 't';
       $rid = (isset($menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2]) ? $menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2] : NULL);
       $form['header']['role'] = array(
-        '#type'        => 'fieldset',
-        '#title'       => $tr('Roles'),
-        '#collapsible' => TRUE,
-        '#collapsed'   => !is_numeric($rid),
+        '#type'          => 'fieldset',
+        '#title'         => $tr('Roles'),
+        '#collapsible'   => TRUE,
+        '#collapsed'     => !is_numeric($rid),
       );
       $form['header']['role']['header'] = array(
-        '#type'          => 'markup',
-        '#value'         => '<div>' . t('If a user has one or more roles assigned at creation time, then she will receive the additional subscriptions defined for these roles.') . '</div>',
+        '#markup'        => '<div>' . t('If a user has one or more roles assigned at creation time, then she will receive the additional subscriptions defined for these roles.') . '</div>',
         '#weight'        => -5,
       );
       $rid = (is_numeric($rid) ? $rid : DRUPAL_AUTHENTICATED_RID);
@@ -476,7 +475,7 @@ function subscriptions_user_suspend_form(array &$form, array &$form_state, $acco
   $options[] = $tr('Yes');
   if ($count > 0) {
     $form['suspend']['queued'] = array(
-      '#value'       => '<div>' . t('You have %count items queued for delivery. (The number of resulting notifications will typically be much smaller.)', array('%count' => $count)) . '</div>',
+      '#markup'      => '<div>' . t('You have %count items queued for delivery. (The number of resulting notifications will typically be much smaller.)', array('%count' => $count)) . '</div>',
     );
     $options[-1] = t('!Yes, but drop the queued items', array('!Yes' => $tr('Yes')));
   }
@@ -690,7 +689,7 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
     '#description'   => t('Sends a notification when an item receives a comment or reply.'),
   );
   $form['settings']['preferences']['description'] = array(
-    '#value'       => t('Any changes you make here will only apply to newly created subscriptions.'),
+    '#markup'        => t('Any changes you make here will only apply to newly created subscriptions.'),
   );
   $form['settings']['visibility'] = array(
     '#type'          => 'fieldset',
@@ -913,7 +912,7 @@ function subscriptions_intervals(array $form, array &$form_state) {
     $default .= "$interval|$text\n";
   }
   $form['info'] = array(
-    '#value' => t('Define the selection of %Send_interval options available through the user interface. Adding additional ones is easy, but removing one that is already in use is not recommended.', array('%Send_interval' => t('Send interval'))),
+    '#markup' => t('Define the selection of %Send_interval options available through the user interface. Adding additional ones is easy, but removing one that is already in use is not recommended.', array('%Send_interval' => t('Send interval'))),
   );
   $form['intervals'] = array(
     '#type' => 'textarea',
