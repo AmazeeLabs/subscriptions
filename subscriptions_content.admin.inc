@@ -143,7 +143,7 @@ function _subscriptions_content_node_form(array $form, $uid) {
     $query
       ->fields('ncs', array('last_comment_timestamp'));
     $query->addExpression('CASE WHEN s.send_comments + s.send_updates = 0 THEN n.created
-                                WHEN s.send_comments + s.send_updates = 2 THEN 
+                                WHEN s.send_comments + s.send_updates = 2 THEN
                                      CASE WHEN n.changed > ncs.last_comment_timestamp THEN n.changed ELSE ncs.last_comment_timestamp END
                                 WHEN s.send_comments = 1 THEN ncs.last_comment_timestamp
                                 ELSE n.changed END', 'latest_activity');
@@ -248,24 +248,32 @@ function _subscriptions_content_node_form(array $form, $uid) {
  * @ingroup form
  */
 function _subscriptions_content_type_form(array $form, $uid) {
+  $subscriptions = array();
+  $bulk_op = (empty($_SESSION['subscriptions']['bulk_op']) ? '' : $_SESSION['subscriptions']['bulk_op']);
+  if ($bulk_op) {
+    // No initialization for bulk subscription.
+    $uid = -DRUPAL_AUTHENTICATED_RID;
+  }
+  else {
+    $query = db_select('subscriptions', 's', array('fetch' => PDO::FETCH_ASSOC));
+    $nt_alias = $query->join('node_type', 'nt', 's.value = nt.type');
+    $result = $query
+      ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
+      ->fields($nt_alias, array('type', 'name'))
+      ->condition('s.module', 'node')
+      ->condition('s.field', 'type')
+      ->condition('s.recipient_uid', $uid)
+      ->addTag('node_type_access')
+      ->orderBy('s.author_uid')
+      ->execute();
+    foreach ($result as $s) {
+      $subscriptions[$s['value']][$s['author_uid']] = $s;
+    }
+  }
   $unlisteds = variable_get('subscriptions_unlisted_content_types', array());
   /** @var $blockeds array */
   $blockeds = variable_get('subscriptions_blocked_content_types', array());
   $omits = array_merge($unlisteds, $blockeds);
-  $query = db_select('subscriptions', 's', array('fetch' => PDO::FETCH_ASSOC));
-  $nt_alias = $query->join('node_type', 'nt', 's.value = nt.type');
-  $result = $query
-    ->fields('s', array('value', 'send_interval', 'author_uid', 'send_comments', 'send_updates'))
-    ->fields($nt_alias, array('type', 'name'))
-    ->condition('s.module', 'node')
-    ->condition('s.field', 'type')
-    ->condition('s.recipient_uid', $uid)
-    ->addTag('node_type_access')
-    ->orderBy('s.author_uid')
-    ->execute();
-  foreach ($result as $s) {
-    $subscriptions[$s['value']][$s['author_uid']] = $s;
-  }
   $form[0] = array(
     '#theme' => 'subscriptions_form_table',
   );

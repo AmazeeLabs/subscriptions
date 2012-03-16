@@ -75,6 +75,15 @@ function subscriptions_menu() {
     'title' => 'Overview',
     'weight' => -100,
   );
+  $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/bulk'] = array(
+    'title' => 'Bulk operation',
+    'weight' => -80,
+    'page callback' => 'drupal_get_form',
+    'file' => 'subscriptions.admin.inc',
+    'page arguments' => array('subscriptions_page_user_bulk'),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => '_subscriptions_bulk_access',
+  );
   $items[SUBSCRIPTIONS_CONFIG_PATH . '/intervals'] = array(
     'title' => 'Interval',
     'page callback' => 'drupal_get_form',
@@ -222,6 +231,16 @@ function _subscriptions_access($account, $access = NULL) {
   return FALSE;
 }
 
+/*
+ * Access callback for bulk operations.
+ *
+ * @returns: bool
+ */
+function _subscriptions_bulk_access()
+{
+  return user_access('bulk-administer user subscriptions') && !empty($_SESSION['subscriptions']['bulk_op']);
+}
+
 /**
  * Implements hook_permission().
  *
@@ -236,6 +255,14 @@ function subscriptions_permission() {
       'administer user subscriptions' => array(
         'title' => t('Administer user subscriptions'),
         'description' => t('Administer the subscriptions of all other users.'),
+        'restrict access' => TRUE,
+      ),
+      $placeholder_key => array(),
+    ),
+    array(
+      'bulk-administer user subscriptions' => array(
+        'title' => t('Administer user subscriptions using bulk user operations'),
+        'description' => t('Add subscriptions to or remove subscriptions from multiple users at once from the user list.'),
         'restrict access' => TRUE,
       ),
       $placeholder_key => array(),
@@ -860,5 +887,41 @@ function _subscriptions_module_load_include($module, $ext) {
     $loaded[$key] = (bool) module_load_include($ext, $module);
   }
   return $loaded[$key];
+}
+
+/**
+ * Implements hook_user_operations().
+ *
+ * @return array|null
+ */
+function subscriptions_user_operations() {
+  if (user_access('bulk-administer user subscriptions')) {
+    return array(
+      array(
+        'label' => t('Subscribe the selected users to...'),
+        'callback' => '_subscriptions_bulk_operation',
+        'callback arguments' => array('sub'),
+      ),
+      array(
+        'label' => t('Unsubscribe the selected users from...'),
+        'callback' => '_subscriptions_bulk_operation',
+        'callback arguments' => array('unsub'),
+      ),
+    );
+  }
+  return NULL;
+}
+
+/**
+ * Callback for bulk subscriptions.
+ *
+ * @param $uids array
+ * @param $bulk_op string
+ */
+function _subscriptions_bulk_operation(array $uids, $bulk_op) {
+  $_SESSION['subscriptions']['bulk_op'] = $bulk_op;
+  $_SESSION['subscriptions']['uids'] = serialize($uids);
+  $_SESSION['subscriptions']['back_url'] = $_GET['q'];
+  drupal_goto(SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/bulk');
 }
 
