@@ -272,15 +272,15 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
 
   $menu_item = menu_get_item();
   if ($menu_item['map'][0] == 'admin') {
+    $form['header'] = array(
+      '#type'          => 'fieldset',
+      '#title'         => t('Admin Information'),
+      '#attributes'    => array('class' => array('error')),
+      '#collapsible'   => TRUE,
+      '#collapsed'     => FALSE,
+      '#weight'        => -2,
+    );
     if (empty($_SESSION['subscriptions']['bulk_op'])) {
-      $form['header'] = array(
-        '#type'          => 'fieldset',
-        '#title'         => t('Admin Information'),
-        '#attributes'    => array('class' => array('error')),
-        '#collapsible'   => TRUE,
-        '#collapsed'     => FALSE,
-        '#weight'        => -2,
-      );
       $form['header'][] = array(
         '#markup'        => '<div>' . t('The selected subscriptions will be given to <b>newly created</b> users.') . '</div>',
       );
@@ -314,20 +314,14 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
     }
     else {
       $bulk_op = $_SESSION['subscriptions']['bulk_op'];
-      $uids = unserialize($_SESSION['subscriptions']['uids']);
-      $form['header']['info1'] = array(
-        '#type' => 'item',
-        '#value' => t('You have selected %count users for performing bulk !action.', array(
-            '%count' => count($uids),
-            '!action' => '<strong>'. ($bulk_op == 'sub' ? t('subscribing') : t('unsubscribing')) .'</strong>',
-          )),
-      );
-      $form['header']['info2'] = array(
-        '#type' => 'item',
-        '#value' => t('Select the subscriptions to !change and click [@Save] to perform the action for all users.', array(
-            '!change' => '<strong>'. ($bulk_op == 'sub' ? t('add') : t('remove')) .'</strong>',
-            '@Save' => t('Save'),
-          )),
+      $variables = _subscriptions_page_user_bulk_variables();
+      $output = $variables['info'] . '<br />';
+      $output .= t('Select the subscriptions to !change and click [@Save] to perform the action for the selected users.', $variables);
+      if ($bulk_op == 'unsub') {
+        $output .= '<br /><strong>' . t('This action cannot be undone!') . '</strong>';
+      }
+      $form['header']['info'] = array(
+        '#markup' => $output,
       );
     }
   }
@@ -836,11 +830,9 @@ function _subscriptions_user_settings_form_submit(array $form, array &$form_stat
 }
 
 /**
- * Provide the form definition for admin/config/system/subscriptions/userdefaults/bulk.
+ * Provides the form definition for admin/config/system/subscriptions/userdefaults/bulk.
  *
  * Called by _subscriptions_menu() in subscriptions.module.
- *
- * @param $form_state array
  *
  * @return array
  *
@@ -848,26 +840,15 @@ function _subscriptions_user_settings_form_submit(array $form, array &$form_stat
  *
  * @see _subscriptions_menu()
  */
-function subscriptions_page_user_bulk(array &$form_state) {
-  $bulk_op = $_SESSION['subscriptions']['bulk_op'];
-  $uids = unserialize($_SESSION['subscriptions']['uids']);
-  $count = count($uids);
-  $variables = array(
-    '%count' => $count,
-    '!action' => '<strong>'. ($bulk_op == 'sub' ? t('subscribing') : t('unsubscribing')) .'</strong>',
-    '@Save' => t('Save'),
-    '@Done' => t('Done'),
-  );
-  $output = t('%count users selected for performing bulk !action.', $variables) .'<br /><br />';
-  if ($bulk_op == 'unsub') {
-    $output .= '<strong>'. t('Beware: These actions cannot be undone!') .'</strong>' .'<br /><br />';
-  }
-  $output .= t('Proceed as follows:', $variables) .'<ol>';
-  $output .= '<li>' . t('Navigate to any of the subscription type subtabs.', $variables) .'</li>';
-  $output .= '<li>' . t('Select the subscriptions to change.', $variables) .'</li>';
-  $output .= '<li>' . t('Click [@Save] to perform the action for the selected users and return here.', $variables) .'</li>';
-  $output .= '<li>' . t('Repeat if desired.', $variables) .'</li>';
-  $output .= '<li>' . t('Click [@Done] below to clear the selected list of users and return to the user list page.', $variables) .'</li></ol><br />';
+function subscriptions_page_user_bulk() {
+  $variables = _subscriptions_page_user_bulk_variables();
+  $output = $variables['info'] . '<br /><br />';
+  $output .= t('Proceed as follows:', $variables) . '<ol>';
+  $output .= '<li>' . t('Navigate to any of the subscription type subtabs.', $variables) . '</li>';
+  $output .= '<li>' . t('Select the subscriptions to change.', $variables) . '</li>';
+  $output .= '<li>' . t('Click [@Save] to perform the action for the selected users and return here.', $variables) . '</li>';
+  $output .= '<li>' . t('Repeat if desired.', $variables) . '</li>';
+  $output .= '<li>' . t('Click [@Done] below to clear the selected list of users and return to the user list page.', $variables) . '</li></ol><br />';
   $form['info'] = array(
     '#markup' => $output,
   );
@@ -876,6 +857,25 @@ function subscriptions_page_user_bulk(array &$form_state) {
     '#value' => t('Done'),
   );
   return $form;
+}
+
+/**
+ * Helper function to provide strings.
+ *
+ * @return array
+ */
+function _subscriptions_page_user_bulk_variables() {
+  $bulk_op = $_SESSION['subscriptions']['bulk_op'];
+  $uids = unserialize($_SESSION['subscriptions']['uids']);
+  $count = count($uids);
+  $variables = array(
+    '!action' => '<strong>' . ($bulk_op == 'sub' ? t('subscribing') : t('unsubscribing')) . '</strong>',
+    '!change' => '<strong>' . ($bulk_op == 'sub' ? t('add') : t('remove')) . '</strong>',
+    '@Save'   => t('Save'),
+    '@Done'   => t('Done'),
+  );
+  $variables['info'] = format_plural($count, '1 user selected for bulk !action.', '@count users selected for bulk !action.', $variables);
+  return $variables;
 }
 
 /**
