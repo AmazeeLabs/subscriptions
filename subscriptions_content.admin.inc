@@ -163,12 +163,21 @@ function _subscriptions_content_node_form(array $form, $uid) {
 
   if (module_exists('comment')) {
     // check whether we've commented:
-    $nids = array_keys($subscriptions);
-    $select = db_select('subscriptions', 's')
-      ->fields('s', array('value'))
-      ->condition('s.module', 'node')
-      ->condition('s.field', 'nid')
-      ->condition('s.recipient_uid', $uid);
+    if (db_driver() == 'pgsql') {
+      $select = db_select('subscriptions', 's');
+      $select->addExpression('CAST(s.value AS decimal)', 'value');
+      $select = $select
+        ->condition('s.module', 'node')
+        ->condition('s.field', 'nid')
+        ->condition('s.recipient_uid', $uid);
+    }
+    else {
+      $select = db_select('subscriptions', 's')
+        ->fields('s', array('value'))
+        ->condition('s.module', 'node')
+        ->condition('s.field', 'nid')
+        ->condition('s.recipient_uid', $uid);
+    }
     $result = db_select('comment', 'c')
       ->fields('c')
       ->condition('c.nid', $select, 'IN')
