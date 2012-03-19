@@ -46,6 +46,10 @@ function subscriptions_settings_form(array $form, array &$form_state) {
     }
   }
   $form['links'][] = array(
+    '#markup' => '<div>' . l(t('Bulk subscribing/unsubscribing'), 'admin/people') . '</div>',
+    '#weight' => 0,
+  );
+  $form['links'][] = array(
     '#markup' => '<div>' . l(t('Run cron manually!'), 'admin/reports/status/run-cron') . '</div>',
     '#weight' => 0,
   );
