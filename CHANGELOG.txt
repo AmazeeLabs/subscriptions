@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1490034: PostgreSQL GROUP BY quirk, still on Threads/Pages page.
   - #1485764: PostgreSQL kludge on Threads/Pages page.
   - #1485546: Fix #markup porting errors.
   - #1249502: Implement bulk subscribe and unsubscribe.

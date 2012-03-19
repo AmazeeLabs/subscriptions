@@ -179,7 +179,7 @@ function _subscriptions_content_node_form(array $form, $uid) {
         ->condition('s.recipient_uid', $uid);
     }
     $result = db_select('comment', 'c')
-      ->fields('c')
+      ->fields('c', array('nid'))
       ->condition('c.nid', $select, 'IN')
       ->condition('c.uid', $uid)
       ->groupBy('c.nid')
