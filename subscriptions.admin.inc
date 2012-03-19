@@ -354,7 +354,7 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
 
   $callback = $stypes[$stype]['page'];
   if (!empty($callback) && function_exists($callback)) {
-    $form = $callback($form, $uid);
+    $form = $callback($form, (isset($bulk_uids) ? 0 : $uid));
     if (is_string($form)) {
       $form = array(
         'message' => array(
