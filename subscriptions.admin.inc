@@ -32,18 +32,10 @@ function subscriptions_settings_form(array $form, array &$form_state) {
     '#weight' => -20,
     );
   if (module_exists('subscriptions_mail')) {
-    if (module_exists('mail_edit')) {
-      $form['links'][] = array(
-        '#markup' => '<div>' . l($tr('Mail templates'), 'admin/config/system/mail-edit') . '</div>',
-        '#weight' => -10,
-      );
-    }
-    else {
-      $form['links'][] = array(
-        '#markup' => '<div>' . l('Mail Editor', 'http://drupal.org/project/mail_edit') . '</div>',
-        '#weight' => -10,
-      );
-    }
+    $form['links'][] = array(
+      '#markup' => '<div>' . l($tr('Mail templates'), 'admin/config/system/mail-edit') . '</div>',
+      '#weight' => -10,
+    );
   }
   $form['links'][] = array(
     '#markup' => '<div>' . l(t('Bulk subscribing/unsubscribing'), 'admin/people') . '</div>',
