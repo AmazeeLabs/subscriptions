@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1338506: Avoid auto-subscribing users that don't have the 'subscribe to content' permission.
   - Clean up the Mail Editor link.
   - #1249502: Add a link to the user list for bulk subscribe/unsubscribe.
   - #1249502: Fix interference of default subscriptions with bulk subscribe/unsubscribe.

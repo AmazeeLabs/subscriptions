@@ -625,7 +625,7 @@ function subscriptions_content_suppress_notifications($set = NULL) {
  *   Parameter for subscriptions_autosubscribe().
  */
 function _subscriptions_content_autosubscribe($content_type, $module, $field, $value, $context) {
-  if (subscriptions_content_type_is_blocked($content_type)) {
+  if (!user_access('subscribe to content') || subscriptions_content_type_is_blocked($content_type)) {
     return;
   }
   subscriptions_autosubscribe($module, $field, $value, $context);
