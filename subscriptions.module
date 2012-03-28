@@ -441,6 +441,13 @@ function subscriptions_queue(array $event) {
           // author-specific subscriptions trigger on comments, when the node author is subscribed to:
           ->condition('s.author_uid', array(($module == 'node' && $event['type'] == 'comment' && isset($event['node']->uid) ? $event['node']->uid : $event['uid']) , -1), 'IN')
           ->groupBy('u.uid');
+        if (db_driver() == 'pgsql') {
+          $select
+            ->groupBy('u.uid')->groupBy('u.name')->groupBy('u.language')
+            ->groupBy('s.module')->groupBy('s.field')->groupBy('s.value')->groupBy('s.author_uid')->groupBy('s.send_interval')
+            ->groupBy('su.digest')->groupBy('su.suspended')
+            ->groupBy('last_sent');
+        }
 
         if (!empty($query['where'])) {
           foreach ($query['where'] as $cond) {
@@ -466,7 +473,7 @@ function subscriptions_queue(array $event) {
           $select
             ->groupBy($query['groupby']);
         }
-        $insert = db_insert('subscriptions_queue')
+        $insert = db_insert('subscriptions_queue', array('return' => Database::RETURN_NULL))
           ->from($select);
         /*  for debugging:
         $sqid = $insert->execute();
