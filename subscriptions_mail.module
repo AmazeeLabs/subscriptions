@@ -243,3 +243,23 @@ function _subscriptions_mail_module_load_include($ext) {
   return $loaded[$key];
 }
 
+/**
+ * Checks the $base_url and provide a warning if needed.
+ *
+ * @param bool $interactive
+ */
+function _subscriptions_mail_check_baseurl($interactive) {
+  // Check the $base_url (#199039, #226335, #1015320).
+  $url = url('', array('absolute' => TRUE));
+  if (empty($_POST) && preg_match('!//($|/|localhost/|([0-9]{1,3}\.){3}[0-9]{1,3}/)!', $url)) {
+    $msg = t('Your installation returns %url as the base URL of the site. This is probably not what you want, and it can usually be fixed by setting the %variable variable in your %file file.', array('%url' => $url, '%variable' => '$base_url', '%file' => 'settings.php'));
+    if ($interactive) {
+      drupal_set_message($msg, 'error');
+    }
+    else {
+      $watchdog = 'watchdog';  // keep potx from translating 'cron'
+      $watchdog('cron', $msg . ' ' . t('If it happens only when running from cron, then it could be due to a mis-configuration of your cron job.'), NULL, WATCHDOG_ERROR);
+    }
+  }
+}
+

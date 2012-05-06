@@ -164,6 +164,8 @@ function _subscriptions_mail_cron() {
     $message .= ' ' . t('!remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other !cron client modules.', $variables);
     $watchdog = 'watchdog'; // keep potx from translating 'cron'
     $watchdog('cron', $message);
+
+    _subscriptions_mail_check_baseurl(FALSE);
   }
 }
 
