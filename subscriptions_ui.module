@@ -44,7 +44,7 @@ function subscriptions_ui_node_view($node, $view_mode, $langcode) {
         return;
       }
       $node->content['links']['node']['#links']['subscriptions-subscribe'] = array(
-        'href' => $_GET['q'] . '/subscribe',
+        'href' => current_path() . '/subscribe',
         'title' => t('Subscribe') . (in_array($node->type, $blocked_types) ? SUBSCRIPTIONS_UNAVAILABLE : ''),
         'html' => TRUE,
         'fragment' => 'subscribe',
@@ -334,7 +334,7 @@ function subscriptions_ui_node_form_submit(array $form, array &$form_state) {
         ->execute();
     }
   }
-  $form_state['redirect'] = str_replace('/subscribe', '', $_GET['q']);
+  $form_state['redirect'] = str_replace('/subscribe', '', current_path());
 }
 
 /**
