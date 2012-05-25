@@ -31,7 +31,7 @@ define('SUBSCRIPTIONS_CONFIG_PATH_LEVEL', count(explode('/', SUBSCRIPTIONS_CONFI
  */
 function subscriptions_init() {
   define('SUBSCRIPTIONS_UNAVAILABLE', '<span class="error" title="' . t('(unavailable to regular users)') . '">&curren;</span>');
-  if (arg(0) == 's' && arg(1) == 'del') {
+  if (subscriptions_arg(0) == 's' && subscriptions_arg(1) == 'del') {
     $router_item = menu_get_item('subscriptions/rem/' . substr(current_path(), 6));
     if (isset($router_item) && $router_item['access']) {
       menu_set_item(current_path(), $router_item);
@@ -865,7 +865,7 @@ function subscriptions_suspended($uid, $alert = FALSE) {
  * @ingroup hooks
  */
 function subscriptions_form_user_profile_form_alter(array &$form, array &$form_state) {
-  subscriptions_suspended(arg(1), TRUE);
+  subscriptions_suspended(subscriptions_arg(1, 'uid'), TRUE);
 }
 
 /**
@@ -930,5 +930,30 @@ function _subscriptions_bulk_operation(array $uids, $bulk_op) {
   $_SESSION['subscriptions']['uids'] = serialize($uids);
   $_SESSION['subscriptions']['back_url'] = current_path();
   drupal_goto(SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/bulk');
+}
+
+/**
+ * Returns arg($index) in the proper way.
+ *
+ * @param int $index
+ * @param bool $member_name
+ *
+ * @return mixed
+ */
+function subscriptions_arg($index, $member_name = FALSE) {
+  $mgi = menu_get_item();
+  $arg = NULL;
+  if (isset($mgi['map'][$index])) {
+    $arg = $mgi['map'][$index];
+    if ($member_name) {
+      if (is_object($arg) && isset($arg->$member_name)) {
+        $arg = $arg->$member_name;
+      }
+      else {
+        $arg = NULL;
+      }
+    }
+  }
+  return $arg;
 }
 

@@ -237,8 +237,7 @@ function subscriptions_page_form_submit(array $form, array &$form_state) {
     }
   }
   if (!empty($rid0)) {
-    $menu_item = menu_get_item();
-    $subs_type = $menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 1];
+    $subs_type = subscriptions_arg(SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 1);
     $form_state['redirect'] = SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/' . $subs_type;
     if ($rid0 != DRUPAL_AUTHENTICATED_RID) {
       $form_state['redirect'] .= '/' . $rid0;
@@ -266,8 +265,7 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
     return NULL;
   }
 
-  $menu_item = menu_get_item();
-  if ($menu_item['map'][0] == 'admin') {
+  if (subscriptions_arg(0) == 'admin') {
     $form['header'] = array(
       '#type'          => 'fieldset',
       '#title'         => t('Admin Information'),
@@ -282,7 +280,7 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
       );
 
       $tr = 't';
-      $rid = (isset($menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2]) ? $menu_item['map'][SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2] : NULL);
+      $rid = subscriptions_arg(SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2);
       $form['header']['role'] = array(
         '#type'          => 'fieldset',
         '#title'         => $tr('Roles'),
@@ -321,7 +319,7 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
     }
   }
   else {
-    subscriptions_suspended(arg(1), TRUE);
+    subscriptions_suspended(subscriptions_arg(1, 'uid'), TRUE);
     //if (variable_get('subscriptions_hide_overview_page', 0)) {
     //  $dummy_form_state = NULL;
     //  $form = subscriptions_user_suspend_form($dummy_form_state, $account);
@@ -547,7 +545,7 @@ function _subscriptions_suspended_alert($uid, $suspended) {
   switch ($suspended) {
     case 2:
       $msg = t('Your subscriptions have been suspended because your e-mail address did not work anymore!');
-      if (!(arg(0) == 'user' && arg(1) == $uid && arg(2) == 'edit')) {
+      if (!(subscriptions_arg(0) == 'user' && subscriptions_arg(1, 'uid') == $uid && subscriptions_arg(2) == 'edit')) {
         drupal_set_message($msg . '<br />' . t('Please go <a href="@path1">here</a> to update your e-mail address and then <a href="@path2">here</a> to resume delivery of your notifications.', array('@path1' => url("user/$uid/edit"), '@path2' => $path2)), 'error', FALSE);
       }
       else {
@@ -769,8 +767,9 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
  * @ingroup form
  */
 function _subscriptions_user_settings_form_submit(array $form, array &$form_state) {
+  $uid = subscriptions_arg(1, 'uid');
   if (isset($form_state['values']['reset']) && $form_state['values']['op'] == $form_state['values']['reset']) {
-    if (($uid = arg(1)) > 0) {
+    if ($uid > 0) {
       db_update('subscriptions_user')
         ->fields(array(
           'digest' => -1,
@@ -791,10 +790,7 @@ function _subscriptions_user_settings_form_submit(array $form, array &$form_stat
     }
   }
   elseif ($form_state['values']['op'] == $form_state['values']['save_settings']) {
-    if (arg(0) == 'user') {
-      $uid = arg(1);
-    }
-    else {
+    if (subscriptions_arg(0) != 'user') {
       $uid = -DRUPAL_AUTHENTICATED_RID;
       if (variable_get('subscriptions_hide_overview_page', 0) != $form_state['values']['hide_overview_page']) {
         variable_set('subscriptions_hide_overview_page', $form_state['values']['hide_overview_page']);
