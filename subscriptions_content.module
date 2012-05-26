@@ -230,6 +230,7 @@ function _subscriptions_content_types() {
     'weight' => -40,
   );
   return $types;
+  t('Pages/Threads');
 }
 
 /**

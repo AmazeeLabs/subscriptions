@@ -130,6 +130,7 @@ function subscriptions_menu() {
       'access arguments' => array($data['access']),
     );
     $items['subscriptions/del/' . $stype] = array(
+      'title' => 'N/A',
       'type' => MENU_CALLBACK,
       'file' => 'subscriptions.admin.inc',
       'page callback' => 'drupal_get_form',
@@ -156,6 +157,7 @@ function subscriptions_menu() {
       $items['user/%user/subscriptions/' . $stype]['type'] = MENU_DEFAULT_LOCAL_TASK;
       $default_item = $items['user/%user/subscriptions/' . $stype];
       $items['user/%user/subscriptions'] = array_merge($items['user/%user/subscriptions'], array(
+        'title' => 'N/A',
         'file' => $default_item['file'],
         'page callback' => $default_item['page callback'],
         'page arguments' => $default_item['page arguments'],

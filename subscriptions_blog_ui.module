@@ -42,9 +42,8 @@ function subscriptions_blog_ui_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
  * @see subscriptions_types()
  */
 function _subscriptions_blog_ui_types() {
-  $tr = 't';
   $types['blog'] = array(
-    'title' => $tr('Blogs'),
+    'title' => 'Blogs',
     'access' => 'subscribe to blogs',
     'permission' => array(
       'title' => t('Subscribe to blogs'),

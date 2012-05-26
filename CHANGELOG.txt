@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Fix some minor translation issues.
   - #1585516: Remove all arg() calls, which caused issues with non-standard paths.
   - Replace $_GET['q'] with current_path(), for D8.
   - #1015320: Check for $base_url errors during cron, too.
