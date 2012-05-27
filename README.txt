@@ -38,12 +38,13 @@ Modules
 
 For standard Subscriptions functionality you need to enable the following modules:
  * Subscriptions UI
- * Subscriptions Mail
+ * Subscriptions Mail (+ Mail Editor + Token)
  * Content Subscriptions
  * Taxonomy Subscriptions (e.g. forums!)
 
-Mail Editor (http://drupal.org/project/mail_edit) allows you to customize the
-notification messages sent by Subscriptions Mail.
+Mail Editor (http://drupal.org/project/mail_edit) and
+Token (http://drupal.org/project/token) are required for sending email
+notification messages using Subscriptions Mail.
 
 SMTP Authentication (http://drupal.org/project/smtp) may be useful for sending
 out emails, if your provider imposes limits on what you can do with PHP mail.
@@ -55,7 +56,7 @@ out emails, if your provider imposes limits on what you can do with PHP mail.
 Upgrading from 6.x-1.x
 ----------------------
 
-Subscriptions D7 is designed to smoothly upgrade a 6.x-1.4 installation.
+Subscriptions D7 is designed to smoothly upgrade a 6.x-1.5 installation.
 
 
 
