@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.0-beta4 (2012-05-27):
   - Fix subscriptions_blog_ui.module.
   - #1572354: Abort subscriptions_mail_update_7000() if the module is disabled.
   - #1489044: Update the README.txt file.
@@ -34,7 +37,6 @@ subscriptions 7.x-1.0-beta3 (2012-02-14):
   - #1431864: Fix exception on Pages/Threads page when running without comment.module.
   - Avoid possible error when installing Mail Editor and Subscriptions Mail at the same time.
   - #1422880 by DamienMcKenna: Allow other modules to alter the node options.
-
 
 subscriptions 7.x-1.0-beta2 (2012-01-07):
   - Fix minor string error.
