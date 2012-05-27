@@ -392,8 +392,7 @@ function subscriptions_page_user_overview(array $form, array &$form_state, $acco
     }
   }
   // give other modules a chance to add their count(s)
-  $more_counts = module_invoke_all('count_user_subscriptions', $counts, $uid);
-  $counts = array_merge($counts, $more_counts);
+  $counts = module_invoke_all('count_user_subscriptions', $counts, $uid);
 
   $tr = 't';
   $header = array(array('data' => $tr('Type'), 'width' => '20%'), t('Number'));
@@ -408,7 +407,8 @@ function subscriptions_page_user_overview(array $form, array &$form_state, $acco
     if (($has_access || user_access('administer user subscriptions')) && isset($type['fields'])) {
       $rows[] = array(
         ($has_access ? l($tr($type['title']), ($uid < 0 ? SUBSCRIPTIONS_CONFIG_PATH . "/userdefaults/$stype" : "user/$uid/subscriptions/$stype")) : $type['title']),
-        isset($counts[$type['fields'][0]][$type['fields'][1]]) ? $counts[$type['fields'][0]][$type['fields'][1]] : 0,
+        (isset($type['fields'][2]) && isset($counts[$type['fields'][0]][$type['fields'][2]])) ? $counts[$type['fields'][0]][$type['fields'][2]] :
+        (isset($counts[$type['fields'][0]][$type['fields'][1]]) ? $counts[$type['fields'][0]][$type['fields'][1]] : 0),
       );
     }
   }
