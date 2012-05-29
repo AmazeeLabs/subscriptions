@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - #1603644: Restore the 'Subscriptions' menu title and fix the translation issues fixes.
   - Update README.txt file.
 
 

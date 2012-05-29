@@ -130,7 +130,6 @@ function subscriptions_menu() {
       'access arguments' => array($data['access']),
     );
     $items['subscriptions/del/' . $stype] = array(
-      'title' => 'N/A',
       'type' => MENU_CALLBACK,
       'file' => 'subscriptions.admin.inc',
       'page callback' => 'drupal_get_form',
@@ -142,7 +141,7 @@ function subscriptions_menu() {
       continue;  // no page
     }
     $items['user/%user/subscriptions/' . $stype] = array(
-      'title' => $data['title'],
+      'title' => 'N/A',  // for l.d.o, overwritten below
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',
       'page callback' => 'drupal_get_form',
@@ -151,13 +150,13 @@ function subscriptions_menu() {
       'access arguments' => array(1, $data['access']),
       'weight' => $weight,
     );
+    $items['user/%user/subscriptions/'. $stype]['title'] = $data['title'];
 
     if ($hide_overview_page && $minimum_weight == $weight) {
       // Install the first subscription type page as the default task.
       $items['user/%user/subscriptions/' . $stype]['type'] = MENU_DEFAULT_LOCAL_TASK;
       $default_item = $items['user/%user/subscriptions/' . $stype];
       $items['user/%user/subscriptions'] = array_merge($items['user/%user/subscriptions'], array(
-        'title' => 'N/A',
         'file' => $default_item['file'],
         'page callback' => $default_item['page callback'],
         'page arguments' => $default_item['page arguments'],
@@ -171,7 +170,7 @@ function subscriptions_menu() {
       continue;  // not in site settings
     }
     $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/' . $stype] = array(
-      'title' => $data['title'],
+      'title' => 'N/A',  // for l.d.o, overwritten below
       'type' => MENU_LOCAL_TASK,
       'file' => 'subscriptions.admin.inc',
       'page callback' => 'drupal_get_form',
@@ -179,6 +178,7 @@ function subscriptions_menu() {
       'access arguments' => array('administer site configuration'),
       'weight' => $weight,
     );
+    $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/'. $stype]['title'] = $data['title'];
   }
 
   // Unsubscribe links
