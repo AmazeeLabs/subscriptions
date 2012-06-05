@@ -614,7 +614,8 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
       '#type'          => 'checkbox',
       '#title'         => t('Hide the %Overview page from your users', array('%Overview' => t('Overview'))),
       '#default_value' => variable_get('subscriptions_hide_overview_page', 0),
-      '#description'   => t("If you hide this page, your users won't be able to change any of these settings. The default is OFF.") . '<br />' . t('Also, you must give your users the %subscribe_to_content permission, so that they have access to the %Pages_Threads page!', array('%subscribe_to_content' => $tr('subscribe to content'), '%Pages_Threads' => $tr('Pages/Threads'))),
+      '#description'   => '<span class="error">' . t("If you hide this page, your users won't be able to change any of these settings. The default is OFF.") . '<br />' . t('Also, you must give your users the %subscribe_to_content permission, so that they have access to the %Pages_Threads page!', array('%subscribe_to_content' => $tr('subscribe to content'), '%Pages_Threads' => $tr('Pages/Threads'))) . '</span>',
+      '#prefix'        => '<div style="height: 1ex;">&nbsp;</div>',
     );
   }
   $form['settings']['autosub'] = array(
