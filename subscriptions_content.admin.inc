@@ -86,13 +86,6 @@ function _subscriptions_content_form_subscriptions_settings_form_alter(array &$f
     '#default_value' => $avoid_empty_subscribe_links,
     '#description'   => t('Nodes of %Static_content_types may end up with no %Subscribe options at all. Turn this option on to avoid displaying %Subscribe links in this case. The default is OFF, because this option causes processing overhead for each node view operation.', array('%Static_content_types' => t('Static content types'), '%Subscribe' => t('Subscribe'))),
   );
-
-  $form['content']['subscriptions_generate_full_node'] = array(
-    '#type'          => 'checkbox',
-    '#title'         => t('Generate the %full_node variable', array('%full_node' => '!full_node')),
-    '#default_value' => variable_get('subscriptions_generate_full_node', 0),
-    '#description'   => t("Generating this variable causes considerable overhead even if it's not used, and <strong>it may even cause errors</strong>, depending on the !content_type! Default is OFF.", array('!content_type' => $tr('content type'))),
-  );
 }
 
 /**
