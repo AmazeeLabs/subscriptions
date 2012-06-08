@@ -963,9 +963,9 @@ function subscriptions_arg($index, $member_name = FALSE) {
 }
 
 /**
- * Implements hook_coder_review_ignore().
+ * Implements hook_coder_ignore().
  */
-function subscriptions_coder_review_ignore() {
+function subscriptions_coder_ignore() {
   return array(
     'path'        => drupal_get_path('module', 'subscriptions'),
     'line prefix' => drupal_get_path('module', 'subscriptions'),
