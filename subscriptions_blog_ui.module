@@ -183,7 +183,7 @@ function _subscriptions_blog_ui_blog_form(array $blogs, array $form, $uid) {
  * @ingroup hooks
  */
 function subscriptions_blog_ui_count_user_subscriptions(array $counts, $uid) {
-  $counts['node']['blog'] = db_query("SELECT count(*) FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value = 'blog' AND author_uid != -1 AND recipient_uid = :recipient_uid", array(':recipient_uid' => $uid))->fetchField();
+  $counts['node']['blog'] = db_query("SELECT count(*) FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value = 'blog' AND author_uid <> -1 AND recipient_uid = :recipient_uid", array(':recipient_uid' => $uid))->fetchField();
   return $counts;
 }
 

@@ -215,7 +215,7 @@ function subscriptions_ui_node_form($form, &$form_state, $node, $account = NULL)
 
   $form['wrapper'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Subscribe') . (!empty($is_blocked) ? '&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE : ''),
+    '#title' => filter_xss(t('Subscribe') . (!empty($is_blocked) ? '&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE : ''), array('span')),
     '#collapsible' => TRUE,
     '#collapsed' => !variable_get('subscriptions_form_expanded', 0),
     '#theme' => 'subscriptions_ui_table',
@@ -360,6 +360,7 @@ function subscriptions_ui_form_subscriptions_settings_form_alter(array &$form, a
       '#collapsible' => TRUE,
       '#weight' => -4,
   );
+  $description = t('How to display the subscriptions sub-form on node pages.  Default is the first option.<br />To use the block, <b>you must enable the block</b> !here; put it into the %content region and set the %block_title to !none.', array('!here' => l(t('here'), 'admin/structure/block'), '%content' => 'content', '%block_title' => $tr('Block title'), '!none' => '<em>&lt;none&gt;</em>'));
   $form['display_settings']['subscriptions_form_in_block'] = array(
     '#type'          => 'radios',
     '#title'         => t('Node form position'),
@@ -368,7 +369,7 @@ function subscriptions_ui_form_subscriptions_settings_form_alter(array &$form, a
                           t('Fieldset in %block block (below the comments)', array('%block' => t('Subscriptions interface'))), // 1
                         ),
     '#default_value' => variable_get('subscriptions_form_in_block', 0),
-    '#description'   => t('How to display the subscriptions sub-form on node pages.  Default is the first option.<br />To use the block, <b>you must enable the block</b> !here; put it into the %content region and set the %block_title to !none.', array('!here' => l(t('here'), 'admin/structure/block'), '%content' => 'content', '%block_title' => $tr('Block title'), '!none' => '<em>&lt;none&gt;</em>')),
+    '#description'   => filter_xss($description, array('a', 'br', 'b', 'em')),
   );
   $form['display_settings']['subscriptions_form_link_only'] = array(
     '#type'          => 'radios',

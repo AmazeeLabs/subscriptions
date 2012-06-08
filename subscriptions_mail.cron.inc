@@ -31,15 +31,15 @@ function _subscriptions_mail_cron() {
   //TEST: watchdog('cron', "Subscriptions has $available_seconds of $total_seconds seconds available.");
   if ($usable_seconds <= 0) {
     $variables = array(
-      '!Module' => 'Subscriptions',
-      '@link'   => url(SUBSCRIPTIONS_CONFIG_PATH, array('fragment' => 'edit-subscriptions-cron-percent')),
+      '@Subscriptions' => 'Subscriptions',
+      '@link'          => url(SUBSCRIPTIONS_CONFIG_PATH, array('fragment' => 'edit-subscriptions-cron-percent')),
     );
     $watchdog = 'watchdog';  // keep potx from translating 'cron'
     if ($usable_seconds == 0) {
-      $watchdog('cron', t('!Module cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables), NULL, WATCHDOG_WARNING);
+      $watchdog('cron', t('@Subscriptions cannot send any notifications because its <a href="@link">cron job time</a> is 0!', $variables), NULL, WATCHDOG_WARNING);
     }
     else {
-      $watchdog('cron', t('!Module cannot send any notifications because the cron run has less than 5 available seconds left!', $variables), NULL, WATCHDOG_WARNING);
+      $watchdog('cron', t('@Subscriptions cannot send any notifications because the cron run has less than 5 available seconds left!', $variables), NULL, WATCHDOG_WARNING);
     }
   }
 
@@ -139,11 +139,11 @@ function _subscriptions_mail_cron() {
   if ($single_count + $digest_count + $single_failed + $digest_failed > 0) {
     $current_seconds = timer_read('page')/1000;
     $variables = array(
-      '!Module'            => 'Subscriptions',
+      '@Subscriptions'     => 'Subscriptions',
       '!single_count'      => $single_count,
       '!digest_count'      => $digest_count,
-      '!single_failed'      => $single_failed,
-      '!digest_failed'      => $digest_failed,
+      '!single_failed'     => $single_failed,
+      '!digest_failed'     => $digest_failed,
       '!used_seconds'      => round($current_seconds - $lost_seconds),
       '!total_seconds'     => $total_seconds,
       '!remaining_items'   => db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE last_sent + send_interval < :send_interval AND suspended = 0", array(':send_interval' => REQUEST_TIME))->fetchField(),
@@ -153,13 +153,13 @@ function _subscriptions_mail_cron() {
       '!cron'              => 'cron',
     );
     if (variable_get('subscriptions_mail_trash_silently', 0)) {
-      $message = t('!Module DISCARDED !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds, due to the %varname variable being set.', $variables);
+      $message = t('@Subscriptions DISCARDED !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds, due to the %varname variable being set.', $variables);
     }
     elseif ($single_failed > 0 || $digest_failed > 0) {
-      $message = t('!Module FAILED !single_failed single and !digest_failed digest notifications, sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
+      $message = t('@Subscriptions FAILED !single_failed single and !digest_failed digest notifications, sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
     }
     else {
-      $message = t('!Module sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
+      $message = t('@Subscriptions sent !single_count single and !digest_count digest notifications in !used_seconds of !total_seconds seconds.', $variables);
     }
     $message .= ' ' . t('!remaining_items queue items remaining (plus !suspended_items suspended), !remaining_seconds seconds left for other !cron client modules.', $variables);
     $watchdog = 'watchdog'; // keep potx from translating 'cron'
@@ -296,7 +296,7 @@ function _subscriptions_mail_send($module, $mailkey, $name, $to, $from, $uid, $s
     }
     return TRUE;
   }
-  watchdog('subscriptions', 'Error e-mailing notification to %name (!address).', $watchdog_params, WATCHDOG_ERROR, l('edit user', "user/$uid/edit"));
+  watchdog('subscriptions', 'Error e-mailing notification to %name (!address).', $watchdog_params, WATCHDOG_ERROR, l(t('edit user'), "user/$uid/edit"));
   return FALSE;
 }
 

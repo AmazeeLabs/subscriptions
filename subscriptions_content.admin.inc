@@ -38,7 +38,7 @@ function _subscriptions_content_form_subscriptions_settings_form_alter(array &$f
     '#title'         => t('Unlisted content types'),
     '#default_value' => variable_get('subscriptions_unlisted_content_types', array()),
     '#options'       => $select,
-    '#description'   => t('Select content types which should be <strong>removed from subscription listings</strong>.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by content type will be unavailable for the selected types.'),
+    '#description'   => t('Select content types which should be <strong>removed from subscriptions listings</strong>.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by content type will be unavailable for the selected types.'),
     '#multiple'      => TRUE,
   );
   $form['content']['subscriptions_blocked_content_types'] = array(
@@ -280,13 +280,14 @@ function _subscriptions_content_type_form(array $form, $uid) {
     '#theme' => 'subscriptions_form_table',
   );
   $defaults = array();
+  $tr = 't';
   foreach (node_type_get_types() as $type) {
     // add the active subscriptions
     $type_name = check_plain($type->name);
     if (in_array($type->type, $omits)) {
       if (user_access('subscribe to all content types') || user_access('administer site configuration')) {
         if (in_array($type->type, $blockeds)) {
-          $type_name = '<span class="error" title="' . t('This !content_type is blocked. ', array('!content_type' => t('content type'))) . '">' . $type_name . '</span>&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE;
+          $type_name = '<span class="error" title="' . t('This content type is blocked.') . '">' . $type_name . '</span>&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE;
         }
         else {
           $type_name = $type_name . '&nbsp;' . SUBSCRIPTIONS_UNAVAILABLE;

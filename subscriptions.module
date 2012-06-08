@@ -150,7 +150,7 @@ function subscriptions_menu() {
       'access arguments' => array(1, $data['access']),
       'weight' => $weight,
     );
-    $items['user/%user/subscriptions/'. $stype]['title'] = $data['title'];
+    $items['user/%user/subscriptions/' . $stype]['title'] = $data['title'];
 
     if ($hide_overview_page && $minimum_weight == $weight) {
       // Install the first subscription type page as the default task.
@@ -178,7 +178,7 @@ function subscriptions_menu() {
       'access arguments' => array('administer site configuration'),
       'weight' => $weight,
     );
-    $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/'. $stype]['title'] = $data['title'];
+    $items[SUBSCRIPTIONS_CONFIG_PATH . '/userdefaults/' . $stype]['title'] = $data['title'];
   }
 
   // Unsubscribe links
@@ -238,8 +238,7 @@ function _subscriptions_access($account, $access = NULL) {
  *
  * @returns: bool
  */
-function _subscriptions_bulk_access()
-{
+function _subscriptions_bulk_access() {
   return user_access('bulk-administer user subscriptions') && !empty($_SESSION['subscriptions']['bulk_op']);
 }
 
@@ -957,5 +956,15 @@ function subscriptions_arg($index, $member_name = FALSE) {
     }
   }
   return $arg;
+}
+
+/**
+ * Implements hook_coder_review_ignore().
+ */
+function subscriptions_coder_review_ignore() {
+  return array(
+    'path'        => drupal_get_path('module', 'subscriptions'),
+    'line prefix' => drupal_get_path('module', 'subscriptions') . '/',
+  );
 }
 

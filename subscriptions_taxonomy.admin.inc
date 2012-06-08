@@ -46,7 +46,7 @@ function _subscriptions_taxonomy_form_subscriptions_settings_form_alter(array &$
     '#title'         => t('Omitted vocabularies'),
     '#default_value' => variable_get('subscriptions_omitted_taxa', array()),
     '#options'       => $select,
-    '#description'   => t('Select vocabularies which should be <strong>omitted</strong> from subscription listings; this means the terms of those vocabularies will be unlisted, i.e. they will be removed from subscription listings.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by category will be unavailable for the terms in the selected vocabularies.'),
+    '#description'   => t('Select vocabularies which should be <strong>omitted</strong> from subscriptions listings; this means the terms of those vocabularies will be unlisted, i.e. they will be removed from subscription listings.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by category will be unavailable for the terms in the selected vocabularies.'),
     '#multiple'      => TRUE,
   );
 

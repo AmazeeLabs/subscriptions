@@ -74,7 +74,7 @@ function subscriptions_mail_form_subscriptions_settings_form_alter(array &$form,
  */
 function _subscriptions_mail_purge_queue_form(array $form_state) {
   $form['#submit'][] = 'subscriptions_purge_queue';
-  return confirm_form($form, t('Are you sure you want to purge the !Module queue?', array('!Module' => 'Subscriptions')), array('path' => drupal_get_destination(), 'fragment' => 'edit-purge-queue'), NULL, t('Purge the queue'));
+  return confirm_form($form, t('Are you sure you want to purge the @Subscriptions queue?', array('@Subscriptions' => 'Subscriptions')), array('path' => drupal_get_destination(), 'fragment' => 'edit-purge-queue'), NULL, t('Purge the queue'));
 }
 
 /**
@@ -82,10 +82,10 @@ function _subscriptions_mail_purge_queue_form(array $form_state) {
  */
 function subscriptions_purge_queue() {
   $count = db_delete('subscriptions_queue')->execute();
-  $variables = array('!Module' => 'Subscriptions', '%count' => $count);
+  $variables = array('@Subscriptions' => 'Subscriptions', '%count' => $count);
   drupal_set_message(t('All %count items have been purged.', $variables));
   $watchdog = 'watchdog';  // keep potx from translating 'cron'
-  $watchdog('cron', t('!Module: all %count items have been purged.', $variables), NULL, WATCHDOG_WARNING);
+  $watchdog('cron', t('@Subscriptions: all %count items have been purged.', $variables), NULL, WATCHDOG_WARNING);
 }
 
 /**

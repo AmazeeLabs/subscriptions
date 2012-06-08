@@ -283,7 +283,7 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
       $rid = subscriptions_arg(SUBSCRIPTIONS_CONFIG_PATH_LEVEL + 2);
       $form['header']['role'] = array(
         '#type'          => 'fieldset',
-        '#title'         => $tr('Roles'),
+        '#title'         => check_plain($tr('Roles')),
         '#collapsible'   => TRUE,
         '#collapsed'     => !is_numeric($rid),
       );
@@ -365,7 +365,7 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
   //  'title' => t('!name Subscriptions', array('!name' => $user->name)),
   //  'href' => url('subscriptions/feed'),
   //));
-  drupal_set_title(empty($account->name) ? t('Subscriptions') : $account->name);
+  drupal_set_title(check_plain(empty($account->name) ? t('Subscriptions') : $account->name));
   return $form;
 }
 
@@ -454,10 +454,9 @@ function subscriptions_user_suspend_form(array &$form, array &$form_state, $acco
     return;
   }
 
-  $tr = 't';
   $form['suspend'] = array(
     '#type'          => 'fieldset',
-    '#title'         => $tr('Delivery of notifications'),
+    '#title'         => t('Delivery of notifications'),
     '#weight'        => 5,
     '#collapsible'   => TRUE,
     '#collapsed'     => !$suspended,
@@ -466,6 +465,7 @@ function subscriptions_user_suspend_form(array &$form, array &$form_state, $acco
   if ($suspended) {
     $count = db_query("SELECT COUNT(*) FROM {subscriptions_queue} WHERE uid = :uid AND suspended <> 0", array(':uid' => $uid))->fetchField();
   }
+  $tr = 't';
   $options[] = $tr('Yes');
   if ($count > 0) {
     $form['suspend']['queued'] = array(
@@ -477,12 +477,13 @@ function subscriptions_user_suspend_form(array &$form, array &$form_state, $acco
   if (user_access('administer user subscriptions')) {
     $options[2] = t('!No, and alert user to bad email address (administrator option)', array('!No' => $tr('No')));
   }
+  $description = user_access('suspend own subscriptions', $account)
+                 ? t('You can temporarily suspend notifications from being sent, e.g. during a vacation. They will be retained and sent after you reenable notifications.')
+                 : t('Select %Yes to send all queued notifications and resume normal delivery.', array('%Yes' => $tr('Yes')));
   $form['suspend']['state'] = array(
     '#type'          => 'radios',
     '#title'         => t('Receive notifications'),
-    '#description'   => ( user_access('suspend own subscriptions', $account)
-                          ? t('You can temporarily suspend notifications from being sent, e.g. during a vacation. They will be retained and sent after you reenable notifications.')
-                          : t('Select %Yes to send all queued notifications and resume normal delivery.', array('%Yes' => $tr('Yes'))) ),
+    '#description'   => filter_xss($description),
     '#default_value' => ( user_access('administer user subscriptions') ? $suspended : min($suspended, 1) ),
     '#options'       => $options,
   );
@@ -579,7 +580,7 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
   $tr = 't';
   $form['settings'] = array(
     '#type'          => 'fieldset',
-    '#title'         => $tr('Settings'),
+    '#title'         => check_plain($tr('Settings')),
     '#weight'        => 10,
     '#collapsible'   => !empty($account),
     '#collapsed'     => !empty($account),
@@ -587,7 +588,7 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
   if ($uid < 0) {
     $form['settings']['info'] = array(
       '#type'          => 'fieldset',
-      '#title'         => $tr('Admin Information'),
+      '#title'         => t('Admin Information'),
       '#attributes'    => array('class' => array('error')),
       '#collapsible'   => TRUE,
       '#collapsed'     => FALSE,
@@ -610,11 +611,12 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
         )
       ) . '</div>',
     );
+    $description = '<span class="error">' . t("If you hide this page, your users won't be able to change any of these settings. The default is OFF.") . '<br />' . t('Also, you must give your users the %subscribe_to_content permission, so that they have access to the %Pages_Threads page!', array('%subscribe_to_content' => $tr('Subscribe to content'), '%Pages_Threads' => $tr('Pages/Threads'))) . '</span>';
     $form['settings']['info']['hide_overview_page'] = array(
       '#type'          => 'checkbox',
       '#title'         => t('Hide the %Overview page from your users', array('%Overview' => t('Overview'))),
       '#default_value' => variable_get('subscriptions_hide_overview_page', 0),
-      '#description'   => '<span class="error">' . t("If you hide this page, your users won't be able to change any of these settings. The default is OFF.") . '<br />' . t('Also, you must give your users the %subscribe_to_content permission, so that they have access to the %Pages_Threads page!', array('%subscribe_to_content' => $tr('subscribe to content'), '%Pages_Threads' => $tr('Pages/Threads'))) . '</span>',
+      '#description'   => filter_xss($description, array('span', 'br', 'em')),
       '#prefix'        => '<div style="height: 1ex;">&nbsp;</div>',
     );
   }
@@ -703,7 +705,7 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
     $visibility_options[] = t('Completely inaccessible to the user');
     $form['settings']['visibility']['info'] = array(
       '#type'          => 'fieldset',
-      '#title'         => $tr('Admin Information'),
+      '#title'         => t('Admin Information'),
       '#attributes'    => array('class' => array('error')),
       '#collapsible'   => TRUE,
       '#collapsed'     => FALSE,
@@ -730,8 +732,8 @@ function subscriptions_user_settings_form(array $form, array &$form_state, $acco
     $pref_access = empty($account) || $site_setting >= -1;
     $control_access = empty($account) || $site_setting >= 0;
     $form['settings']['visibility']['send_' . $parm . '_visible'] = array(
-      '#title'         => ($parm == 'interval' ? t('Send interval') :
-                          ($parm == 'updates' ? t('On updates') : t('On comments'))),
+      '#title'         => filter_xss(($parm == 'interval' ? t('Send interval') :
+                                     ($parm == 'updates' ? t('On updates') : t('On comments')))),
       '#type'          => 'radios',
       '#options'       => $visibility_options,
       '#default_value' => 1 - _subscriptions_get_setting('send_' . $parm . '_visible', $account),
