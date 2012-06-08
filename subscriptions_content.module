@@ -200,34 +200,36 @@ function _subscriptions_content_access($load_function, $load_args, $node) {
  * @see subscriptions_types()
  */
 function _subscriptions_content_types() {
-  $types['all_types'] = array(
-    'title' => '',
-    'access' => 'subscribe to all content types',
+  $types['node'] = array(
+    'title'      => 'Pages/Threads',
+    'page'       => 'subscriptions_content_page_node',
+    'fields'     => array('node', 'nid'),
+    'weight'     => -40,
+    'access'     => 'subscribe to content',
     'permission' => array(
-      'title' => t('Subscribe to all content types'),
-      'description' => t('Make unlisted and blocked content types available for subscribing. This is typically used only for administrative roles.'),
+      'title'       => t('Subscribe to content'),
+      'description' => t('Subscribe to single pages/threads.'),
     ),
   );
   $types['type'] = array(
-    'title' => 'Content types',
-    'access' => 'subscribe to content types',
+    'title'      => 'Content types',
+    'page'       => 'subscriptions_content_page_type',
+    'fields'     => array('node', 'type'),
+    'weight'     => -30,
+    'access'     => 'subscribe to content types',
     'permission' => array(
-      'title' => t('Subscribe to content types'),
+      'title'       => t('Subscribe to content types'),
+      'description' => t('Subscribe to entire content types; requires the %perm permission.', array('%perm' => $types['node']['permission']['title'])),
     ),
-    'page' => 'subscriptions_content_page_type',
-    'fields' => array('node', 'type'),
-    'weight' => -30,
   );
-  $types['node'] = array(
-    'title' => 'Pages/Threads',
-    'access' => 'subscribe to content',
+  $types['all_types'] = array(
+    'title'      => '',
+    'access'     => 'subscribe to all content types',
     'permission' => array(
-      'title' => t('Subscribe to content'),
-      'description' => t('Allow the role holder to subscribe to single pages/threads.'),
+      'title'       => t('Subscribe to all content types'),
+      'description' => t('Subscribe even to unlisted and blocked content types.') .
+                       '<br /><em>' . t('This permission is typically reserved for administrative roles.') . '</em>',
     ),
-    'page' => 'subscriptions_content_page_node',
-    'fields' => array('node', 'nid'),
-    'weight' => -40,
   );
   return $types;
   t('Pages/Threads');

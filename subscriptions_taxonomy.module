@@ -146,14 +146,15 @@ function _subscriptions_taxonomy_node_options($account, $node) {
  */
 function _subscriptions_taxonomy_types() {
   $types['taxa'] = array(
-    'title' => 'Categories',
-    'access' => 'subscribe to taxonomy terms',
+    'title'      => 'Categories',
+    'page'       => 'subscriptions_taxonomy_page_taxa',
+    'fields'     => array('node', 'tid'),
+    'weight'     => -20,
+    'access'     => 'subscribe to taxonomy terms',
     'permission' => array(
-      'title' => t('Subscribe to taxonomy terms'),
+      'title'       => t('Subscribe to taxonomy terms'),
+      'description' => t('Subscribe to the available taxonomy terms.')
     ),
-    'page' => 'subscriptions_taxonomy_page_taxa',
-    'fields' => array('node', 'tid'),
-    'weight' => -20,
   );
   return $types;
 }

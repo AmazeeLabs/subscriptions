@@ -43,14 +43,15 @@ function subscriptions_blog_ui_subscriptions($op, $arg0 = NULL, $arg1 = NULL, $a
  */
 function _subscriptions_blog_ui_types() {
   $types['blog'] = array(
-    'title' => 'Blogs',
-    'access' => 'subscribe to blogs',
+    'title'      => 'Blogs',
+    'page'       => 'subscriptions_blog_ui_page_blog',
+    'fields'     => array('node', 'type', 'blog'),
+    'weight'     => -3,
+    'access'     => 'subscribe to blogs',
     'permission' => array(
-      'title' => t('Subscribe to blogs'),
+      'title'       => t('Subscribe to blogs'),
+      'description' => t('Use the dedicated @Blog_Subscriptions UI elements.', array('@Blog_Subscriptions' => 'Blog Subscriptions'))
     ),
-    'page' => 'subscriptions_blog_ui_page_blog',
-    'fields' => array('node', 'type', 'blog'),
-    'weight' => -3,
   );
   return $types;
   t('subscribe to blogs');
