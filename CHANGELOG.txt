@@ -3,6 +3,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  - Tentatively add the slash to hook_coder_ignore().
   - Tentatively revert 'coder_review_ignore' to 'coder_ignore'.
   - Fix the hook_coder_review_ignore() usage according to #144172/$1360744.
   - #1616998: Bring the permissions into a reasonable order.

@@ -968,7 +968,7 @@ function subscriptions_arg($index, $member_name = FALSE) {
 function subscriptions_coder_ignore() {
   return array(
     'path'        => drupal_get_path('module', 'subscriptions'),
-    'line prefix' => drupal_get_path('module', 'subscriptions'),
+    'line prefix' => drupal_get_path('module', 'subscriptions') . '/',
   );
 }
 
