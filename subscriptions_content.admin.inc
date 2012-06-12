@@ -38,7 +38,7 @@ function _subscriptions_content_form_subscriptions_settings_form_alter(array &$f
     '#title'         => t('Unlisted content types'),
     '#default_value' => variable_get('subscriptions_unlisted_content_types', array()),
     '#options'       => $select,
-    '#description'   => t('Select content types which should be <strong>removed from subscriptions listings</strong>.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by content type will be unavailable for the selected types.'),
+    '#description'   => t('Select the content types which should be <strong>removed from subscriptions listings</strong>.<br />The content may still be available for subscribing via different kinds of subscriptions, but subscribing by content type will be unavailable for the selected types.'),
     '#multiple'      => TRUE,
   );
   $form['content']['subscriptions_blocked_content_types'] = array(
@@ -46,7 +46,7 @@ function _subscriptions_content_form_subscriptions_settings_form_alter(array &$f
     '#title'         => t('Blocked content types'),
     '#default_value' => variable_get('subscriptions_blocked_content_types', array()),
     '#options'       => $select,
-    '#description'   => t('Select content types which should be <strong>completely unavailable for subscribing</strong>, i.e. content of the selected types will never trigger notifications for regular users.'),
+    '#description'   => t('Select the content types which should be <strong>completely unavailable for subscribing</strong>, i.e. content of the selected types will never trigger notifications for regular users.'),
     '#multiple'      => TRUE,
   );
   $form['content']['subscriptions_blocked_content_types_note'] = array(
@@ -77,7 +77,7 @@ function _subscriptions_content_form_subscriptions_settings_form_alter(array &$f
     '#title'         => t('Static content types'),
     '#default_value' => $statics,
     '#options'       => $select,
-    '#description'   => t('Select content types which do not change nor receive comments and thus should not have the %option option.', array('%option' => t('Subscribe to this page'))),
+    '#description'   => t('Select the content types which do not change nor receive comments and thus should not have the %option option.', array('%option' => t('Subscribe to this page'))),
     '#multiple'      => TRUE,
   );
   $form['content']['static_content']['subscriptions_avoid_empty_subscribe_links'] = array(

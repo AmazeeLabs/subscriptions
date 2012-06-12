@@ -405,26 +405,6 @@ function subscriptions_queue(array $event) {
     }
     foreach ($subs_module_query as $module => $module_query) {
       foreach ($module_query as $field => $query) {
-        //TODO: if any of $join, $where, $args are assigned, this doesn't work!
-        //$join = empty($query['join']) ? '' : $query['join'];
-        //$where = empty($query['where']) ? array() : array($query['where']);
-        //if (!empty($query['args'])) {
-        //  $args = array_merge($args, $query['args']);
-        //}
-        //$conditions = implode(' AND ', $where);
-        //$sql = "
-        //  INSERT INTO {subscriptions_queue} (uid, name, language, module, field, value, author_uid, send_interval, digest, last_sent, load_function, load_args, is_new, suspended)
-        //  SELECT u.uid, u.name, u.language, s.module, s.field, s.value, s.author_uid, s.send_interval, su.digest, COALESCE(sls.last_sent, 0), '%s', '%s', '%d', suspended
-        //  FROM {subscriptions} s
-        //  INNER JOIN {subscriptions_user} su ON s.recipient_uid = su.uid
-        //  INNER JOIN {users} u ON su.uid = u.uid
-        //  $join
-        //  LEFT JOIN {subscriptions_last_sent} sls ON su.uid = sls.uid AND s.send_interval = sls.send_interval
-        //  WHERE
-        //    s.module = '%s' AND
-        //    s.field = '%s' AND
-        //    s.author_uid IN (%d, -1) AND $conditions";
-
         $select = db_select('subscriptions', 's');
         $select->innerJoin('subscriptions_user', 'su', 's.recipient_uid = su.uid');
         $select->innerJoin('users', 'u', 'su.uid = u.uid');
