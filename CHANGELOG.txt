@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.0-rc1 (2012-06-12):
   - Tune some strings and remove an obsolete comment (no functional changes).
   - Tentatively add the slash to hook_coder_ignore().
   - Tentatively revert 'coder_review_ignore' to 'coder_ignore'.
@@ -36,7 +39,6 @@ subscriptions 7.x-1.0-beta4 (2012-05-27):
   - #1249502: Implement bulk subscribe and unsubscribe.
   - #1482720: PostgreSQL does not have IF(), use CASE instead.
   - #1430446 by DamienMcKenna: Add more hook_alter calls.
-
 
 subscriptions 7.x-1.0-beta3 (2012-02-14):
   - #1438302: Disallow updating Subscriptions Mail (especially from D6!) if Mail Editor or Token are missing.
