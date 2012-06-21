@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.0 (2012-06-22):
   - Added some information about upgrading to the README.txt file.
 
 
@@ -19,7 +22,6 @@ subscriptions 7.x-1.0-rc1 (2012-06-12):
   - #1615340: Add a note to explain how to access parts of digest items in Mail Editor.
   - #1603644: Restore the 'Subscriptions' menu title and fix the translation issues fixes.
   - Update README.txt file.
-
 
 subscriptions 7.x-1.0-beta4 (2012-05-27):
   - Fix subscriptions_blog_ui.module.
