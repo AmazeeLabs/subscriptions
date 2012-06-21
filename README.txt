@@ -57,14 +57,31 @@ Upgrading from 6.x-1.x
 ----------------------
 
 Subscriptions D7 is designed to smoothly upgrade a 6.x-1.5 installation.
+Upgrading later D6 versions should work as well.
+
+The proprietary !variables in the D6 Mail Editor have been replaced with the
+core [tokens]. Subscriptions attempts to update your templates, but you must
+review each one to verify that it produces the desired result. The tokens
+as well as other advancements in Drupal and in Mail Editor provide more
+sophisticated functionality. Some of this is displayed by the new default
+templates, so you may want to have a look at these, too.
 
 
 
 
-Upgrading from 5.x-1.x
-----------------------
+Upgrading from 5.x-2.x to 6.x-1.5
+---------------------------------
 
-Subscriptions D6 is designed to smoothly upgrade and convert a 1.x
+Subscriptions 6.x-1.5 is designed to smoothly upgrade and convert a 5.x-2.6
+installation.
+
+
+
+
+Upgrading from 5.x-1.x to 5.x-2.6
+---------------------------------
+
+Subscriptions 5.x-2.6 is designed to smoothly upgrade and convert a 1.9
 installation. If you currently have 1.x installed, we recommend to put
 your site in maintenance mode, remove the 1.x files (if you only move
 them to a different directory under the web root, Drupal will still find
