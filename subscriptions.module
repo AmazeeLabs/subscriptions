@@ -346,14 +346,25 @@ function subscriptions_user_delete($account) {
  * Helper function to do access checking and create a subscription.
  *
  * @param string $access_key
+ *   The key for checking access to the subscription item.
  * @param string $module
+ *   Module that implements the subscription.
  * @param string $field
+ *   Field that's being checked for the subscription.
  * @param mixed $value
+ *   Value that must be in the field in order to trigger the subscription.
  * @param int $author_uid
+ *   Optional ID of the author if the subscription is restricted to nodes by
+ *   on specific author.
  * @param object|null $recipient
+ *   Optional user object of the recipient.
  * @param int $send_interval
+ *   Optional send interval, must be >0.
  * @param int $send_updates
+ *   Optional flag (0 or 1) to indicate whether to trigger on node updates.
  * @param int $send_comments
+ *   Optional flag (0 or 1) to indicate whether to trigger on comment additions
+ *   or changes.
  */
 function subscriptions_write($access_key, $module, $field, $value, $author_uid = -1, $recipient = NULL, $send_interval = 1, $send_updates = 0, $send_comments = 0) {
   global $user;

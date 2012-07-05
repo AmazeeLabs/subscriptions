@@ -3,6 +3,8 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+  Bugs fixed:
+    - #399628-19: Document the subscriptions_write() function (no functional change).
 
 
 subscriptions 7.x-1.0 (2012-06-22):
