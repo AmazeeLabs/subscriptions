@@ -814,4 +814,25 @@ function subscriptions_content_disable() {
     ->condition('load_function', 'subscriptions_content_%', 'LIKE')
     ->execute();
 }
+/**
+ * Implements hook_views_api()
+ */
+function subscriptions_content_views_api() {
+  return array('api' => 3);
+}
+
+/**
+ * Implements hook_views_data_alter() to add items to the node table that are
+ * relevant to subscriptions_content.
+ */
+function subscriptions_content_views_data_alter(&$data) {
+  // new comments
+  $data['node']['subscriptions_content_links'] = array(
+    'title' => t('Subscribe link'),
+    'help' => t('Display a link to subscribe to the node.'),
+    'field' => array(
+      'handler' => 'subscriptions_content_views_handler_field_node_link',
+    ),
+  );
+}
 
