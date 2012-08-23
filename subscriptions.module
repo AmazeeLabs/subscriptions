@@ -937,7 +937,7 @@ function _subscriptions_bulk_operation(array $uids, $bulk_op) {
  * @return mixed
  */
 function subscriptions_arg($index, $member_name = FALSE) {
-  if ($mgi = menu_get_item() && isset($mgi['map'][$index])) {
+  if (($mgi = menu_get_item()) && isset($mgi['map'][$index])) {
     $path_exploded = $mgi['map'];
   }
   else {
