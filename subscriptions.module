@@ -937,10 +937,15 @@ function _subscriptions_bulk_operation(array $uids, $bulk_op) {
  * @return mixed
  */
 function subscriptions_arg($index, $member_name = FALSE) {
-  $mgi = menu_get_item();
+  if ($mgi = menu_get_item() && isset($mgi['map'][$index])) {
+    $path_exploded = $mgi['map'];
+  }
+  else {
+    $path_exploded = explode('/', current_path());
+  }
   $arg = NULL;
-  if (isset($mgi['map'][$index])) {
-    $arg = $mgi['map'][$index];
+  if (!empty($path_exploded[$index])) {
+    $arg = $path_exploded[$index];
     if ($member_name) {
       if (is_object($arg) && isset($arg->$member_name)) {
         $arg = $arg->$member_name;
