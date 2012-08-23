@@ -7,6 +7,7 @@ subscriptions 7.x-1.x-dev:
     - #1683186 by joel_osc: Add support for translating the terms on the taxa subscriptions page into the user's language.
     - Revised the README.txt file.
   Bugs fixed:
+    - Hide comment settings if comment.module is not enabled.
     - #1744576: Restore the node UI that was broken by the prior patch.
     - #1744576: Make s/del/... work again.
     - Always expand the node UI fieldset on the node/%/subscribe pages.
