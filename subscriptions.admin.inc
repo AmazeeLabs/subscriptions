@@ -218,13 +218,7 @@ function subscriptions_page_form_submit(array $form, array &$form_state) {
                       isset($defaults['checkboxes'][$value][$author_uid]))) {
               // It was bulk-unsubscribed, or it was enabled but now it is not. Delete.
               foreach ($rids as $rid) {
-                db_delete('subscriptions')
-                  ->condition('module', $module)
-                  ->condition('field', $field)
-                  ->condition('value', $value)
-                  ->condition('author_uid', $author_uid)
-                  ->condition('recipient_uid', -$rid)
-                  ->execute();
+                subscriptions_delete(-$rid, $module, $field, $value, ($bulk_op == 'unsub' ? NULL : $author_uid));
               }
               $changed = TRUE;
             }

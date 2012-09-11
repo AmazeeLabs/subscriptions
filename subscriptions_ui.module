@@ -327,13 +327,7 @@ function subscriptions_ui_node_form_submit(array $form, array &$form_state) {
       call_user_func_array('subscriptions_write_subscription', $args);
     }
     else {
-      db_delete('subscriptions')
-        ->condition('module', $args['0'])
-        ->condition('field', $args['1'])
-        ->condition('value', $args['2'])
-        ->condition('author_uid', $args['3'])
-        ->condition('recipient_uid', $args['4'])
-        ->execute();
+      subscriptions_delete($args['4'], $args['0'], $args['1'], $args['2'], $args['3']);
     }
   }
   $form_state['redirect'] = str_replace('/subscribe', '', current_path());

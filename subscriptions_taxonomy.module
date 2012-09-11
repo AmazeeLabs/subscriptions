@@ -241,11 +241,7 @@ function subscriptions_taxonomy_taxonomy($op, $type, $array) {
         ->condition('field', 'tid')
         ->condition('value', $tid)
         ->execute();
-      db_delete('subscriptions')
-        ->condition('module', 'node')
-        ->condition('field', 'tid')
-        ->condition('value', $tid)
-        ->execute();
+      subscriptions_delete_for_all_users('node', 'tid', $tid);
       break;
     case 'taxonomy_vocabulary':
       $vid = $array['vid'];

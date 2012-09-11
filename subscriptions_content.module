@@ -319,11 +319,7 @@ function subscriptions_content_node_insert($node, $inserted = TRUE) {
  * @param object $node
  */
 function subscriptions_content_node_delete($node) {
-  db_delete('subscriptions')
-    ->condition('module', 'node')
-    ->condition('field', 'nid')
-    ->condition('value', $node->nid)
-    ->execute();
+  subscriptions_delete_for_all_users('node', 'nid', $node->nid);
 }
 
 /**
@@ -766,11 +762,7 @@ function subscriptions_content_node_type_delete($info) {
     ->condition('field', 'type')
     ->condition('value', $type)
     ->execute();
-  db_delete('subscriptions')
-    ->condition('module', 'node')
-    ->condition('field', 'type')
-    ->condition('value', $type)
-    ->execute();
+  subscriptions_delete_for_all_users('node', 'type', $type);
   foreach (array('blocked', 'unlisted') as $key) {
     $array = variable_get('subscriptions_' . $key . '_content_types', array());
     unset($array[$type]);

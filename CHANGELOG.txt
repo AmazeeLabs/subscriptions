@@ -4,6 +4,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 subscriptions 7.x-1.x-dev:
   Enhancements:
+    - #1779950: Add API for deleting subscriptions.
     - #1683186 by joel_osc: Add support for translating the terms on the taxa subscriptions page into the user's language.
     - Revised the README.txt file.
   Bugs fixed:
