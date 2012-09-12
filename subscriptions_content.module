@@ -151,7 +151,7 @@ function _subscriptions_content_node_options($account, $node) {
       );
       // Content type and author
       $options['type'][] = array(
-        'name' => t('To %type content by %name', array('%type' => $type_name, '%name' => ($node->uid ? check_plain($node->name) : variable_get('anonymous', '???')))) . $unlisted_tag,
+        'name' => t('To %type content by %name', array('%type' => $type_name, '%name' => format_username(user_load($node->uid)))) . $unlisted_tag,
         'params' => array('module' => 'node', 'field' => 'type', 'value' => $node->type, 'author_uid' => $node->uid),
         'link' => 'type/' . $node->type . '/' . $node->uid,
       );

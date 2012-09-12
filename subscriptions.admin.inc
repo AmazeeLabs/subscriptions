@@ -359,7 +359,7 @@ function subscriptions_page_form($form, &$form_state, $account, $stype) {
   //  'title' => t('!name Subscriptions', array('!name' => $user->name)),
   //  'href' => url('subscriptions/feed'),
   //));
-  drupal_set_title(check_plain(empty($account->name) ? t('Subscriptions') : $account->name));
+  drupal_set_title(empty($account->name) ? t('Subscriptions') : format_username($account));
   return $form;
 }
 
@@ -421,7 +421,7 @@ function subscriptions_page_user_overview(array $form, array &$form_state, $acco
     subscriptions_user_suspend_form($form, $form_state, $account);
   }
   $form = subscriptions_user_settings_form($form, $form_state, $account);
-  drupal_set_title($uid < 0 ? t('Subscriptions') : $account->name);
+  drupal_set_title($uid < 0 ? t('Subscriptions') : format_username($account));
   return $form;
 }
 
@@ -1094,10 +1094,10 @@ function subscriptions_form_helper(array &$form, array &$defaults, $author_uid, 
     $defaults['send_updates'][$key][$author_uid] = 1;
   }
   if (isset($subscription['author_uid']) && $subscription['author_uid'] > 0) {
-    $author_value = check_plain(db_query('SELECT name FROM {users} WHERE uid = :uid', array(':uid' => $subscription['author_uid']))->fetchField());
+    $author_value = format_username(user_load($subscription['author_uid']));
   }
   elseif ($author_uid == 0) {
-    $author_value = variable_get('anonymous', '???');
+    $author_value = format_username(NULL);
   }
   else {
     $author_value = '';
@@ -1107,7 +1107,7 @@ function subscriptions_form_helper(array &$form, array &$defaults, $author_uid, 
     '#markup' => $title,
   );
   $form['author'][$key][$author_uid] = array(
-    '#markup' => $author_value,
+    '#markup' => check_plain($author_value),
   );
   $form['send_interval'][$key][$author_uid] = array(
     '#type' => 'select',

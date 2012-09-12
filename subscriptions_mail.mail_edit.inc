@@ -212,7 +212,7 @@ function _subscriptions_mail_preview_form(array $values) {
     $queue_item = array(
       'sqid'          => 0,
       'uid'           => $user->uid,
-      'name'          => $user->name,
+      'name'          => check_plain(format_username($user)),
       'language'      => $user->language,
       'module'        => 'node',
       'field'         => 'nid',
