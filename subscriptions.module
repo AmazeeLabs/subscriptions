@@ -193,6 +193,19 @@ function subscriptions_menu() {
 }
 
 /**
+ * Implements hook_admin_paths().
+ *
+ * @return array
+ */
+function subscriptions_admin_paths() {
+  $paths = array(
+    'user/*/subscriptions' => TRUE,
+    'user/*/subscriptions/*' => TRUE,
+  );
+  return $paths;
+}
+
+/**
  * Verifies remote access without password.
  *
  * @param $a2
