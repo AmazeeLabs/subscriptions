@@ -56,8 +56,8 @@ t('{{MAIL@| Greetings, [current-user:name].
 [subs:comments:join:
 ]
 }}| Direct unsubscribe link ([subs:type]):
-| [subs:unsubscribe-url]{{MAIL@
-!FOOTER}}', array('!SEPARATOR' => subscriptions_mail_template_raw('SEP', $langcode), '!FOOTER' => subscriptions_mail_template_raw('FOOT', $langcode)), array('langcode' => $langcode));
+| [subs:unsubscribe-url]
+{{MAIL@!FOOTER}}', array('!SEPARATOR' => subscriptions_mail_template_raw('SEP', $langcode), '!FOOTER' => subscriptions_mail_template_raw('FOOT', $langcode)), array('langcode' => $langcode));
 
     case 'CITEM':    return // SUBSCRIPTIONS_DEFAULT_COMMENT_ITEM
 t('| {{[subs:is-new]?New:Updated}} {{[subs:is-published]?:UNPUBLISHED }}comment:
