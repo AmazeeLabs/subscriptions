@@ -36,7 +36,7 @@ t('{{MAIL@| Greetings, [current-user:name].
 | Your subscription on [site:name]
 | notifies you of {{[subs:is-new]==0?:a new post:
 }}{{[subs:is-updated]#an updated post:
-}}{{[subs:is-old]#new comments:
+}}{{[subs:is-old]#new comments on:
 }}|
 }}{{![subs:is-published]#| ***** This post is unpublished! *****
 }}{{![subs:category:tid]?:{{[subs:category:tid]==[subs:forum:tid]?:| Category: [subs:category:name]
@@ -47,9 +47,9 @@ t('{{MAIL@| Greetings, [current-user:name].
 }}&nbsp;
 {{[subs:is-old]?{{[node:summary]?[node:summary]:[node:body]}}:[node:body]}}
 | LINK: [node:url]
-{{!![subs:files:field_files:count]#| Attached files:
+{{![subs:is-old]#{{!![subs:files:field_files:count]#| Attached files:
 {{[subs:files:field_files:count]#| [subs:files:field_files:index:#0:url]
-}}}}{{![subs:comments:count]?!SEPARATOR
+}}}}}}{{![subs:comments:count]?!SEPARATOR
 :|
 | Comments: [subs:comments:count]
 !SEPARATOR
@@ -113,6 +113,7 @@ function subscriptions_mail_template($key, $langcode) {
  * @param string $key
  *  The key for calling subscriptions_mail_template() to retrieve the
  *  default template, if there's no match in the {mail_edit} table.
+ *
  * @return
  */
 function subscriptions_mail_template_load($mailmod, $mailkey, $langcode, $part, $key) {
