@@ -183,17 +183,18 @@ function _subscriptions_blog_ui_blog_form(array $blogs, array $form, $uid) {
 }
 
 /**
- * Implements hook_count_user_subscriptions().
+ * Implements hook_subscriptions_counts_alter().
  *
  * @param array $counts
+ *   An array indexed by module and type, containing the counts.
  * @param int $uid
+ *   The ID of the user whose counts should be collected.
  *
- * @return array
+ * @return void
  *
  * @ingroup hooks
  */
-function subscriptions_blog_ui_count_user_subscriptions(array $counts, $uid) {
+function subscriptions_blog_ui_subscriptions_counts_alter(array &$counts, $uid) {
   $counts['node']['blog'] = db_query("SELECT count(*) FROM {subscriptions} WHERE module = 'node' AND field = 'type' AND value = 'blog' AND author_uid <> -1 AND recipient_uid = :recipient_uid", array(':recipient_uid' => $uid))->fetchField();
-  return $counts;
 }
 

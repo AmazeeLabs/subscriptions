@@ -385,8 +385,8 @@ function subscriptions_page_user_overview(array $form, array &$form_state, $acco
       $counts[$subs->module][$subs->field] = $subs->number;
     }
   }
-  // give other modules a chance to add their count(s)
-  $counts = module_invoke_all('count_user_subscriptions', $counts, $uid);
+  // Give other modules a chance to add their count(s).
+  drupal_alter('subscriptions_counts', $counts, $uid);
 
   $tr = 't';
   $header = array(array('data' => $tr('Type'), 'width' => '20%'), t('Number'));
