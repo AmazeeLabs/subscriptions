@@ -107,7 +107,7 @@ function _subscriptions_mail_mail_edit_form_extra(array &$form, array &$form_sta
     if ($mailkey == '.DEFAULT') {
       $form['explain_default'] = array(
         '#markup' => t('This template serves a double purpose for all other !Subscriptions templates (except for the %digest template):<ul><li>it is used as default template where no customized template exists, and</li><li>it serves as starting point for adding new templates.</li></ul>', array('!Subscriptions' => 'Subscriptions', '%digest' => 'digest')),
-        '#weight' => -5,
+        '#weight' => -7,
       );
       $description = t('The mail body contains one node of unknown type.');
     }
