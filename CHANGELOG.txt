@@ -3,6 +3,9 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 
 subscriptions 7.x-1.x-dev:
+
+
+subscriptions 7.x-1.1 (2012-11-01):
   Enhancements:
     - Implement [subs:has-distinct-summary] token and improve the default template.
     - #1821292: Implement an editable default template.
@@ -25,7 +28,6 @@ subscriptions 7.x-1.x-dev:
 
 subscriptions 7.x-1.0 (2012-06-22):
   - Added some information about upgrading to the README.txt file.
-
 
 subscriptions 7.x-1.0-rc1 (2012-06-12):
   - Tune some strings and remove an obsolete comment (no functional changes).
