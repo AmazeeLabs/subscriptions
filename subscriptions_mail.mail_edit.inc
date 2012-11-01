@@ -118,7 +118,7 @@ function _subscriptions_mail_mail_edit_form_extra(array &$form, array &$form_sta
       '@t1' => '[subs:*]',
       '@t2' => '[subs:items]',
       '@t3' => '[node:*]',
-      '@t4' => '[user:*]',
+      '@t4' => '[node:author:*]',
       '@t5' => '[current-user:*]',
       '!t6' => '<code>{{[subs:comments:count]#...[subs:comments:value:#0]...}}</code>',
     ));

@@ -41,11 +41,14 @@ t('{{MAIL@| Greetings, [current-user:name].
 }}{{![subs:is-published]#| ***** This post is unpublished! *****
 }}{{![subs:category:tid]?:{{[subs:category:tid]==[subs:forum:tid]?:| Category: [subs:category:name]
 }}}}{{![subs:forum:tid]?:| Forum: [subs:forum:name]
-}}{{![user:name]?:| Author: [user:name]
+}}{{![node:author:name]?:| Author: [node:author:name]
 }}| Title: [node:title]
 {{![subs:terms:field_tags:count]?:| [subs:terms:field_tags:first:vocabulary:name]: {{[subs:terms:field_tags:count]#{{!!#0#, }}[subs:terms:field_tags:index:#0:name]}}
-}}&nbsp;
-{{[subs:is-old]?{{[node:summary]?[node:summary]:[node:body]}}:[node:body]}}
+}}{{![subs:is-old]?&nbsp;
+[node:body]:{{![subs:has-distinct-summary]?&nbsp;
+[node:body]:| Summary:
+&nbsp;
+[node:summary]}}}}
 | LINK: [node:url]
 {{![subs:is-old]#{{!![subs:files:field_files:count]#| Attached files:
 {{[subs:files:field_files:count]#| [subs:files:field_files:index:#0:url]

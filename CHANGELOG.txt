@@ -4,6 +4,7 @@ CHANGELOG for Subscriptions 1.x for Drupal 7
 
 subscriptions 7.x-1.x-dev:
   Enhancements:
+    - Implement [subs:has-distinct-summary] token and improve the default template.
     - #1821292: Implement an editable default template.
     - Make the user/%/subscriptions pages use the admin theme, just like the user/%/edit page.
     - #1779950: Add API for deleting subscriptions.
