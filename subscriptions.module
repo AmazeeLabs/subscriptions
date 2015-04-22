@@ -913,9 +913,10 @@ function subscriptions_suspended($uid, $alert = FALSE) {
  *
  * @ingroup hooks
  */
-function subscriptions_form_user_profile_form_alter(array &$form, array &$form_state) {
+// Change: we do not want to show the suspended alert on the profile form.
+/*function subscriptions_form_user_profile_form_alter(array &$form, array &$form_state) {
   subscriptions_suspended(subscriptions_arg(1, 'uid'), TRUE);
-}
+}*/
 
 /**
  * Provides the data for resolving tokens.
